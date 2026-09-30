@@ -172,7 +172,7 @@ body {
 .legend-grigio { background: #f1f5f9; border: 2px solid #94a3b8; }
 
 /* ========================================================
-   CALENDARIO & TRANSIZIONI
+   CALENDARIO & TRANSIZIONI RAPIDE (STILE GOOGLE CALENDAR)
    ======================================================== */
 .calendar-container { 
     background: #ffffff; 
@@ -185,25 +185,26 @@ body {
     display: grid; 
     grid-template-columns: 65px repeat(5, minmax(180px, 1fr)); 
     min-width: 980px; 
-    transition: transform 0.22s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.22s ease-out;
+    transition: transform 0.12s cubic-bezier(0.0, 0.0, 0.2, 1), opacity 0.12s ease-out;
+    will-change: transform, opacity;
 }
 
-/* Animazioni di transizione settimana */
+/* Animazioni ultra-veloci (120ms) */
 .slide-out-left {
-    transform: translateX(-40px);
-    opacity: 0;
+    transform: translate3d(-18px, 0, 0);
+    opacity: 0.2;
 }
 .slide-out-right {
-    transform: translateX(40px);
-    opacity: 0;
+    transform: translate3d(18px, 0, 0);
+    opacity: 0.2;
 }
 .slide-in-right {
-    transform: translateX(40px);
-    opacity: 0;
+    transform: translate3d(18px, 0, 0);
+    opacity: 0.2;
 }
 .slide-in-left {
-    transform: translateX(-40px);
-    opacity: 0;
+    transform: translate3d(-18px, 0, 0);
+    opacity: 0.2;
 }
 
 .time-column { 
@@ -861,7 +862,6 @@ body {
                         { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
                     ],
                     venerdì: [
-                        // Aggiornato: 23/10 Mattino per Gruppi A/B e Pomeriggio per Gruppi C/D
                         { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO (GRUPPI A/B)", luogo: "Aula 2 CTO", tipo: "normale" },
                         { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO (GRUPPI C/D)", luogo: "Aula 2 CTO", tipo: "normale" }
                     ]
@@ -892,7 +892,6 @@ body {
                         { oraInizio: 16, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" }
                     ],
                     venerdì: [
-                        // Aggiornato: 30/10 Mattino per Gruppi A/B e Pomeriggio per Gruppi C/D
                         { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO (GRUPPI A/B)", luogo: "Aula 1 CTO", tipo: "normale" },
                         { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO (GRUPPI C/D)", luogo: "Aula 1 CTO", tipo: "normale" }
                     ]
@@ -1023,7 +1022,7 @@ body {
         }
 
         // ============================================
-        // GESTIONE SWIPE DA MOBILE (VISTA COMPATTA)
+        // GESTIONE SWIPE RAPIDO DA MOBILE
         // ============================================
         let touchStartX = 0;
         let touchStartY = 0;
@@ -1044,7 +1043,7 @@ body {
                 const diffX = touchEndX - touchStartX;
                 const diffY = touchEndY - touchStartY;
 
-                if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY)) {
                     if (diffX < 0) {
                         nextWeek();
                     } else {
@@ -1193,7 +1192,7 @@ body {
         }
 
         // ============================================
-        // RENDER GRAFICO CON TRANSIZIONE FLUIDA
+        // RENDER GRAFICO CON TRANSIZIONE VELOCE (120ms)
         // ============================================
         let isTransitioning = false;
 
@@ -1220,7 +1219,7 @@ body {
                             isTransitioning = false;
                         });
                     });
-                }, 180);
+                }, 100);
             } else {
                 buildCalendarHTML();
             }
