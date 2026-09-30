@@ -172,15 +172,26 @@ body {
 .legend-grigio { background: #f1f5f9; border: 2px solid #94a3b8; }
 
 /* ========================================================
-   CALENDARIO & TRANSIZIONI RAPIDE (STILE GOOGLE CALENDAR)
+   CALENDARIO & TRANSIZIONI RAPIDE
    ======================================================== */
 .calendar-container { 
     background: #ffffff; 
     overflow-x: auto; 
     position: relative;
     -webkit-overflow-scrolling: touch;
+}
+
+/* Modalità compatta: vincola il touch all'asse verticale per permettere lo swipe JS */
+.calendar-container.vista-compatta {
     touch-action: pan-y;
 }
+
+/* Modalità espansa: sblocca lo scroll orizzontale nativo touch */
+.calendar-container.vista-espansa {
+    touch-action: auto !important;
+    overflow-x: scroll !important;
+}
+
 .calendar { 
     display: grid; 
     grid-template-columns: 65px repeat(5, minmax(180px, 1fr)); 
@@ -189,23 +200,11 @@ body {
     will-change: transform, opacity;
 }
 
-/* Animazioni ultra-veloci (120ms) */
-.slide-out-left {
-    transform: translate3d(-18px, 0, 0);
-    opacity: 0.2;
-}
-.slide-out-right {
-    transform: translate3d(18px, 0, 0);
-    opacity: 0.2;
-}
-.slide-in-right {
-    transform: translate3d(18px, 0, 0);
-    opacity: 0.2;
-}
-.slide-in-left {
-    transform: translate3d(-18px, 0, 0);
-    opacity: 0.2;
-}
+/* Animazioni di cambio settimana */
+.slide-out-left { transform: translate3d(-18px, 0, 0); opacity: 0.2; }
+.slide-out-right { transform: translate3d(18px, 0, 0); opacity: 0.2; }
+.slide-in-right { transform: translate3d(18px, 0, 0); opacity: 0.2; }
+.slide-in-left { transform: translate3d(-18px, 0, 0); opacity: 0.2; }
 
 .time-column { 
     background: #ffffff; 
@@ -505,12 +504,8 @@ body {
         padding-right: 3px;
         justify-content: center;
     }
-    .calendar-container.vista-compatta .day-name {
-        font-size: 9px;
-    }
-    .calendar-container.vista-compatta .day-number {
-        font-size: 13px;
-    }
+    .calendar-container.vista-compatta .day-name { font-size: 9px; }
+    .calendar-container.vista-compatta .day-number { font-size: 13px; }
     .calendar-container.vista-compatta .evento {
         padding: 3px 2px;
         width: calc(100% - 3px);
@@ -527,18 +522,14 @@ body {
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
-    .calendar-container.vista-compatta .evento-time {
-        font-size: 8.5px;
-        margin-top: 1px;
-    }
-    .calendar-container.vista-compatta .evento-docente {
-        display: none;
-    }
+    .calendar-container.vista-compatta .evento-time { font-size: 8.5px; margin-top: 1px; }
+    .calendar-container.vista-compatta .evento-docente { display: none; }
 
-    /* VISTA ESPANSA */
+    /* VISTA ESPANSA: PERMETTE LO SCROLL A DESTRA DEI GIORNI */
     .calendar-container.vista-espansa .calendar {
-        min-width: 780px !important;
-        grid-template-columns: 50px repeat(5, minmax(140px, 1fr)) !important;
+        min-width: 900px !important;
+        width: 900px !important;
+        grid-template-columns: 55px repeat(5, minmax(165px, 1fr)) !important;
     }
     .calendar-container.vista-espansa .time-slot { font-size: 10px; padding-right: 4px; }
     .calendar-container.vista-espansa .evento { font-size: 10px; padding: 5px; }
@@ -1022,7 +1013,7 @@ body {
         }
 
         // ============================================
-        // GESTIONE SWIPE RAPIDO DA MOBILE
+        // GESTIONE SWIPE RAPIDO DA MOBILE (SOLO IN COMPATTA)
         // ============================================
         let touchStartX = 0;
         let touchStartY = 0;
@@ -1036,6 +1027,8 @@ body {
             }, { passive: true });
 
             container.addEventListener('touchend', (e) => {
+                // Lo swipe tra settimane si attiva SOLO se la vista è compatta.
+                // In vista espansa si lascia il controllo allo scroll orizzontale nativo.
                 if (!container.classList.contains('vista-compatta')) return;
 
                 const touchEndX = e.changedTouches[0].screenX;
