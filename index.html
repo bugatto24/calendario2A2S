@@ -10,128 +10,520 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
+    <!-- Font Google Roboto per look identico a Google Calendar -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-.container { max-width: 1800px; margin: 0 auto; }
-.header { background: #7e22ce; color: white; padding: 25px; border-radius: 12px 12px 0 0; text-align: center; }
-.header h1 { font-size: 1.8rem; margin-bottom: 8px; }
-.header p { opacity: 0.9; font-size: 0.95rem; }
+body { 
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
+    background: #f1f5f9; 
+    color: #1e293b;
+    min-height: 100vh; 
+    padding: 12px; 
+}
+.container { 
+    max-width: 1700px; 
+    margin: 0 auto; 
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
 
-/* Barra Utente e Gruppo Cloud */
-.user-bar { background: #581c87; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 14px; }
-.user-bar-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.user-bar-input-group { display: flex; align-items: center; gap: 8px; }
-.user-bar input, .user-bar select { padding: 7px 12px; border-radius: 6px; border: none; font-size: 14px; outline: none; }
-.btn-user { background: #9333ea; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-.btn-user:hover { background: #a855f7; }
-.btn-save-cloud { background: #10b981; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-.btn-save-cloud:hover { background: #059669; }
-.sync-badge { font-size: 12px; padding: 5px 12px; border-radius: 6px; background: rgba(255,255,255,0.2); font-weight: 600; }
+/* Header in stile Material / Google Workspace */
+.header { 
+    background: #ffffff;
+    color: #1e293b; 
+    padding: 20px 24px; 
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+.header-title-box { display: flex; align-items: center; gap: 14px; }
+.header-logo {
+    width: 44px;
+    height: 44px;
+    background: #7e22ce;
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(126, 34, 206, 0.3);
+}
+.header h1 { font-size: 1.4rem; font-weight: 700; color: #0f172a; }
+.header p { color: #64748b; font-size: 0.88rem; margin-top: 2px; }
 
-.controls { background: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; flex-wrap: wrap; gap: 15px; }
-.nav-buttons, .action-buttons { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.btn { padding: 10px 16px; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-.btn-nav { background: #9333ea; color: white; }
-.btn-nav:hover:not(:disabled) { background: #7e22ce; }
-.btn-nav:disabled { background: #d1d5db; cursor: not-allowed; opacity: 0.5; }
-.btn-export { background: #10b981; color: white; }
-.btn-export:hover { background: #059669; }
-.btn-reset { background: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db; }
-.btn-reset:hover { background: #e5e7eb; }
-select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
+/* Barra Utente e Gruppo */
+.user-bar { 
+    background: #f8fafc; 
+    padding: 14px 20px; 
+    border-bottom: 1px solid #e2e8f0;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    flex-wrap: wrap; 
+    gap: 12px; 
+    font-size: 13px; 
+}
+.user-bar-left { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    flex-wrap: wrap; 
+}
+.user-bar-input-group { 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+}
+.user-bar input, .user-bar select, .controls select { 
+    padding: 8px 12px; 
+    border-radius: 8px; 
+    border: 1.5px solid #cbd5e1; 
+    font-size: 13px; 
+    outline: none; 
+    font-weight: 500;
+    background: #ffffff;
+    transition: all 0.2s;
+}
+.user-bar input:focus, .user-bar select:focus, .controls select:focus {
+    border-color: #7e22ce;
+    box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.12);
+}
 
-.legend { background: white; padding: 15px; display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; border-bottom: 2px solid #e5e7eb; font-size: 13px; }
+/* Pulsanti stile Google */
+.btn { 
+    padding: 8px 14px; 
+    border: none; 
+    border-radius: 8px; 
+    font-size: 13px; 
+    font-weight: 500; 
+    cursor: pointer; 
+    transition: all 0.15s ease-in-out; 
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+}
+.btn-user { background: #7e22ce; color: white; }
+.btn-user:hover { background: #6b21a8; }
+.btn-save-cloud { background: #16a34a; color: white; font-weight: 600; }
+.btn-save-cloud:hover { background: #15803d; }
+.sync-badge { 
+    font-size: 12px; 
+    padding: 6px 12px; 
+    border-radius: 20px; 
+    background: #ede9fe; 
+    color: #6b21a8; 
+    font-weight: 600; 
+}
+
+/* Controlli Settimane e Azioni */
+.controls { 
+    background: #ffffff; 
+    padding: 14px 20px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 1px solid #e2e8f0; 
+    flex-wrap: wrap; 
+    gap: 12px; 
+}
+.nav-buttons, .action-buttons { 
+    display: flex; 
+    gap: 8px; 
+    align-items: center; 
+    flex-wrap: wrap; 
+}
+.btn-nav { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
+.btn-nav:hover:not(:disabled) { background: #e2e8f0; }
+.btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-export { background: #0284c7; color: white; }
+.btn-export:hover { background: #0369a1; }
+.btn-reset { background: #ffffff; color: #64748b; border: 1px solid #e2e8f0; }
+.btn-reset:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+
+/* Legenda Material */
+.legend { 
+    background: #f8fafc; 
+    padding: 12px 20px; 
+    display: flex; 
+    justify-content: center; 
+    gap: 24px; 
+    flex-wrap: wrap; 
+    border-bottom: 1px solid #e2e8f0; 
+    font-size: 12px; 
+    font-weight: 500;
+}
 .legend-item { display: flex; align-items: center; gap: 8px; }
-.legend-box { width: 18px; height: 18px; border-radius: 4px; }
-.legend-verde { background: #d1fae5; border: 2px solid #10b981; }
+.legend-box { width: 14px; height: 14px; border-radius: 4px; }
+.legend-verde { background: #dcfce7; border: 2px solid #22c55e; }
 .legend-giallo { background: #fef3c7; border: 2px solid #f59e0b; }
-.legend-grigio { background: #e5e7eb; border: 2px solid #6b7280; }
+.legend-grigio { background: #f1f5f9; border: 2px solid #94a3b8; }
 
-.calendar-container { background: white; overflow-x: auto; border-radius: 0 0 12px 12px; }
-.calendar { display: grid; grid-template-columns: 80px repeat(5, 1fr); min-width: 1100px; }
-.time-column { background: #f9fafb; border-right: 2px solid #e5e7eb; }
-.time-header { background: #7e22ce; color: white; padding: 15px; font-weight: bold; text-align: center; font-size: 13px; }
-.time-slot { height: 64px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #4b5563; font-size: 12px; }
-.day-column { border-right: 1px solid #e5e7eb; position: relative; }
-.day-header { background: #7e22ce; color: white; padding: 15px; text-align: center; font-weight: bold; text-transform: capitalize; font-size: 14px; }
-.day-grid { position: relative; height: 832px; }
-.grid-line { position: absolute; width: 100%; height: 64px; border-bottom: 1px solid #e5e7eb; }
+/* ========================================================
+   CALENDARIO STILE GOOGLE CALENDAR
+   ======================================================== */
+.calendar-container { 
+    background: #ffffff; 
+    overflow-x: auto; 
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+}
+.calendar { 
+    display: grid; 
+    grid-template-columns: 65px repeat(5, minmax(180px, 1fr)); 
+    min-width: 980px; 
+}
 
-.evento { position: absolute; width: calc(100% - 10px); left: 5px; padding: 8px; border-radius: 6px; font-size: 12px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.08); cursor: pointer; transition: transform 0.15s; }
-.evento:hover { transform: scale(1.01); z-index: 10; }
-.evento-title { font-weight: bold; margin-bottom: 3px; }
-.evento-time { font-size: 11px; opacity: 0.9; margin-bottom: 2px; }
-.evento-docente { font-size: 10px; opacity: 0.8; }
-.evento-normale { background: #d1fae5; border-left: 4px solid #10b981; color: #065f46; }
-.evento-obbligatorio { background: #fef3c7; border-left: 4px solid #f59e0b; color: #92400e; }
-.evento-saltata { background: #f3f4f6; border-left: 4px solid #9ca3af; color: #4b5563; opacity: 0.6; }
+/* Colonna Orari Sticky */
+.time-column { 
+    background: #ffffff; 
+    border-right: 1px solid #e2e8f0; 
+    position: sticky;
+    left: 0;
+    z-index: 20;
+}
+.time-header { 
+    background: #ffffff; 
+    color: #64748b; 
+    padding: 14px 6px; 
+    font-weight: 500; 
+    text-align: right; 
+    font-size: 11px; 
+    border-bottom: 1px solid #e2e8f0;
+    height: 58px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+.time-slot { 
+    height: 64px; 
+    display: flex; 
+    align-items: flex-start; 
+    justify-content: flex-end; 
+    padding-right: 8px;
+    padding-top: 2px;
+    font-weight: 500; 
+    color: #71717a; 
+    font-size: 11px; 
+    position: relative;
+}
 
-.stats-container { background: white; margin-top: 20px; padding: 25px; border-radius: 12px; }
-.stats-title { font-size: 1.3rem; font-weight: bold; color: #7e22ce; margin-bottom: 15px; text-align: center; }
-.insegnamento { border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
-.insegnamento-header { background: #f9fafb; padding: 12px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+/* Colonne Giorni */
+.day-column { 
+    border-right: 1px solid #f1f5f9; 
+    position: relative; 
+    background: #ffffff;
+}
+.day-column:last-child { border-right: none; }
+.day-header { 
+    background: #ffffff; 
+    color: #475569; 
+    padding: 10px 4px; 
+    text-align: center; 
+    font-weight: 600; 
+    border-bottom: 1px solid #e2e8f0; 
+    height: 58px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 15;
+}
+.day-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }
+.day-number { 
+    font-size: 15px; 
+    font-weight: 700; 
+    color: #0f172a; 
+    margin-top: 2px;
+}
+
+.day-grid { 
+    position: relative; 
+    height: 832px; /* 13 ore x 64px */
+}
+.grid-line { 
+    position: absolute; 
+    width: 100%; 
+    height: 64px; 
+    border-bottom: 1px solid #f1f5f9; 
+}
+
+/* Eventi stile Google Calendar Cards */
+.evento { 
+    position: absolute; 
+    width: calc(100% - 8px); 
+    left: 4px; 
+    padding: 6px 8px; 
+    border-radius: 8px; 
+    font-size: 11px; 
+    overflow: hidden; 
+    cursor: pointer; 
+    transition: all 0.15s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    border: 1px solid transparent;
+}
+.evento:hover { 
+    transform: translateY(-1px); 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    z-index: 25 !important; 
+}
+.evento-title { 
+    font-weight: 600; 
+    line-height: 1.25;
+    font-size: 11.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.evento-time { 
+    font-size: 10.5px; 
+    font-weight: 500;
+    opacity: 0.85; 
+}
+.evento-docente { 
+    font-size: 10px; 
+    opacity: 0.75; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Temi colore eventi */
+.evento-normale { 
+    background: #ecfdf5; 
+    border-left: 4px solid #10b981; 
+    border-color: #a7f3d0 #a7f3d0 #a7f3d0 #10b981;
+    color: #065f46; 
+}
+.evento-obbligatorio { 
+    background: #fffbeb; 
+    border-left: 4px solid #f59e0b; 
+    border-color: #fde68a #fde68a #fde68a #f59e0b;
+    color: #92400e; 
+}
+.evento-saltata { 
+    background: #f8fafc; 
+    border-left: 4px solid #94a3b8; 
+    border-color: #e2e8f0 #e2e8f0 #e2e8f0 #94a3b8;
+    color: #64748b; 
+    opacity: 0.7;
+    text-decoration: line-through;
+}
+
+/* Statistiche / Progressi Insegnamenti */
+.stats-container { 
+    background: #ffffff; 
+    padding: 24px; 
+    border-top: 1px solid #e2e8f0; 
+}
+.stats-title { 
+    font-size: 1.25rem; 
+    font-weight: 700; 
+    color: #0f172a; 
+    margin-bottom: 16px; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.insegnamento { 
+    border: 1px solid #e2e8f0; 
+    border-radius: 12px; 
+    margin-bottom: 12px; 
+    overflow: hidden; 
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.insegnamento-header { 
+    background: #ffffff; 
+    padding: 14px 18px; 
+    cursor: pointer; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    transition: background 0.15s;
+}
+.insegnamento-header:hover { background: #f8fafc; }
 .insegnamento-info { display: flex; align-items: center; gap: 12px; }
-.insegnamento-arrow { font-size: 16px; transition: transform 0.2s; }
-.insegnamento-arrow.expanded { transform: rotate(90deg); }
-.insegnamento-nome { font-weight: bold; color: #1f2937; font-size: 14px; }
-.insegnamento-ore { font-size: 0.85rem; color: #6b7280; }
-.insegnamento-percent { font-size: 1.3rem; font-weight: bold; }
-.percent-ok { color: #10b981; }
-.percent-warn { color: #f59e0b; }
-.percent-bad { color: #ef4444; }
-.progress-bar { width: 100%; height: 10px; background: #e5e7eb; }
+.insegnamento-arrow { font-size: 14px; transition: transform 0.2s; color: #94a3b8; }
+.insegnamento-arrow.expanded { transform: rotate(90deg); color: #7e22ce; }
+.insegnamento-nome { font-weight: 600; color: #1e293b; font-size: 14px; }
+.insegnamento-ore { font-size: 0.85rem; color: #64748b; font-weight: 500; }
+.insegnamento-percent { font-size: 1.25rem; font-weight: 700; }
+.percent-ok { color: #16a34a; }
+.percent-warn { color: #d97706; }
+.percent-bad { color: #dc2626; }
+.progress-bar { width: 100%; height: 8px; background: #f1f5f9; }
 .progress-fill { height: 100%; transition: width 0.3s; }
-.moduli-container { padding: 15px; background: white; border-top: 2px solid #e5e7eb; display: none; }
+.moduli-container { padding: 14px 20px; background: #faf5ff; border-top: 1px solid #f1f5f9; display: none; }
 .moduli-container.visible { display: block; }
-.modulo { padding: 8px 0 8px 20px; border-bottom: 1px solid #f3f4f6; }
+.modulo { padding: 10px 0 10px 16px; border-bottom: 1px solid #f3e8ff; }
 .modulo:last-child { border-bottom: none; }
 .modulo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-.modulo-nome { font-size: 0.9rem; font-weight: 500; }
+.modulo-nome { font-size: 0.88rem; font-weight: 500; color: #334155; }
 .modulo-stats { display: flex; align-items: center; gap: 8px; }
-.modulo-ore { font-size: 0.8rem; color: #9ca3af; }
-.modulo-percent { font-size: 0.9rem; font-weight: bold; }
-.modulo-progress { width: 100%; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; }
+.modulo-ore { font-size: 0.8rem; color: #64748b; }
+.modulo-percent { font-size: 0.88rem; font-weight: 700; }
+.modulo-progress { width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
 
 /* Modale */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+.modal-overlay { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(15, 23, 42, 0.4); 
+    backdrop-filter: blur(2px);
+    display: none; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 1000; 
+    padding: 16px;
+}
 .modal-overlay.active { display: flex; }
-.modal { background: white; border-radius: 12px; padding: 25px; width: 100%; max-width: 480px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-.btn-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9ca3af; }
-.quick-status-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-.btn-status-quick { padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid transparent; background: #f3f4f6; }
-.btn-status-quick.active-normale { border-color: #10b981; background: #d1fae5; color: #065f46; }
-.btn-status-quick.active-obbligatorio { border-color: #f59e0b; background: #fef3c7; color: #92400e; }
-.btn-status-quick.active-saltata { border-color: #9ca3af; background: #e5e7eb; color: #374151; }
+.modal { 
+    background: white; 
+    border-radius: 16px; 
+    padding: 24px; 
+    width: 100%; 
+    max-width: 460px; 
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); 
+    animation: popModal 0.15s ease-out;
+}
+@keyframes popModal { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.modal-header h3 { font-size: 1.15rem; color: #0f172a; font-weight: 700; }
+.btn-close { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #94a3b8; }
+.quick-status-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.btn-status-quick { padding: 9px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid transparent; background: #f8fafc; font-family: inherit; }
+.btn-status-quick.active-normale { border-color: #10b981; background: #ecfdf5; color: #065f46; }
+.btn-status-quick.active-obbligatorio { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
+.btn-status-quick.active-saltata { border-color: #94a3b8; background: #f1f5f9; color: #475569; }
 .form-group { margin-bottom: 12px; }
-.form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #4b5563; }
-.form-group input { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; }
+.form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #475569; }
+.form-group input { width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-family: inherit; }
+.form-group input:focus { border-color: #7e22ce; outline: none; }
 .form-row { display: flex; gap: 10px; }
-.modal-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e5e7eb; }
-.btn-delete { background: #fee2e2; color: #dc2626; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; }
-.btn-save { background: #7e22ce; color: white; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+.modal-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f1f5f9; }
+.btn-delete { background: #fee2e2; color: #dc2626; border: none; padding: 9px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.btn-save-modal { background: #7e22ce; color: white; border: none; padding: 9px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+
+/* ========================================================
+   OTTIMIZZAZIONE MOBILE RESPONSIVE
+   ======================================================== */
+@media (max-width: 768px) {
+    body { padding: 6px; }
+    .header { padding: 14px 16px; flex-direction: column; align-items: flex-start; }
+    .header h1 { font-size: 1.2rem; }
+    .header p { font-size: 0.8rem; }
+
+    /* Barra Utente su Mobile */
+    .user-bar { 
+        padding: 12px 14px; 
+        flex-direction: column; 
+        align-items: stretch; 
+        gap: 10px; 
+    }
+    .user-bar-left { 
+        flex-direction: column; 
+        align-items: stretch; 
+        gap: 8px; 
+        width: 100%; 
+    }
+    .user-bar-input-group { 
+        width: 100%; 
+        display: grid; 
+        grid-template-columns: 1fr auto auto; 
+        gap: 6px; 
+    }
+    .user-bar-input-group label { display: none; }
+    .user-bar input { width: 100%; font-size: 13px; }
+    .sync-badge { text-align: center; }
+
+    /* Controlli Settimana e Azioni su Mobile */
+    .controls { 
+        padding: 12px 14px; 
+        flex-direction: column; 
+        align-items: stretch; 
+        gap: 10px; 
+    }
+    .nav-buttons { 
+        width: 100%; 
+        display: grid; 
+        grid-template-columns: auto 1fr auto; 
+        gap: 6px; 
+    }
+    .nav-buttons select { width: 100%; min-width: 0; }
+    .action-buttons { 
+        width: 100%; 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 8px; 
+    }
+    .action-buttons .btn { justify-content: center; width: 100%; }
+
+    .legend { gap: 12px; justify-content: flex-start; padding: 10px 14px; font-size: 11px; }
+
+    .calendar { 
+        grid-template-columns: 50px repeat(5, minmax(140px, 1fr)); 
+        min-width: 750px; 
+    }
+    .time-slot { font-size: 10px; padding-right: 4px; }
+    .evento { font-size: 10px; padding: 5px; }
+    .evento-title { font-size: 10.5px; }
+    .stats-container { padding: 16px; }
+    .insegnamento-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
         <div class="header">
-            <h1>Calendario Fisioterapia 2025-2026</h1>
-            <p>Sincronizzazione Cloud con Firebase</p>
+            <div class="header-title-box">
+                <div class="header-logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
+                <div>
+                    <h1>Calendario Fisioterapia 2025-2026</h1>
+                    <p>Sincronizzazione Cloud con Firebase</p>
+                </div>
+            </div>
+            <div class="sync-badge" id="syncStatus">Stato: Non connesso</div>
         </div>
 
         <!-- Barra Profilo e Filtro Gruppo -->
         <div class="user-bar">
             <div class="user-bar-left">
                 <div class="user-bar-input-group">
-                    <label for="usernameInput">👤 Profilo:</label>
-                    <input type="text" id="usernameInput" placeholder="es. mario_rossi">
-                    <button class="btn-user" onclick="caricaOCreaProfilo()">Carica / Crea</button>
-                    <button class="btn-save-cloud" onclick="salvaSuCloud()">Aggiorna</button>
+                    <input type="text" id="usernameInput" placeholder="Nome utente (es. mario_rossi)">
+                    <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica un profilo esistente o creane uno nuovo">Carica/Crea</button>
+                    <!-- Pulsante Rinominato in Salva -->
+                    <button class="btn btn-save-cloud" onclick="salvaSuCloud()" title="Salva tutte le modifiche sul cloud">💾 Salva</button>
                 </div>
                 
-                <div class="user-bar-input-group">
-                    <label for="groupSelector">👥 Gruppo:</label>
+                <div class="user-bar-input-group" style="grid-template-columns: auto 1fr;">
+                    <span style="font-weight: 600; color: #475569;">Gruppo:</span>
                     <select id="groupSelector" onchange="cambiaGruppo()">
                         <option value="ALL">Tutti i Gruppi</option>
                         <option value="A">Gruppo A</option>
@@ -141,32 +533,35 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                     </select>
                 </div>
             </div>
-            <div class="sync-badge" id="syncStatus">Stato: Non connesso</div>
         </div>
 
+        <!-- Controlli Settimane e Navigazione -->
         <div class="controls">
             <div class="nav-buttons">
-                <button class="btn btn-nav" id="btnPrev" onclick="prevWeek()">◀ Precedente</button>
+                <button class="btn btn-nav" id="btnPrev" onclick="prevWeek()">◀</button>
                 <select id="weekSelector" onchange="changeWeek()"></select>
-                <button class="btn btn-nav" id="btnNext" onclick="nextWeek()">Successiva ▶</button>
+                <button class="btn btn-nav" id="btnNext" onclick="nextWeek()">▶</button>
             </div>
             
             <div class="action-buttons">
                 <button class="btn btn-export" onclick="exportICS()">🗓️ Esporta ICS</button>
-                <button class="btn btn-reset" onclick="ripristinaDati()">↺ Ripristina Originale</button>
+                <button class="btn btn-reset" onclick="ripristinaDati()">↺ Ripristina</button>
             </div>
         </div>
 
+        <!-- Legenda -->
         <div class="legend">
-            <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Da seguire (Clicca per edit)</span></div>
+            <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Da seguire (Tocca per edit)</span></div>
             <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
             <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Da saltare</span></div>
         </div>
 
+        <!-- Vista Calendario (Google Calendar Style) -->
         <div class="calendar-container">
             <div class="calendar" id="calendar"></div>
         </div>
 
+        <!-- Statistiche / Progressi Insegnamenti -->
         <div class="stats-container">
             <h3 class="stats-title">📊 Piano Frequenza Personalizzato</h3>
             <div class="insegnamenti-container" id="insegnamentiContainer"></div>
@@ -194,7 +589,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-delete" onclick="eliminaEventoCorrente()">🗑️ Elimina</button>
-                <button type="button" class="btn-save" onclick="salvaModificheEvento()">Salva</button>
+                <button type="button" class="btn-save-modal" onclick="salvaModificheEvento()">Conferma</button>
             </div>
         </div>
     </div>
@@ -483,16 +878,14 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
         }
 
         // ============================================
-        // LOGICA FILTRAGGIO GRUPPI
+        // FILTRAGGIO GRUPPI
         // ============================================
         function appartieneAlGruppo(evento, gruppoTarget) {
             if (gruppoTarget === 'ALL') return true;
             const text = ((evento.docente || '') + ' ' + (evento.titolo || '')).toUpperCase();
             
-            // Se non c'è menzione di "GRUPPO", la lezione è comune a tutti
             if (!text.includes('GRUPPO') && !text.includes('GRUPPI')) return true;
 
-            // Verifica menzioni specifiche
             if (gruppoTarget === 'A') return text.includes('GRUPPO A') || text.includes('GRUPPI A');
             if (gruppoTarget === 'B') return text.includes('GRUPPO B') || text.includes('GRUPPI B');
             if (gruppoTarget === 'C') return text.includes('GRUPPO C') || text.includes('GRUPPI C') || text.includes('C/D');
@@ -509,7 +902,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
         }
 
         // ============================================
-        // AZIONI PULSANTI CLOUD
+        // CLOUD PROFILE & SALVATAGGIO
         // ============================================
         function caricaOCreaProfilo() {
             const inputVal = document.getElementById('usernameInput').value;
@@ -535,7 +928,6 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
             db.ref('utenti/' + currentUser).once('value').then(snapshot => {
                 const data = snapshot.val();
                 if (data) {
-                    // Gestione formato dati (se salvato con chiave gruppo o solo array)
                     if (data.settimane) {
                         settimane = Array.isArray(data.settimane) ? data.settimane : Object.values(data.settimane);
                         if (data.gruppo) {
@@ -546,11 +938,11 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                     } else {
                         settimane = Array.isArray(data) ? data : Object.values(data);
                     }
-                    statusBadge.textContent = `🟢 Caricato: ${currentUser}`;
+                    statusBadge.textContent = `🟢 Connesso: ${currentUser}`;
                 } else {
                     settimane = JSON.parse(JSON.stringify(defaultSettimane));
                     salvaSuCloud();
-                    statusBadge.textContent = `🟢 Creato nuovo: ${currentUser}`;
+                    statusBadge.textContent = `🟢 Creato: ${currentUser}`;
                 }
                 aggiornaInterfaccia();
             }).catch(err => {
@@ -570,7 +962,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
             }
 
             const statusBadge = document.getElementById('syncStatus');
-            statusBadge.textContent = "Aggiornamento in corso...";
+            statusBadge.textContent = "Salvataggio...";
 
             const payload = {
                 settimane: settimane,
@@ -580,11 +972,11 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
 
             db.ref('utenti/' + currentUser).set(payload)
               .then(() => {
-                  statusBadge.textContent = `🟢 Aggiornato: ${currentUser}`;
+                  statusBadge.textContent = `🟢 Salvato: ${currentUser}`;
                   alert("Modifiche salvate sul cloud con successo!");
               })
               .catch(err => {
-                  console.error("Errore aggiornamento:", err);
+                  console.error("Errore salvataggio:", err);
                   statusBadge.textContent = "🔴 Errore salvataggio";
                   alert("Impossibile salvare su Firebase. Verifica le regole del database.");
               });
@@ -606,7 +998,6 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                 giorni.forEach(g => {
                     const eventi = s.eventi[g] || [];
                     eventi.forEach(e => {
-                        // Considera solo le lezioni destinate al gruppo selezionato
                         if (e.titolo && e.titolo.includes(searchTerm) && appartieneAlGruppo(e, gruppoSelezionato)) {
                             const d = e.oraFine - e.oraInizio;
                             totale += d;
@@ -623,17 +1014,33 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
             const settimana = settimane[settimanaCorrente];
             if (!settimana) return;
 
-            let html = '<div class="time-column"><div class="time-header">Ora</div>';
-            ore.forEach(ora => { html += `<div class="time-slot">${String(ora).padStart(2, '0')}:00</div>`; });
+            const baseDate = new Date(dateMap[settimana.numero] || '2026-09-28');
+
+            let html = '<div class="time-column"><div class="time-header">GMT+2</div>';
+            ore.forEach(ora => { 
+                html += `<div class="time-slot">${String(ora).padStart(2, '0')}:00</div>`; 
+            });
             html += '</div>';
 
             giorni.forEach(giorno => {
-                html += `<div class="day-column"><div class="day-header">${giorno}</div><div class="day-grid">`;
-                ore.forEach((ora, idx) => { html += `<div class="grid-line" style="top: ${idx * 64}px;"></div>`; });
+                const dataGiorno = new Date(baseDate);
+                dataGiorno.setDate(baseDate.getDate() + (giornoOffset[giorno] || 0));
+                const giornoNum = dataGiorno.getDate();
+                const giornoBreve = giorno.substring(0, 3).toUpperCase();
+
+                html += `<div class="day-column">
+                    <div class="day-header">
+                        <span class="day-name">${giornoBreve}</span>
+                        <span class="day-number">${giornoNum}</span>
+                    </div>
+                    <div class="day-grid">`;
+
+                ore.forEach((ora, idx) => { 
+                    html += `<div class="grid-line" style="top: ${idx * 64}px;"></div>`; 
+                });
 
                 const eventi = (settimana.eventi && settimana.eventi[giorno]) ? settimana.eventi[giorno] : [];
                 eventi.forEach((evento, eventIdx) => {
-                    // Salta il rendering se non appartiene al gruppo selezionato
                     if (!appartieneAlGruppo(evento, gruppoSelezionato)) return;
 
                     const top = (evento.oraInizio - 8) * 64;
@@ -644,7 +1051,9 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                     html += `<div class="evento ${classe}" style="top: ${top}px; height: ${height}px;" onclick="apriModale(${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
                     html += `<div class="evento-title">${emoji} ${evento.titolo}</div>`;
                     html += `<div class="evento-time">${formattaOra(evento.oraInizio)} - ${formattaOra(evento.oraFine)}</div>`;
-                    if (evento.docente) html += `<div class="evento-docente">${evento.docente}</div>`;
+                    if (evento.docente || evento.luogo) {
+                        html += `<div class="evento-docente">${[evento.docente, evento.luogo].filter(Boolean).join(' • ')}</div>`;
+                    }
                     html += `</div>`;
                 });
                 html += '</div></div>';
@@ -694,7 +1103,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                 const seguitoIns = moduliData.reduce((acc, m) => acc + m.seguite, 0);
                 const percIns = totaleIns > 0 ? Math.round((seguitoIns / totaleIns) * 100) : 0;
                 const colorClass = percIns >= 70 ? 'percent-ok' : percIns >= 60 ? 'percent-warn' : 'percent-bad';
-                const progressColor = percIns >= 70 ? '#10b981' : percIns >= 60 ? '#f59e0b' : '#ef4444';
+                const progressColor = percIns >= 70 ? '#16a34a' : percIns >= 60 ? '#d97706' : '#dc2626';
 
                 const existingContainer = document.getElementById(`moduli-${idx}`);
                 const isExpanded = existingContainer && existingContainer.classList.contains('visible');
@@ -712,7 +1121,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                     <div class="moduli-container ${isExpanded ? 'visible' : ''}" id="moduli-${idx}">`;
 
                 moduliData.forEach(mod => {
-                    const modColor = mod.percentuale >= 70 ? '#10b981' : mod.percentuale >= 60 ? '#f59e0b' : '#ef4444';
+                    const modColor = mod.percentuale >= 70 ? '#16a34a' : mod.percentuale >= 60 ? '#d97706' : '#dc2626';
                     const modColorClass = mod.percentuale >= 70 ? 'percent-ok' : mod.percentuale >= 60 ? 'percent-warn' : 'percent-bad';
 
                     html += `<div class="modulo">
@@ -796,7 +1205,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
         }
 
         function ripristinaDati() {
-            if (confirm("Vuoi ripristinare il calendario predefinito? Clicca poi su 'Aggiorna' per confermare il ripristino sul Cloud.")) {
+            if (confirm("Vuoi ripristinare il calendario predefinito? Clicca poi su '💾 Salva' per confermare il ripristino sul Cloud.")) {
                 settimane = JSON.parse(JSON.stringify(defaultSettimane));
                 aggiornaInterfaccia();
             }
