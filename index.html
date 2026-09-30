@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-    <!-- Font Google Roboto per look identico a Google Calendar -->
+    <!-- Font Google Roboto -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -34,7 +34,7 @@ body {
     border: 1px solid #e2e8f0;
 }
 
-/* Header in stile Material / Google Workspace */
+/* Header stile Workspace */
 .header { 
     background: #ffffff;
     color: #1e293b; 
@@ -99,7 +99,7 @@ body {
     box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.12);
 }
 
-/* Pulsanti stile Google */
+/* Pulsanti */
 .btn { 
     padding: 8px 14px; 
     border: none; 
@@ -117,6 +117,8 @@ body {
 .btn-user:hover { background: #6b21a8; }
 .btn-save-cloud { background: #16a34a; color: white; font-weight: 600; }
 .btn-save-cloud:hover { background: #15803d; }
+.btn-toggle-view { background: #e0e7ff; color: #4338ca; font-weight: 600; border: 1px solid #c7d2fe; }
+.btn-toggle-view:hover { background: #c7d2fe; }
 .sync-badge { 
     font-size: 12px; 
     padding: 6px 12px; 
@@ -151,7 +153,7 @@ body {
 .btn-reset { background: #ffffff; color: #64748b; border: 1px solid #e2e8f0; }
 .btn-reset:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
 
-/* Legenda Material */
+/* Legenda */
 .legend { 
     background: #f8fafc; 
     padding: 12px 20px; 
@@ -170,7 +172,7 @@ body {
 .legend-grigio { background: #f1f5f9; border: 2px solid #94a3b8; }
 
 /* ========================================================
-   CALENDARIO STILE GOOGLE CALENDAR
+   CALENDARIO
    ======================================================== */
 .calendar-container { 
     background: #ffffff; 
@@ -242,12 +244,7 @@ body {
     z-index: 15;
 }
 .day-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }
-.day-number { 
-    font-size: 15px; 
-    font-weight: 700; 
-    color: #0f172a; 
-    margin-top: 2px;
-}
+.day-number { font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 2px; }
 
 .day-grid { 
     position: relative; 
@@ -263,8 +260,8 @@ body {
 /* Eventi stile Google Calendar Cards */
 .evento { 
     position: absolute; 
-    width: calc(100% - 8px); 
-    left: 4px; 
+    width: calc(100% - 6px); 
+    left: 3px; 
     padding: 6px 8px; 
     border-radius: 8px; 
     font-size: 11px; 
@@ -284,19 +281,19 @@ body {
 }
 .evento-title { 
     font-weight: 600; 
-    line-height: 1.25;
-    font-size: 11.5px;
+    line-height: 1.2;
+    font-size: 11px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 .evento-time { 
-    font-size: 10.5px; 
+    font-size: 10px; 
     font-weight: 500;
     opacity: 0.85; 
 }
 .evento-docente { 
-    font-size: 10px; 
+    font-size: 9.5px; 
     opacity: 0.75; 
     white-space: nowrap;
     overflow: hidden;
@@ -325,7 +322,7 @@ body {
     text-decoration: line-through;
 }
 
-/* Statistiche / Progressi Insegnamenti */
+/* Statistiche */
 .stats-container { 
     background: #ffffff; 
     padding: 24px; 
@@ -336,9 +333,6 @@ body {
     font-weight: 700; 
     color: #0f172a; 
     margin-bottom: 16px; 
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 .insegnamento { 
     border: 1px solid #e2e8f0; 
@@ -346,7 +340,6 @@ body {
     margin-bottom: 12px; 
     overflow: hidden; 
     background: #ffffff;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
 }
 .insegnamento-header { 
     background: #ffffff; 
@@ -424,20 +417,18 @@ body {
 .btn-save-modal { background: #7e22ce; color: white; border: none; padding: 9px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
 /* ========================================================
-   OTTIMIZZAZIONE MOBILE RESPONSIVE
+   MODALITÀ MOBILE & RESPONSIVE
    ======================================================== */
 @media (max-width: 768px) {
-    body { padding: 6px; }
-    .header { padding: 14px 16px; flex-direction: column; align-items: flex-start; }
-    .header h1 { font-size: 1.2rem; }
-    .header p { font-size: 0.8rem; }
+    body { padding: 4px; }
+    .header { padding: 12px 14px; flex-direction: column; align-items: flex-start; }
+    .header h1 { font-size: 1.15rem; }
 
-    /* Barra Utente su Mobile */
     .user-bar { 
-        padding: 12px 14px; 
+        padding: 10px 12px; 
         flex-direction: column; 
         align-items: stretch; 
-        gap: 10px; 
+        gap: 8px; 
     }
     .user-bar-left { 
         flex-direction: column; 
@@ -455,12 +446,11 @@ body {
     .user-bar input { width: 100%; font-size: 13px; }
     .sync-badge { text-align: center; }
 
-    /* Controlli Settimana e Azioni su Mobile */
     .controls { 
-        padding: 12px 14px; 
+        padding: 10px 12px; 
         flex-direction: column; 
         align-items: stretch; 
-        gap: 10px; 
+        gap: 8px; 
     }
     .nav-buttons { 
         width: 100%; 
@@ -469,23 +459,73 @@ body {
         gap: 6px; 
     }
     .nav-buttons select { width: 100%; min-width: 0; }
+    
     .action-buttons { 
         width: 100%; 
         display: grid; 
-        grid-template-columns: 1fr 1fr; 
-        gap: 8px; 
+        grid-template-columns: 1fr 1fr 1fr; 
+        gap: 6px; 
     }
-    .action-buttons .btn { justify-content: center; width: 100%; }
+    .action-buttons .btn { justify-content: center; width: 100%; padding: 8px 6px; font-size: 11px; }
 
-    .legend { gap: 12px; justify-content: flex-start; padding: 10px 14px; font-size: 11px; }
+    .legend { gap: 10px; justify-content: flex-start; padding: 8px 12px; font-size: 11px; }
 
-    .calendar { 
-        grid-template-columns: 50px repeat(5, minmax(140px, 1fr)); 
-        min-width: 750px; 
+    /* --- VISTA COMPATTA (DEFAULT SU MOBILE: NESSUNO SCROLL) --- */
+    .calendar-container.vista-compatta .calendar {
+        min-width: 100% !important;
+        width: 100% !important;
+        grid-template-columns: 36px repeat(5, 1fr) !important;
     }
-    .time-slot { font-size: 10px; padding-right: 4px; }
-    .evento { font-size: 10px; padding: 5px; }
-    .evento-title { font-size: 10.5px; }
+    .calendar-container.vista-compatta .time-column {
+        width: 36px !important;
+    }
+    .calendar-container.vista-compatta .time-header {
+        font-size: 9px;
+        padding: 10px 2px;
+    }
+    .calendar-container.vista-compatta .time-slot {
+        font-size: 9px;
+        padding-right: 3px;
+        justify-content: center;
+    }
+    .calendar-container.vista-compatta .day-name {
+        font-size: 9px;
+    }
+    .calendar-container.vista-compatta .day-number {
+        font-size: 13px;
+    }
+    .calendar-container.vista-compatta .evento {
+        padding: 3px 2px;
+        width: calc(100% - 3px);
+        left: 1.5px;
+        border-left-width: 3px;
+        border-radius: 4px;
+    }
+    .calendar-container.vista-compatta .evento-title {
+        font-size: 9.5px;
+        line-height: 1.15;
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .calendar-container.vista-compatta .evento-time {
+        font-size: 8.5px;
+        margin-top: 1px;
+    }
+    .calendar-container.vista-compatta .evento-docente {
+        display: none; /* Nasconde l'aula su vista compatta per leggibilità */
+    }
+
+    /* --- VISTA ESPANSA (SCROLLABILE) --- */
+    .calendar-container.vista-espansa .calendar {
+        min-width: 780px !important;
+        grid-template-columns: 50px repeat(5, minmax(140px, 1fr)) !important;
+    }
+    .calendar-container.vista-espansa .time-slot { font-size: 10px; padding-right: 4px; }
+    .calendar-container.vista-espansa .evento { font-size: 10px; padding: 5px; }
+
     .stats-container { padding: 16px; }
     .insegnamento-header { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
@@ -517,9 +557,8 @@ body {
             <div class="user-bar-left">
                 <div class="user-bar-input-group">
                     <input type="text" id="usernameInput" placeholder="Nome utente (es. mario_rossi)">
-                    <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica un profilo esistente o creane uno nuovo">Carica/Crea</button>
-                    <!-- Pulsante Rinominato in Salva -->
-                    <button class="btn btn-save-cloud" onclick="salvaSuCloud()" title="Salva tutte le modifiche sul cloud">💾 Salva</button>
+                    <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica o crea profilo">Carica/Crea</button>
+                    <button class="btn btn-save-cloud" onclick="salvaSuCloud()" title="Salva sul cloud">💾 Salva</button>
                 </div>
                 
                 <div class="user-bar-input-group" style="grid-template-columns: auto 1fr;">
@@ -544,20 +583,22 @@ body {
             </div>
             
             <div class="action-buttons">
-                <button class="btn btn-export" onclick="exportICS()">🗓️ Esporta ICS</button>
-                <button class="btn btn-reset" onclick="ripristinaDati()">↺ Ripristina</button>
+                <!-- Tasto commutazione Vista Compatta / Espansa -->
+                <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleVistaMobile()">📐 Espandi</button>
+                <button class="btn btn-export" onclick="exportICS()">🗓️ ICS</button>
+                <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset</button>
             </div>
         </div>
 
         <!-- Legenda -->
         <div class="legend">
-            <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Da seguire (Tocca per edit)</span></div>
+            <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
             <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
-            <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Da saltare</span></div>
+            <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
         </div>
 
         <!-- Vista Calendario (Google Calendar Style) -->
-        <div class="calendar-container">
+        <div class="calendar-container vista-compatta" id="calendarContainer">
             <div class="calendar" id="calendar"></div>
         </div>
 
@@ -583,9 +624,17 @@ body {
             <div class="form-group"><label>Materia</label><input type="text" id="editTitolo"></div>
             <div class="form-group"><label>Docente</label><input type="text" id="editDocente"></div>
             <div class="form-group"><label>Aula</label><input type="text" id="editLuogo"></div>
+            
+            <!-- Orari con Input Time (Es. 08:30) -->
             <div class="form-row">
-                <div class="form-group" style="flex:1"><label>Inizio</label><input type="number" id="editOraInizio" step="0.5"></div>
-                <div class="form-group" style="flex:1"><label>Fine</label><input type="number" id="editOraFine" step="0.5"></div>
+                <div class="form-group" style="flex:1">
+                    <label>Ora Inizio</label>
+                    <input type="time" id="editOraInizio">
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>Ora Fine</label>
+                    <input type="time" id="editOraFine">
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-delete" onclick="eliminaEventoCorrente()">🗑️ Elimina</button>
@@ -759,7 +808,7 @@ body {
                         { oraInizio: 14, oraFine: 18, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
                     ],
                     giovedì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula Magna Psi. M.绘画Torre Molinette", tipo: "normale" },
                         { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
                         { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
                         { oraInizio: 16, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" }
@@ -878,6 +927,23 @@ body {
         }
 
         // ============================================
+        // VISTA COMPATTA / ESPANSA (MOBILE)
+        // ============================================
+        function toggleVistaMobile() {
+            const container = document.getElementById('calendarContainer');
+            const btn = document.getElementById('btnToggleView');
+            if (container.classList.contains('vista-compatta')) {
+                container.classList.remove('vista-compatta');
+                container.classList.add('vista-espansa');
+                btn.textContent = '📐 Compatta';
+            } else {
+                container.classList.remove('vista-espansa');
+                container.classList.add('vista-compatta');
+                btn.textContent = '📐 Espandi';
+            }
+        }
+
+        // ============================================
         // FILTRAGGIO GRUPPI
         // ============================================
         function appartieneAlGruppo(evento, gruppoTarget) {
@@ -983,12 +1049,18 @@ body {
         }
 
         // ============================================
-        // CALCOLO ORE E RENDER
+        // CONVERSIONI ORARI
         // ============================================
-        function formattaOra(ora) {
-            const h = Math.floor(ora);
-            const m = Math.round((ora - h) * 60);
+        function formattaOra(decimalHour) {
+            const h = Math.floor(decimalHour);
+            const m = Math.round((decimalHour - h) * 60);
             return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+
+        function timeStringToDecimal(timeStr) {
+            if (!timeStr) return 8;
+            const [h, m] = timeStr.split(':').map(Number);
+            return h + (m / 60);
         }
 
         function calcolaOreModulo(searchTerm) {
@@ -1009,6 +1081,9 @@ body {
             return { totale, seguite, percentuale: totale > 0 ? Math.round((seguite / totale) * 100) : 0 };
         }
 
+        // ============================================
+        // RENDER GRAFICO
+        // ============================================
         function renderCalendario() {
             const calElem = document.getElementById('calendar');
             const settimana = settimane[settimanaCorrente];
@@ -1016,7 +1091,7 @@ body {
 
             const baseDate = new Date(dateMap[settimana.numero] || '2026-09-28');
 
-            let html = '<div class="time-column"><div class="time-header">GMT+2</div>';
+            let html = '<div class="time-column"><div class="time-header">Ora</div>';
             ore.forEach(ora => { 
                 html += `<div class="time-slot">${String(ora).padStart(2, '0')}:00</div>`; 
             });
@@ -1163,8 +1238,11 @@ body {
             document.getElementById('editTitolo').value = ev.titolo;
             document.getElementById('editDocente').value = ev.docente || '';
             document.getElementById('editLuogo').value = ev.luogo || '';
-            document.getElementById('editOraInizio').value = ev.oraInizio;
-            document.getElementById('editOraFine').value = ev.oraFine;
+            
+            // Imposta gli orari formattati (es. "08:30" anziché 8.5)
+            document.getElementById('editOraInizio').value = formattaOra(ev.oraInizio);
+            document.getElementById('editOraFine').value = formattaOra(ev.oraFine);
+
             impostaStato(ev.tipo || 'normale');
             document.getElementById('editModal').classList.add('active');
         }
@@ -1186,12 +1264,16 @@ body {
             if (!eventoSelezionatoRef) return;
             const { weekIdx, giorno, eventIdx } = eventoSelezionatoRef;
             const ev = settimane[weekIdx].eventi[giorno][eventIdx];
+            
             ev.titolo = document.getElementById('editTitolo').value;
             ev.docente = document.getElementById('editDocente').value;
             ev.luogo = document.getElementById('editLuogo').value;
-            ev.oraInizio = parseFloat(document.getElementById('editOraInizio').value);
-            ev.oraFine = parseFloat(document.getElementById('editOraFine').value);
+            
+            // Converte le stringhe "HH:MM" di nuovo in valore decimale
+            ev.oraInizio = timeStringToDecimal(document.getElementById('editOraInizio').value);
+            ev.oraFine = timeStringToDecimal(document.getElementById('editOraFine').value);
             ev.tipo = tipoSelezionato;
+
             chiudiModale();
             aggiornaInterfaccia();
         }
