@@ -18,10 +18,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 .header h1 { font-size: 1.8rem; margin-bottom: 8px; }
 .header p { opacity: 0.9; font-size: 0.95rem; }
 
-/* Barra Utente Cloud */
-.user-bar { background: #581c87; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 14px; }
-.user-bar-input-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.user-bar input { padding: 7px 12px; border-radius: 6px; border: none; font-size: 14px; outline: none; }
+/* Barra Utente e Gruppo Cloud */
+.user-bar { background: #581c87; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 14px; }
+.user-bar-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.user-bar-input-group { display: flex; align-items: center; gap: 8px; }
+.user-bar input, .user-bar select { padding: 7px 12px; border-radius: 6px; border: none; font-size: 14px; outline: none; }
 .btn-user { background: #9333ea; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
 .btn-user:hover { background: #a855f7; }
 .btn-save-cloud { background: #10b981; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
@@ -119,13 +120,26 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
             <p>Sincronizzazione Cloud con Firebase</p>
         </div>
 
-        <!-- Barra Profilo Cloud -->
+        <!-- Barra Profilo e Filtro Gruppo -->
         <div class="user-bar">
-            <div class="user-bar-input-group">
-                <label for="usernameInput">👤 Profilo:</label>
-                <input type="text" id="usernameInput" placeholder="es. mario_rossi">
-                <button class="btn-user" onclick="caricaOCreaProfilo()">Carica / Crea</button>
-                <button class="btn-save-cloud" onclick="salvaSuCloud()">Aggiorna</button>
+            <div class="user-bar-left">
+                <div class="user-bar-input-group">
+                    <label for="usernameInput">👤 Profilo:</label>
+                    <input type="text" id="usernameInput" placeholder="es. mario_rossi">
+                    <button class="btn-user" onclick="caricaOCreaProfilo()">Carica / Crea</button>
+                    <button class="btn-save-cloud" onclick="salvaSuCloud()">Aggiorna</button>
+                </div>
+                
+                <div class="user-bar-input-group">
+                    <label for="groupSelector">👥 Gruppo:</label>
+                    <select id="groupSelector" onchange="cambiaGruppo()">
+                        <option value="ALL">Tutti i Gruppi</option>
+                        <option value="A">Gruppo A</option>
+                        <option value="B">Gruppo B</option>
+                        <option value="C">Gruppo C</option>
+                        <option value="D">Gruppo D</option>
+                    </select>
+                </div>
             </div>
             <div class="sync-badge" id="syncStatus">Stato: Non connesso</div>
         </div>
@@ -144,7 +158,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
         </div>
 
         <div class="legend">
-            <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Da seguire (Clicca per modificare)</span></div>
+            <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Da seguire (Clicca per edit)</span></div>
             <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
             <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Da saltare</span></div>
         </div>
@@ -186,9 +200,6 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
     </div>
 
     <script>
-        // ============================================
-        // FIREBASE INIZIALIZZAZIONE
-        // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyBU9IVD8kqpU7bE7QEwOvOnAgvhtl98Ktg",
             authDomain: "a2s-aadbf.firebaseapp.com",
@@ -208,8 +219,10 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
         }
 
         let currentUser = '';
+        let gruppoSelezionato = 'ALL';
         try {
             currentUser = localStorage.getItem('currentUser_fisioterapia') || '';
+            gruppoSelezionato = localStorage.getItem('currentGroup_fisioterapia') || 'ALL';
         } catch(e) {}
 
         let settimanaCorrente = 0;
@@ -470,6 +483,32 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
         }
 
         // ============================================
+        // LOGICA FILTRAGGIO GRUPPI
+        // ============================================
+        function appartieneAlGruppo(evento, gruppoTarget) {
+            if (gruppoTarget === 'ALL') return true;
+            const text = ((evento.docente || '') + ' ' + (evento.titolo || '')).toUpperCase();
+            
+            // Se non c'è menzione di "GRUPPO", la lezione è comune a tutti
+            if (!text.includes('GRUPPO') && !text.includes('GRUPPI')) return true;
+
+            // Verifica menzioni specifiche
+            if (gruppoTarget === 'A') return text.includes('GRUPPO A') || text.includes('GRUPPI A');
+            if (gruppoTarget === 'B') return text.includes('GRUPPO B') || text.includes('GRUPPI B');
+            if (gruppoTarget === 'C') return text.includes('GRUPPO C') || text.includes('GRUPPI C') || text.includes('C/D');
+            if (gruppoTarget === 'D') return text.includes('GRUPPO D') || text.includes('GRUPPI D') || text.includes('C/D');
+            return true;
+        }
+
+        function cambiaGruppo() {
+            gruppoSelezionato = document.getElementById('groupSelector').value;
+            try {
+                localStorage.setItem('currentGroup_fisioterapia', gruppoSelezionato);
+            } catch(e) {}
+            aggiornaInterfaccia();
+        }
+
+        // ============================================
         // AZIONI PULSANTI CLOUD
         // ============================================
         function caricaOCreaProfilo() {
@@ -496,13 +535,21 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
             db.ref('utenti/' + currentUser).once('value').then(snapshot => {
                 const data = snapshot.val();
                 if (data) {
-                    // Se Firebase ritorna un oggetto anziché un array, lo riconvertiamo
-                    settimane = Array.isArray(data) ? data : Object.values(data);
+                    // Gestione formato dati (se salvato con chiave gruppo o solo array)
+                    if (data.settimane) {
+                        settimane = Array.isArray(data.settimane) ? data.settimane : Object.values(data.settimane);
+                        if (data.gruppo) {
+                            gruppoSelezionato = data.gruppo;
+                            document.getElementById('groupSelector').value = gruppoSelezionato;
+                            try { localStorage.setItem('currentGroup_fisioterapia', gruppoSelezionato); } catch(e) {}
+                        }
+                    } else {
+                        settimane = Array.isArray(data) ? data : Object.values(data);
+                    }
                     statusBadge.textContent = `🟢 Caricato: ${currentUser}`;
                 } else {
-                    // Profilo nuovo: inizializza con i dati di default
                     settimane = JSON.parse(JSON.stringify(defaultSettimane));
-                    db.ref('utenti/' + currentUser).set(settimane);
+                    salvaSuCloud();
                     statusBadge.textContent = `🟢 Creato nuovo: ${currentUser}`;
                 }
                 aggiornaInterfaccia();
@@ -525,7 +572,13 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
             const statusBadge = document.getElementById('syncStatus');
             statusBadge.textContent = "Aggiornamento in corso...";
 
-            db.ref('utenti/' + currentUser).set(settimane)
+            const payload = {
+                settimane: settimane,
+                gruppo: gruppoSelezionato,
+                lastUpdate: new Date().toISOString()
+            };
+
+            db.ref('utenti/' + currentUser).set(payload)
               .then(() => {
                   statusBadge.textContent = `🟢 Aggiornato: ${currentUser}`;
                   alert("Modifiche salvate sul cloud con successo!");
@@ -553,7 +606,8 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                 giorni.forEach(g => {
                     const eventi = s.eventi[g] || [];
                     eventi.forEach(e => {
-                        if (e.titolo && e.titolo.includes(searchTerm)) {
+                        // Considera solo le lezioni destinate al gruppo selezionato
+                        if (e.titolo && e.titolo.includes(searchTerm) && appartieneAlGruppo(e, gruppoSelezionato)) {
                             const d = e.oraFine - e.oraInizio;
                             totale += d;
                             if (e.tipo === 'normale' || e.tipo === 'obbligatorio') seguite += d;
@@ -579,6 +633,9 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
 
                 const eventi = (settimana.eventi && settimana.eventi[giorno]) ? settimana.eventi[giorno] : [];
                 eventi.forEach((evento, eventIdx) => {
+                    // Salta il rendering se non appartiene al gruppo selezionato
+                    if (!appartieneAlGruppo(evento, gruppoSelezionato)) return;
+
                     const top = (evento.oraInizio - 8) * 64;
                     const height = (evento.oraFine - evento.oraInizio) * 64;
                     const classe = evento.tipo === 'obbligatorio' ? 'evento-obbligatorio' : evento.tipo === 'saltata' ? 'evento-saltata' : 'evento-normale';
@@ -767,6 +824,8 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                     const dEv = new Date(baseDate);
                     dEv.setDate(baseDate.getDate() + (giornoOffset[g] || 0));
                     evs.forEach(ev => {
+                        if (!appartieneAlGruppo(ev, gruppoSelezionato)) return;
+
                         const hI = Math.floor(ev.oraInizio), mI = Math.round((ev.oraInizio - hI) * 60);
                         const hF = Math.floor(ev.oraFine), mF = Math.round((ev.oraFine - hF) * 60);
                         const dtS = new Date(dEv); dtS.setHours(hI, mI, 0);
@@ -798,6 +857,8 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                 opt.textContent = `W${s.numero} - ${s.periodo}`;
                 select.appendChild(opt);
             });
+
+            document.getElementById('groupSelector').value = gruppoSelezionato;
 
             if (currentUser) {
                 document.getElementById('usernameInput').value = currentUser;
