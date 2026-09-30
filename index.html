@@ -172,7 +172,7 @@ body {
 .legend-grigio { background: #f1f5f9; border: 2px solid #94a3b8; }
 
 /* ========================================================
-   CALENDARIO
+   CALENDARIO & TRANSIZIONI
    ======================================================== */
 .calendar-container { 
     background: #ffffff; 
@@ -185,6 +185,25 @@ body {
     display: grid; 
     grid-template-columns: 65px repeat(5, minmax(180px, 1fr)); 
     min-width: 980px; 
+    transition: transform 0.22s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.22s ease-out;
+}
+
+/* Animazioni di transizione settimana */
+.slide-out-left {
+    transform: translateX(-40px);
+    opacity: 0;
+}
+.slide-out-right {
+    transform: translateX(40px);
+    opacity: 0;
+}
+.slide-in-right {
+    transform: translateX(40px);
+    opacity: 0;
+}
+.slide-in-left {
+    transform: translateX(-40px);
+    opacity: 0;
 }
 
 .time-column { 
@@ -842,8 +861,9 @@ body {
                         { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
                     ],
                     venerdì: [
-                        { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO", luogo: "Aula 2 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO", luogo: "Aula 2 CTO", tipo: "normale" }
+                        // Aggiornato: 23/10 Mattino per Gruppi A/B e Pomeriggio per Gruppi C/D
+                        { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO (GRUPPI A/B)", luogo: "Aula 2 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO (GRUPPI C/D)", luogo: "Aula 2 CTO", tipo: "normale" }
                     ]
                 }
             },
@@ -872,8 +892,9 @@ body {
                         { oraInizio: 16, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" }
                     ],
                     venerdì: [
-                        { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO", luogo: "Aula 1 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO", luogo: "Aula 1 CTO", tipo: "normale" }
+                        // Aggiornato: 30/10 Mattino per Gruppi A/B e Pomeriggio per Gruppi C/D
+                        { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO (GRUPPI A/B)", luogo: "Aula 1 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO (GRUPPI C/D)", luogo: "Aula 1 CTO", tipo: "normale" }
                     ]
                 }
             },
@@ -1034,7 +1055,7 @@ body {
         }
 
         // ============================================
-        // FILTRAGGIO GRUPPI
+        // FILTRAGGIO GRUPPI (incluso A/B e C/D)
         // ============================================
         function appartieneAlGruppo(evento, gruppoTarget) {
             if (gruppoTarget === 'ALL') return true;
@@ -1042,8 +1063,8 @@ body {
             
             if (!text.includes('GRUPPO') && !text.includes('GRUPPI')) return true;
 
-            if (gruppoTarget === 'A') return text.includes('GRUPPO A') || text.includes('GRUPPI A');
-            if (gruppoTarget === 'B') return text.includes('GRUPPO B') || text.includes('GRUPPI B');
+            if (gruppoTarget === 'A') return text.includes('GRUPPO A') || text.includes('GRUPPI A') || text.includes('A/B');
+            if (gruppoTarget === 'B') return text.includes('GRUPPO B') || text.includes('GRUPPI B') || text.includes('A/B');
             if (gruppoTarget === 'C') return text.includes('GRUPPO C') || text.includes('GRUPPI C') || text.includes('C/D');
             if (gruppoTarget === 'D') return text.includes('GRUPPO D') || text.includes('GRUPPI D') || text.includes('C/D');
             return true;
@@ -1172,58 +1193,85 @@ body {
         }
 
         // ============================================
-        // RENDER GRAFICO
+        // RENDER GRAFICO CON TRANSIZIONE FLUIDA
         // ============================================
-        function renderCalendario() {
+        let isTransitioning = false;
+
+        function renderCalendario(animationDirection = null) {
             const calElem = document.getElementById('calendar');
             const settimana = settimane[settimanaCorrente];
             if (!settimana) return;
 
-            const baseDate = new Date(dateMap[settimana.numero] || '2026-09-28');
+            if (animationDirection && !isTransitioning) {
+                isTransitioning = true;
+                const outClass = animationDirection === 'next' ? 'slide-out-left' : 'slide-out-right';
+                const inClass = animationDirection === 'next' ? 'slide-in-right' : 'slide-in-left';
 
-            let html = '<div class="time-column"><div class="time-header">Ora</div>';
-            ore.forEach(ora => { 
-                html += `<div class="time-slot">${String(ora).padStart(2, '0')}:00</div>`; 
-            });
-            html += '</div>';
+                calElem.classList.add(outClass);
 
-            giorni.forEach(giorno => {
-                const dataGiorno = new Date(baseDate);
-                dataGiorno.setDate(baseDate.getDate() + (giornoOffset[giorno] || 0));
-                const giornoNum = dataGiorno.getDate();
-                const giornoBreve = giorno.substring(0, 3).toUpperCase();
+                setTimeout(() => {
+                    calElem.classList.remove(outClass);
+                    buildCalendarHTML();
+                    calElem.classList.add(inClass);
 
-                html += `<div class="day-column">
-                    <div class="day-header">
-                        <span class="day-name">${giornoBreve}</span>
-                        <span class="day-number">${giornoNum}</span>
-                    </div>
-                    <div class="day-grid" onclick="creaNuovoEvento(event, ${settimanaCorrente}, '${giorno}')">`;
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            calElem.classList.remove(inClass);
+                            isTransitioning = false;
+                        });
+                    });
+                }, 180);
+            } else {
+                buildCalendarHTML();
+            }
 
-                ore.forEach((ora, idx) => { 
-                    html += `<div class="grid-line" style="top: ${idx * 64}px;"></div>`; 
+            function buildCalendarHTML() {
+                const baseDate = new Date(dateMap[settimana.numero] || '2026-09-28');
+
+                let html = '<div class="time-column"><div class="time-header">Ora</div>';
+                ore.forEach(ora => { 
+                    html += `<div class="time-slot">${String(ora).padStart(2, '0')}:00</div>`; 
                 });
+                html += '</div>';
 
-                const eventi = (settimana.eventi && settimana.eventi[giorno]) ? settimana.eventi[giorno] : [];
-                eventi.forEach((evento, eventIdx) => {
-                    if (!appartieneAlGruppo(evento, gruppoSelezionato)) return;
+                giorni.forEach(giorno => {
+                    const dataGiorno = new Date(baseDate);
+                    dataGiorno.setDate(baseDate.getDate() + (giornoOffset[giorno] || 0));
+                    const giornoNum = dataGiorno.getDate();
+                    const giornoBreve = giorno.substring(0, 3).toUpperCase();
 
-                    const top = (evento.oraInizio - 8) * 64;
-                    const height = (evento.oraFine - evento.oraInizio) * 64;
-                    const classe = evento.tipo === 'obbligatorio' ? 'evento-obbligatorio' : evento.tipo === 'saltata' ? 'evento-saltata' : 'evento-normale';
-                    const emoji = evento.tipo === 'obbligatorio' ? '⚠️' : evento.tipo === 'saltata' ? '❌' : '✅';
+                    html += `<div class="day-column">
+                        <div class="day-header">
+                            <span class="day-name">${giornoBreve}</span>
+                            <span class="day-number">${giornoNum}</span>
+                        </div>
+                        <div class="day-grid" onclick="creaNuovoEvento(event, ${settimanaCorrente}, '${giorno}')">`;
 
-                    html += `<div class="evento ${classe}" style="top: ${top}px; height: ${height}px;" onclick="apriModale(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
-                    html += `<div class="evento-title">${emoji} ${evento.titolo}</div>`;
-                    html += `<div class="evento-time">${formattaOra(evento.oraInizio)} - ${formattaOra(evento.oraFine)}</div>`;
-                    if (evento.docente || evento.luogo) {
-                        html += `<div class="evento-docente">${[evento.docente, evento.luogo].filter(Boolean).join(' • ')}</div>`;
-                    }
-                    html += `</div>`;
+                    ore.forEach((ora, idx) => { 
+                        html += `<div class="grid-line" style="top: ${idx * 64}px;"></div>`; 
+                    });
+
+                    const eventi = (settimana.eventi && settimana.eventi[giorno]) ? settimana.eventi[giorno] : [];
+                    eventi.forEach((evento, eventIdx) => {
+                        if (!appartieneAlGruppo(evento, gruppoSelezionato)) return;
+
+                        const top = (evento.oraInizio - 8) * 64;
+                        const height = (evento.oraFine - evento.oraInizio) * 64;
+                        const classe = evento.tipo === 'obbligatorio' ? 'evento-obbligatorio' : evento.tipo === 'saltata' ? 'evento-saltata' : 'evento-normale';
+                        const emoji = evento.tipo === 'obbligatorio' ? '⚠️' : evento.tipo === 'saltata' ? '❌' : '✅';
+
+                        html += `<div class="evento ${classe}" style="top: ${top}px; height: ${height}px;" onclick="apriModale(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
+                        html += `<div class="evento-title">${emoji} ${evento.titolo}</div>`;
+                        html += `<div class="evento-time">${formattaOra(evento.oraInizio)} - ${formattaOra(evento.oraFine)}</div>`;
+                        if (evento.docente || evento.luogo) {
+                            html += `<div class="evento-docente">${[evento.docente, evento.luogo].filter(Boolean).join(' • ')}</div>`;
+                        }
+                        html += `</div>`;
+                    });
+                    html += '</div></div>';
                 });
-                html += '</div></div>';
-            });
-            calElem.innerHTML = html;
+                calElem.innerHTML = html;
+            }
         }
 
         function renderInsegnamenti() {
@@ -1311,8 +1359,8 @@ body {
             }
         }
 
-        function aggiornaInterfaccia() {
-            renderCalendario();
+        function aggiornaInterfaccia(animationDirection = null) {
+            renderCalendario(animationDirection);
             renderInsegnamenti();
             updateControls();
         }
@@ -1351,7 +1399,6 @@ body {
         function compilaCampiTitolo(titoloCompleto) {
             let trovato = false;
 
-            // Riconoscimento insegnamento e modulo dal titolo esistente
             for (const [insNome, moduli] of Object.entries(strutturaCorsi)) {
                 if (titoloCompleto.includes(insNome)) {
                     document.getElementById('editInsegnamento').value = insNome;
@@ -1368,7 +1415,6 @@ body {
             }
 
             if (!trovato) {
-                // Se non rientra nei 3 ufficiali, è un'attività libera/altro
                 document.getElementById('editInsegnamento').value = 'ALTRO';
                 onInsegnamentoChange();
                 document.getElementById('editTitoloLibero').value = titoloCompleto;
@@ -1520,9 +1566,26 @@ body {
             if (selector) selector.value = settimanaCorrente;
         }
 
-        function prevWeek() { if (settimanaCorrente > 0) { settimanaCorrente--; renderCalendario(); updateControls(); } }
-        function nextWeek() { if (settimanaCorrente < settimane.length - 1) { settimanaCorrente++; renderCalendario(); updateControls(); } }
-        function changeWeek() { settimanaCorrente = parseInt(document.getElementById('weekSelector').value); renderCalendario(); updateControls(); }
+        function prevWeek() { 
+            if (settimanaCorrente > 0 && !isTransitioning) { 
+                settimanaCorrente--; 
+                aggiornaInterfaccia('prev'); 
+            } 
+        }
+
+        function nextWeek() { 
+            if (settimanaCorrente < settimane.length - 1 && !isTransitioning) { 
+                settimanaCorrente++; 
+                aggiornaInterfaccia('next'); 
+            } 
+        }
+
+        function changeWeek() { 
+            const newWeek = parseInt(document.getElementById('weekSelector').value);
+            const dir = newWeek > settimanaCorrente ? 'next' : 'prev';
+            settimanaCorrente = newWeek; 
+            aggiornaInterfaccia(dir); 
+        }
 
         function exportICS() {
             let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Fisioterapia UniTO//IT\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nX-WR-CALNAME:Fisioterapia 2025-2026\r\nX-WR-TIMEZONE:Europe/Rome\r\n';
