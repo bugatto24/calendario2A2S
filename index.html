@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Calendario Fisioterapia Cloud</title>
     
-    <!-- Firebase SDK Compatibile con script browser -->
+    <!-- Firebase SDK Compatibile -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
@@ -20,11 +20,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-
 
 /* Barra Utente Cloud */
 .user-bar { background: #581c87; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 14px; }
-.user-bar-input-group { display: flex; align-items: center; gap: 8px; }
-.user-bar input { padding: 6px 12px; border-radius: 6px; border: none; font-size: 14px; outline: none; }
-.btn-user { background: #9333ea; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+.user-bar-input-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.user-bar input { padding: 7px 12px; border-radius: 6px; border: none; font-size: 14px; outline: none; }
+.btn-user { background: #9333ea; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
 .btn-user:hover { background: #a855f7; }
-.sync-badge { font-size: 12px; padding: 4px 10px; border-radius: 4px; background: rgba(255,255,255,0.2); font-weight: 500; }
+.btn-save-cloud { background: #10b981; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+.btn-save-cloud:hover { background: #059669; }
+.sync-badge { font-size: 12px; padding: 5px 12px; border-radius: 6px; background: rgba(255,255,255,0.2); font-weight: 600; }
 
 .controls { background: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; flex-wrap: wrap; gap: 15px; }
 .nav-buttons, .action-buttons { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -114,15 +116,16 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
     <div class="container">
         <div class="header">
             <h1>Calendario Fisioterapia 2025-2026</h1>
-            <p>Sincronizzazione Cloud Automatica</p>
+            <p>Sincronizzazione Cloud con Firebase</p>
         </div>
 
-        <!-- Sezione Gestione Profilo Cloud -->
+        <!-- Barra Profilo Cloud -->
         <div class="user-bar">
             <div class="user-bar-input-group">
                 <label for="usernameInput">👤 Profilo:</label>
                 <input type="text" id="usernameInput" placeholder="es. mario_rossi">
-                <button class="btn-user" onclick="impostaUtente()">Carica / Accedi</button>
+                <button class="btn-user" onclick="caricaOCreaProfilo()">Carica / Crea</button>
+                <button class="btn-save-cloud" onclick="salvaSuCloud()">Aggiorna</button>
             </div>
             <div class="sync-badge" id="syncStatus">Stato: Non connesso</div>
         </div>
@@ -141,7 +144,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
         </div>
 
         <div class="legend">
-            <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Da seguire (Clicca per edit)</span></div>
+            <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Da seguire (Clicca per modificare)</span></div>
             <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
             <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Da saltare</span></div>
         </div>
@@ -172,8 +175,8 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
             <div class="form-group"><label>Docente</label><input type="text" id="editDocente"></div>
             <div class="form-group"><label>Aula</label><input type="text" id="editLuogo"></div>
             <div class="form-row">
-                <div class="form-group" style="flex:1"><label>Inizio (ore)</label><input type="number" id="editOraInizio" step="0.5"></div>
-                <div class="form-group" style="flex:1"><label>Fine (ore)</label><input type="number" id="editOraFine" step="0.5"></div>
+                <div class="form-group" style="flex:1"><label>Inizio</label><input type="number" id="editOraInizio" step="0.5"></div>
+                <div class="form-group" style="flex:1"><label>Fine</label><input type="number" id="editOraFine" step="0.5"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-delete" onclick="eliminaEventoCorrente()">🗑️ Elimina</button>
@@ -184,11 +187,12 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
 
     <script>
         // ============================================
-        // CONFIGURAZIONE FIREBASE PROGETTO A2S-AADBF
+        // FIREBASE INIZIALIZZAZIONE
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyBU9IVD8kqpU7bE7QEwOvOnAgvhtl98Ktg",
             authDomain: "a2s-aadbf.firebaseapp.com",
+            databaseURL: "https://a2s-aadbf-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "a2s-aadbf",
             storageBucket: "a2s-aadbf.firebasestorage.app",
             messagingSenderId: "646624892228",
@@ -200,7 +204,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
             firebase.initializeApp(firebaseConfig);
             db = firebase.database();
         } catch(e) {
-            console.error("Inizializzazione Firebase fallita:", e);
+            console.error("Firebase err:", e);
         }
 
         let currentUser = '';
@@ -213,8 +217,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
 
         const defaultSettimane = [
             {
-                numero: 1,
-                periodo: "1-2 ottobre 2026",
+                numero: 1, periodo: "1-2 ottobre 2026",
                 eventi: {
                     giovedì: [
                         { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
@@ -230,8 +233,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                 }
             },
             {
-                numero: 2,
-                periodo: "5-9 ottobre 2026",
+                numero: 2, periodo: "5-9 ottobre 2026",
                 eventi: {
                     lunedì: [
                         { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula 2.7 Marenco", tipo: "normale" },
@@ -266,8 +268,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                 }
             },
             {
-                numero: 3,
-                periodo: "12-16 ottobre 2026",
+                numero: 3, periodo: "12-16 ottobre 2026",
                 eventi: {
                     lunedì: [
                         { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
@@ -300,8 +301,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                 }
             },
             {
-                numero: 4,
-                periodo: "19-23 ottobre 2026",
+                numero: 4, periodo: "19-23 ottobre 2026",
                 eventi: {
                     lunedì: [
                         { oraInizio: 8, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
@@ -333,8 +333,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                 }
             },
             {
-                numero: 5,
-                periodo: "26-30 ottobre 2026",
+                numero: 5, periodo: "26-30 ottobre 2026",
                 eventi: {
                     lunedì: [
                         { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
@@ -364,8 +363,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                 }
             },
             {
-                numero: 6,
-                periodo: "2-6 novembre 2026",
+                numero: 6, periodo: "2-6 novembre 2026",
                 eventi: {
                     lunedì: [
                         { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
@@ -398,8 +396,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                 }
             },
             {
-                numero: 7,
-                periodo: "9-13 novembre 2026",
+                numero: 7, periodo: "9-13 novembre 2026",
                 eventi: {
                     lunedì: [
                         { oraInizio: 10.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
@@ -430,8 +427,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                 }
             },
             {
-                numero: 8,
-                periodo: "16-20 novembre 2026",
+                numero: 8, periodo: "16-20 novembre 2026",
                 eventi: {
                     lunedì: [
                         { oraInizio: 8.5, oraFine: 12.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
@@ -469,18 +465,18 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
         };
         const giornoOffset = { 'lunedì': 0, 'martedì': 1, 'mercoledì': 2, 'giovedì': 3, 'venerdì': 4 };
 
-        // ============================================
-        // SINCRONIZZAZIONE PROFILO
-        // ============================================
         function sanitizeUsername(name) {
             return name.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
         }
 
-        function impostaUtente() {
+        // ============================================
+        // AZIONI PULSANTI CLOUD
+        // ============================================
+        function caricaOCreaProfilo() {
             const inputVal = document.getElementById('usernameInput').value;
             const sanitized = sanitizeUsername(inputVal);
             if (!sanitized) {
-                alert("Inserisci un nome utente valido (solo lettere minuscole, numeri, trattini o underscore).");
+                alert("Inserisci un nome utente (es. mario_rossi).");
                 return;
             }
             currentUser = sanitized;
@@ -488,43 +484,56 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
                 localStorage.setItem('currentUser_fisioterapia', currentUser);
             } catch(e) {}
             document.getElementById('usernameInput').value = currentUser;
-            connettiFirebase();
-        }
 
-        function connettiFirebase() {
-            if (!db || !currentUser) return;
             const statusBadge = document.getElementById('syncStatus');
-            statusBadge.textContent = `Caricamento: ${currentUser}...`;
+            statusBadge.textContent = "Connessione...";
 
-            const userRef = db.ref('utenti/' + currentUser);
-            userRef.once('value').then(snapshot => {
+            if (!db) {
+                statusBadge.textContent = "🔴 Errore DB";
+                return;
+            }
+
+            db.ref('utenti/' + currentUser).once('value').then(snapshot => {
                 const data = snapshot.val();
-                if (data && Array.isArray(data)) {
-                    settimane = data;
-                    statusBadge.textContent = `🟢 Sincronizzato: ${currentUser}`;
+                if (data) {
+                    // Se Firebase ritorna un oggetto anziché un array, lo riconvertiamo
+                    settimane = Array.isArray(data) ? data : Object.values(data);
+                    statusBadge.textContent = `🟢 Caricato: ${currentUser}`;
                 } else {
+                    // Profilo nuovo: inizializza con i dati di default
                     settimane = JSON.parse(JSON.stringify(defaultSettimane));
-                    salvaSuCloud();
+                    db.ref('utenti/' + currentUser).set(settimane);
                     statusBadge.textContent = `🟢 Creato nuovo: ${currentUser}`;
                 }
-                aggiornaInterfaccia(false);
+                aggiornaInterfaccia();
             }).catch(err => {
-                console.error("Errore di lettura dal database:", err);
-                statusBadge.textContent = "🔴 Errore connessione";
+                console.error("Errore fetch Firebase:", err);
+                statusBadge.textContent = "🔴 Errore caricamento";
             });
         }
 
         function salvaSuCloud() {
-            if (!db || !currentUser) return;
+            if (!currentUser) {
+                alert("Inserisci e carica prima un nome utente!");
+                return;
+            }
+            if (!db) {
+                alert("Database non connesso.");
+                return;
+            }
+
             const statusBadge = document.getElementById('syncStatus');
-            statusBadge.textContent = "Salvataggio...";
+            statusBadge.textContent = "Aggiornamento in corso...";
+
             db.ref('utenti/' + currentUser).set(settimane)
               .then(() => {
-                  statusBadge.textContent = `🟢 Salvato: ${currentUser}`;
+                  statusBadge.textContent = `🟢 Aggiornato: ${currentUser}`;
+                  alert("Modifiche salvate sul cloud con successo!");
               })
               .catch(err => {
-                  console.error("Errore di scrittura sul database:", err);
+                  console.error("Errore aggiornamento:", err);
                   statusBadge.textContent = "🔴 Errore salvataggio";
+                  alert("Impossibile salvare su Firebase. Verifica le regole del database.");
               });
         }
 
@@ -540,8 +549,9 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
         function calcolaOreModulo(searchTerm) {
             let totale = 0, seguite = 0;
             settimane.forEach(s => {
+                if (!s || !s.eventi) return;
                 giorni.forEach(g => {
-                    const eventi = (s.eventi && s.eventi[g]) ? s.eventi[g] : [];
+                    const eventi = s.eventi[g] || [];
                     eventi.forEach(e => {
                         if (e.titolo && e.titolo.includes(searchTerm)) {
                             const d = e.oraFine - e.oraInizio;
@@ -670,11 +680,10 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
             }
         }
 
-        function aggiornaInterfaccia(salva = true) {
+        function aggiornaInterfaccia() {
             renderCalendario();
             renderInsegnamenti();
             updateControls();
-            if (salva) salvaSuCloud();
         }
 
         // ============================================
@@ -718,7 +727,7 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
             ev.oraFine = parseFloat(document.getElementById('editOraFine').value);
             ev.tipo = tipoSelezionato;
             chiudiModale();
-            aggiornaInterfaccia(true);
+            aggiornaInterfaccia();
         }
 
         function eliminaEventoCorrente() {
@@ -726,13 +735,13 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
             const { weekIdx, giorno, eventIdx } = eventoSelezionatoRef;
             settimane[weekIdx].eventi[giorno].splice(eventIdx, 1);
             chiudiModale();
-            aggiornaInterfaccia(true);
+            aggiornaInterfaccia();
         }
 
         function ripristinaDati() {
-            if (confirm("Vuoi ripristinare il calendario originario per questo profilo?")) {
+            if (confirm("Vuoi ripristinare il calendario predefinito? Clicca poi su 'Aggiorna' per confermare il ripristino sul Cloud.")) {
                 settimane = JSON.parse(JSON.stringify(defaultSettimane));
-                aggiornaInterfaccia(true);
+                aggiornaInterfaccia();
             }
         }
 
@@ -792,9 +801,9 @@ select { padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-
 
             if (currentUser) {
                 document.getElementById('usernameInput').value = currentUser;
-                connettiFirebase();
+                caricaOCreaProfilo();
             } else {
-                aggiornaInterfaccia(false);
+                aggiornaInterfaccia();
             }
         }
 
