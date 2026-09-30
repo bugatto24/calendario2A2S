@@ -115,8 +115,6 @@ body {
 }
 .btn-user { background: #7e22ce; color: white; }
 .btn-user:hover { background: #6b21a8; }
-.btn-save-cloud { background: #16a34a; color: white; font-weight: 600; }
-.btn-save-cloud:hover { background: #15803d; }
 .btn-toggle-view { background: #e0e7ff; color: #4338ca; font-weight: 600; border: 1px solid #c7d2fe; }
 .btn-toggle-view:hover { background: #c7d2fe; }
 .sync-badge { 
@@ -126,6 +124,7 @@ body {
     background: #ede9fe; 
     color: #6b21a8; 
     font-weight: 600; 
+    transition: all 0.2s ease;
 }
 
 /* Controlli Settimane e Azioni */
@@ -181,12 +180,10 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
-/* Modalità compatta: vincola il touch all'asse verticale per permettere lo swipe JS */
 .calendar-container.vista-compatta {
     touch-action: pan-y;
 }
 
-/* Modalità espansa: sblocca lo scroll orizzontale nativo touch */
 .calendar-container.vista-espansa {
     touch-action: auto !important;
     overflow-x: scroll !important;
@@ -200,7 +197,6 @@ body {
     will-change: transform, opacity;
 }
 
-/* Animazioni di cambio settimana */
 .slide-out-left { transform: translate3d(-18px, 0, 0); opacity: 0.2; }
 .slide-out-right { transform: translate3d(18px, 0, 0); opacity: 0.2; }
 .slide-in-right { transform: translate3d(18px, 0, 0); opacity: 0.2; }
@@ -455,7 +451,7 @@ body {
     .user-bar-input-group { 
         width: 100%; 
         display: grid; 
-        grid-template-columns: 1fr auto auto; 
+        grid-template-columns: 1fr auto; 
         gap: 6px; 
     }
     .user-bar-input-group label { display: none; }
@@ -554,7 +550,7 @@ body {
                 </div>
                 <div>
                     <h1>Calendario Fisioterapia 2025-2026</h1>
-                    
+                    <p>Sincronizzazione Cloud Automatica</p>
                 </div>
             </div>
             <div class="sync-badge" id="syncStatus">Stato: Non connesso</div>
@@ -566,7 +562,6 @@ body {
                 <div class="user-bar-input-group">
                     <input type="text" id="usernameInput" placeholder="Nome utente (es. mario_rossi)">
                     <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica o crea profilo">Carica/Crea</button>
-                    <button class="btn btn-save-cloud" onclick="salvaSuCloud()" title="Salva sul cloud">💾 Salva</button>
                 </div>
                 
                 <div class="user-bar-input-group" style="grid-template-columns: auto 1fr;">
@@ -679,16 +674,13 @@ body {
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente()">🗑️ Elimina</button>
+                <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente()">🗑️️ Elimina</button>
                 <button type="button" class="btn-save-modal" onclick="salvaModificheEvento()">Conferma</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // MAPPA MODULI E INSEGNAMENTI UFFICIALI
-        // ============================================
         const strutturaCorsi = {
             'PATOLOGIA GENERALE': [
                 { nome: 'PATOLOGIA GENERALE', searchKey: 'PATOLOGIA GENERALE LEZ' },
@@ -1013,7 +1005,7 @@ body {
         }
 
         // ============================================
-        // GESTIONE SWIPE RAPIDO DA MOBILE (SOLO IN COMPATTA)
+        // GESTIONE SWIPE RAPIDO DA MOBILE (SOLO COMPATTA)
         // ============================================
         let touchStartX = 0;
         let touchStartY = 0;
@@ -1027,8 +1019,6 @@ body {
             }, { passive: true });
 
             container.addEventListener('touchend', (e) => {
-                // Lo swipe tra settimane si attiva SOLO se la vista è compatta.
-                // In vista espansa si lascia il controllo allo scroll orizzontale nativo.
                 if (!container.classList.contains('vista-compatta')) return;
 
                 const touchEndX = e.changedTouches[0].screenX;
@@ -1068,10 +1058,11 @@ body {
                 localStorage.setItem('currentGroup_fisioterapia', gruppoSelezionato);
             } catch(e) {}
             aggiornaInterfaccia();
+            salvaSuCloudSilenzioso();
         }
 
         // ============================================
-        // CLOUD PROFILE & SALVATAGGIO
+        // CLOUD PROFILE & SALVATAGGIO AUTOMATICO
         // ============================================
         function caricaOCreaProfilo() {
             const inputVal = document.getElementById('usernameInput').value;
@@ -1110,7 +1101,7 @@ body {
                     statusBadge.textContent = `🟢 Connesso: ${currentUser}`;
                 } else {
                     settimane = JSON.parse(JSON.stringify(defaultSettimane));
-                    salvaSuCloud();
+                    salvaSuCloudSilenzioso();
                     statusBadge.textContent = `🟢 Creato: ${currentUser}`;
                 }
                 aggiornaInterfaccia();
@@ -1120,15 +1111,9 @@ body {
             });
         }
 
-        function salvaSuCloud() {
-            if (!currentUser) {
-                alert("Inserisci e carica prima un nome utente!");
-                return;
-            }
-            if (!db) {
-                alert("Database non connesso.");
-                return;
-            }
+        // Salvataggio automatico senza finestre di alert
+        function salvaSuCloudSilenzioso() {
+            if (!currentUser || !db) return;
 
             const statusBadge = document.getElementById('syncStatus');
             statusBadge.textContent = "Salvataggio...";
@@ -1141,13 +1126,11 @@ body {
 
             db.ref('utenti/' + currentUser).set(payload)
               .then(() => {
-                  statusBadge.textContent = `🟢 Salvato: ${currentUser}`;
-                  alert("Modifiche salvate sul cloud con successo!");
+                  statusBadge.textContent = `🟢 Sincronizzato`;
               })
               .catch(err => {
-                  console.error("Errore salvataggio:", err);
-                  statusBadge.textContent = "🔴 Errore salvataggio";
-                  alert("Impossibile salvare su Firebase. Verifica le regole del database.");
+                  console.error("Errore autosave:", err);
+                  statusBadge.textContent = "🔴 Non salvato";
               });
         }
 
@@ -1414,7 +1397,7 @@ body {
         }
 
         // ============================================
-        // CREAZIONE & MODIFICA EVENTI
+        // CREAZIONE & MODIFICA EVENTI (CON AUTOSAVE)
         // ============================================
         let tipoSelezionato = 'normale';
 
@@ -1531,6 +1514,7 @@ body {
 
             chiudiModale();
             aggiornaInterfaccia();
+            salvaSuCloudSilenzioso(); // Auto-save su Firebase
         }
 
         function eliminaEventoCorrente() {
@@ -1540,12 +1524,14 @@ body {
             settimane[weekIdx].eventi[giorno].splice(eventIdx, 1);
             chiudiModale();
             aggiornaInterfaccia();
+            salvaSuCloudSilenzioso(); // Auto-save su Firebase
         }
 
         function ripristinaDati() {
-            if (confirm("Vuoi ripristinare il calendario predefinito? Clicca poi su '💾 Salva' per confermare il ripristino sul Cloud.")) {
+            if (confirm("Vuoi ripristinare il calendario predefinito sul Cloud?")) {
                 settimane = JSON.parse(JSON.stringify(defaultSettimane));
                 aggiornaInterfaccia();
+                salvaSuCloudSilenzioso();
             }
         }
 
