@@ -115,6 +115,8 @@ body {
 }
 .btn-user { background: #7e22ce; color: white; }
 .btn-user:hover { background: #6b21a8; }
+.btn-today { background: #f8fafc; color: #1e293b; border: 1.5px solid #cbd5e1; font-weight: 600; }
+.btn-today:hover { background: #e2e8f0; border-color: #94a3b8; }
 .btn-toggle-view { background: #e0e7ff; color: #4338ca; font-weight: 600; border: 1px solid #c7d2fe; }
 .btn-toggle-view:hover { background: #c7d2fe; }
 .sync-badge { 
@@ -171,7 +173,7 @@ body {
 .legend-grigio { background: #f1f5f9; border: 2px solid #94a3b8; }
 
 /* ========================================================
-   CALENDARIO & TRANSIZIONI RAPIDE
+   CALENDARIO & LINEA ORARIA CORRENTE (STYLE GOOGLE CALENDAR)
    ======================================================== */
 .calendar-container { 
     background: #ffffff; 
@@ -258,7 +260,25 @@ body {
     z-index: 15;
 }
 .day-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }
-.day-number { font-size: 15px; font-weight: 700; color: #0f172a; margin-top: 2px; }
+.day-number { 
+    font-size: 15px; 
+    font-weight: 700; 
+    color: #0f172a; 
+    margin-top: 2px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+/* Evidenziazione Giorno Odierno */
+.is-today .day-name { color: #7e22ce; font-weight: 700; }
+.is-today .day-number { 
+    background: #7e22ce; 
+    color: #ffffff; 
+}
 
 .day-grid { 
     position: relative; 
@@ -271,6 +291,27 @@ body {
     height: 64px; 
     border-bottom: 1px solid #f1f5f9; 
     pointer-events: none;
+}
+
+/* Linea Ora Attuale Rossa stile Google Calendar */
+.current-time-line {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #ea4335;
+    z-index: 30;
+    pointer-events: none;
+}
+.current-time-line::before {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: -4px;
+    width: 10px;
+    height: 10px;
+    background: #ea4335;
+    border-radius: 50%;
 }
 
 .evento { 
@@ -467,7 +508,7 @@ body {
     .nav-buttons { 
         width: 100%; 
         display: grid; 
-        grid-template-columns: auto 1fr auto; 
+        grid-template-columns: auto auto 1fr auto; 
         gap: 6px; 
     }
     .nav-buttons select { width: 100%; min-width: 0; }
@@ -501,7 +542,7 @@ body {
         justify-content: center;
     }
     .calendar-container.vista-compatta .day-name { font-size: 9px; }
-    .calendar-container.vista-compatta .day-number { font-size: 13px; }
+    .calendar-container.vista-compatta .day-number { font-size: 12px; width: 22px; height: 22px; }
     .calendar-container.vista-compatta .evento {
         padding: 3px 2px;
         width: calc(100% - 3px);
@@ -521,7 +562,7 @@ body {
     .calendar-container.vista-compatta .evento-time { font-size: 8.5px; margin-top: 1px; }
     .calendar-container.vista-compatta .evento-docente { display: none; }
 
-    /* VISTA ESPANSA: PERMETTE LO SCROLL A DESTRA DEI GIORNI */
+    /* VISTA ESPANSA: SCROLL ORIZZONTALE */
     .calendar-container.vista-espansa .calendar {
         min-width: 900px !important;
         width: 900px !important;
@@ -580,6 +621,8 @@ body {
         <!-- Controlli Settimane e Navigazione -->
         <div class="controls">
             <div class="nav-buttons">
+                <!-- Tasto Oggi -->
+                <button class="btn btn-today" onclick="vaiAOggi()" title="Vai alla settimana con il giorno odierno">Oggi</button>
                 <button class="btn btn-nav" id="btnPrev" onclick="prevWeek()">◀</button>
                 <select id="weekSelector" onchange="changeWeek()"></select>
                 <button class="btn btn-nav" id="btnNext" onclick="nextWeek()">▶</button>
@@ -587,7 +630,7 @@ body {
             
             <div class="action-buttons">
                 <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleVistaMobile()">📐 Espandi</button>
-                <button class="btn btn-export" onclick="exportICS()">🗓️ ICS</button>
+                <button class="btn btn-export" onclick="exportICS()">🗓️️ ICS</button>
                 <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset</button>
             </div>
         </div>
@@ -624,7 +667,6 @@ body {
                 <button type="button" class="btn-status-quick" id="btnStatoSaltata" onclick="impostaStato('saltata')">❌ Salta</button>
             </div>
             
-            <!-- Selezione Giorno della Settimana -->
             <div class="form-group">
                 <label for="editGiorno">Giorno</label>
                 <select id="editGiorno">
@@ -636,7 +678,6 @@ body {
                 </select>
             </div>
 
-            <!-- Selezione Insegnamento a Cascata -->
             <div class="form-group">
                 <label for="editInsegnamento">Insegnamento</label>
                 <select id="editInsegnamento" onchange="onInsegnamentoChange()">
@@ -647,13 +688,11 @@ body {
                 </select>
             </div>
 
-            <!-- Selezione Corso / Modulo Ufficiale -->
             <div class="form-group" id="groupModuloSelect">
                 <label for="editModulo">Corso / Modulo</label>
                 <select id="editModulo"></select>
             </div>
 
-            <!-- Campo Testo Libero per Opzione ALTRO -->
             <div class="form-group" id="groupTitoloLibero" style="display:none;">
                 <label for="editTitoloLibero">Nome Attività / Lezione</label>
                 <input type="text" id="editTitoloLibero" placeholder="Es. Tirocinio, Seminario...">
@@ -662,7 +701,6 @@ body {
             <div class="form-group"><label for="editDocente">Docente</label><input type="text" id="editDocente" placeholder="Es. BOZZALI"></div>
             <div class="form-group"><label for="editLuogo">Aula / Sede</label><input type="text" id="editLuogo" placeholder="Es. Aula Magna"></div>
             
-            <!-- Orari Formattati HH:MM -->
             <div class="form-row">
                 <div class="form-group" style="flex:1">
                     <label for="editOraInizio">Ora Inizio</label>
@@ -674,7 +712,7 @@ body {
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente()">🗑️️ Elimina</button>
+                <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente()">🗑 Elimina</button>
                 <button type="button" class="btn-save-modal" onclick="salvaModificheEvento()">Conferma</button>
             </div>
         </div>
@@ -1037,7 +1075,7 @@ body {
         }
 
         // ============================================
-        // FILTRAGGIO GRUPPI (incluso A/B e C/D)
+        // FILTRAGGIO GRUPPI
         // ============================================
         function appartieneAlGruppo(evento, gruppoTarget) {
             if (gruppoTarget === 'ALL') return true;
@@ -1111,7 +1149,6 @@ body {
             });
         }
 
-        // Salvataggio automatico senza finestre di alert
         function salvaSuCloudSilenzioso() {
             if (!currentUser || !db) return;
 
@@ -1168,6 +1205,38 @@ body {
         }
 
         // ============================================
+        // GESTIONE "OGGI" E LINEA ORA ATTUALE
+        // ============================================
+        function vaiAOggi() {
+            const oggi = new Date();
+            let trovata = false;
+
+            // Cerca la settimana che include la data odierna
+            for (let i = 0; i < settimane.length; i++) {
+                const baseStr = dateMap[settimane[i].numero];
+                if (!baseStr) continue;
+                const lunediSettimana = new Date(baseStr);
+                const domenicaSettimana = new Date(baseStr);
+                domenicaSettimana.setDate(lunediSettimana.getDate() + 6);
+
+                if (oggi >= lunediSettimana && oggi <= domenicaSettimana) {
+                    const dir = i > settimanaCorrente ? 'next' : 'prev';
+                    settimanaCorrente = i;
+                    aggiornaInterfaccia(dir);
+                    trovata = true;
+                    break;
+                }
+            }
+
+            if (!trovata) {
+                // Se oggi è fuori periodo, va alla settimana 0
+                const dir = 0 < settimanaCorrente ? 'prev' : null;
+                settimanaCorrente = 0;
+                aggiornaInterfaccia(dir);
+            }
+        }
+
+        // ============================================
         // RENDER GRAFICO CON TRANSIZIONE VELOCE (120ms)
         // ============================================
         let isTransitioning = false;
@@ -1202,6 +1271,12 @@ body {
 
             function buildCalendarHTML() {
                 const baseDate = new Date(dateMap[settimana.numero] || '2026-09-28');
+                const now = new Date();
+                const nowYear = now.getFullYear();
+                const nowMonth = now.getMonth();
+                const nowDate = now.getDate();
+                const nowDayOfWeek = now.getDay(); // 0: Dom, 1: Lun ... 5: Ven, 6: Sab
+                const nowDecimalHour = now.getHours() + (now.getMinutes() / 60);
 
                 let html = '<div class="time-column"><div class="time-header">Ora</div>';
                 ore.forEach(ora => { 
@@ -1215,16 +1290,28 @@ body {
                     const giornoNum = dataGiorno.getDate();
                     const giornoBreve = giorno.substring(0, 3).toUpperCase();
 
-                    html += `<div class="day-column">
+                    // Verifica se questo giorno è "oggi"
+                    const isToday = (dataGiorno.getFullYear() === nowYear &&
+                                     dataGiorno.getMonth() === nowMonth &&
+                                     dataGiorno.getDate() === nowDate);
+
+                    html += `<div class="day-column ${isToday ? 'is-today' : ''}">
                         <div class="day-header">
                             <span class="day-name">${giornoBreve}</span>
                             <span class="day-number">${giornoNum}</span>
                         </div>
                         <div class="day-grid" onclick="creaNuovoEvento(event, ${settimanaCorrente}, '${giorno}')">`;
 
+                    // Linee orarie
                     ore.forEach((ora, idx) => { 
                         html += `<div class="grid-line" style="top: ${idx * 64}px;"></div>`; 
                     });
+
+                    // Linea dell'ora attuale (se oggi è feriale e compreso nell'orario 8-21)
+                    if (isToday && nowDecimalHour >= 8 && nowDecimalHour <= 21) {
+                        const lineTop = (nowDecimalHour - 8) * 64;
+                        html += `<div class="current-time-line" style="top: ${lineTop}px;" title="Ora attuale"></div>`;
+                    }
 
                     const eventi = (settimana.eventi && settimana.eventi[giorno]) ? settimana.eventi[giorno] : [];
                     eventi.forEach((evento, eventIdx) => {
@@ -1233,7 +1320,7 @@ body {
                         const top = (evento.oraInizio - 8) * 64;
                         const height = (evento.oraFine - evento.oraInizio) * 64;
                         const classe = evento.tipo === 'obbligatorio' ? 'evento-obbligatorio' : evento.tipo === 'saltata' ? 'evento-saltata' : 'evento-normale';
-                        const emoji = evento.tipo === 'obbligatorio' ? '⚠️' : evento.tipo === 'saltata' ? '❌' : '✅';
+                        const emoji = evento.tipo === 'obbligatorio' ? '⚠️️' : evento.tipo === 'saltata' ? '❌' : '✅';
 
                         html += `<div class="evento ${classe}" style="top: ${top}px; height: ${height}px;" onclick="apriModale(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
                         html += `<div class="evento-title">${emoji} ${evento.titolo}</div>`;
@@ -1514,7 +1601,7 @@ body {
 
             chiudiModale();
             aggiornaInterfaccia();
-            salvaSuCloudSilenzioso(); // Auto-save su Firebase
+            salvaSuCloudSilenzioso();
         }
 
         function eliminaEventoCorrente() {
@@ -1524,7 +1611,7 @@ body {
             settimane[weekIdx].eventi[giorno].splice(eventIdx, 1);
             chiudiModale();
             aggiornaInterfaccia();
-            salvaSuCloudSilenzioso(); // Auto-save su Firebase
+            salvaSuCloudSilenzioso();
         }
 
         function ripristinaDati() {
@@ -1611,6 +1698,11 @@ body {
             document.getElementById('groupSelector').value = gruppoSelezionato;
 
             initSwipeGestures();
+
+            // Aggiorna l'indicatore orario ogni minuto
+            setInterval(() => {
+                renderCalendario();
+            }, 60000);
 
             if (currentUser) {
                 document.getElementById('usernameInput').value = currentUser;
