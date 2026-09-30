@@ -36,7 +36,7 @@ body {
 
 /* Header stile Workspace */
 .header { 
-    background: #ffffff;
+    background: #ffffff; 
     color: #1e293b; 
     padding: 20px 24px; 
     border-bottom: 1px solid #e2e8f0;
@@ -84,7 +84,7 @@ body {
     align-items: center; 
     gap: 6px; 
 }
-.user-bar input, .user-bar select, .controls select { 
+.user-bar input, .user-bar select, .controls select, .form-group select { 
     padding: 8px 12px; 
     border-radius: 8px; 
     border: 1.5px solid #cbd5e1; 
@@ -94,7 +94,7 @@ body {
     background: #ffffff;
     transition: all 0.2s;
 }
-.user-bar input:focus, .user-bar select:focus, .controls select:focus {
+.user-bar input:focus, .user-bar select:focus, .controls select:focus, .form-group select:focus {
     border-color: #7e22ce;
     box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.12);
 }
@@ -179,6 +179,7 @@ body {
     overflow-x: auto; 
     position: relative;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
 }
 .calendar { 
     display: grid; 
@@ -186,7 +187,6 @@ body {
     min-width: 980px; 
 }
 
-/* Colonna Orari Sticky */
 .time-column { 
     background: #ffffff; 
     border-right: 1px solid #e2e8f0; 
@@ -201,7 +201,7 @@ body {
     font-weight: 500; 
     text-align: right; 
     font-size: 11px; 
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0; 
     height: 58px;
     display: flex;
     align-items: flex-end;
@@ -220,7 +220,6 @@ body {
     position: relative;
 }
 
-/* Colonne Giorni */
 .day-column { 
     border-right: 1px solid #f1f5f9; 
     position: relative; 
@@ -248,16 +247,17 @@ body {
 
 .day-grid { 
     position: relative; 
-    height: 832px; /* 13 ore x 64px */
+    height: 832px; 
+    cursor: cell; 
 }
 .grid-line { 
     position: absolute; 
     width: 100%; 
     height: 64px; 
     border-bottom: 1px solid #f1f5f9; 
+    pointer-events: none;
 }
 
-/* Eventi stile Google Calendar Cards */
 .evento { 
     position: absolute; 
     width: calc(100% - 6px); 
@@ -300,7 +300,6 @@ body {
     text-overflow: ellipsis;
 }
 
-/* Temi colore eventi */
 .evento-normale { 
     background: #ecfdf5; 
     border-left: 4px solid #10b981; 
@@ -394,7 +393,7 @@ body {
     border-radius: 16px; 
     padding: 24px; 
     width: 100%; 
-    max-width: 460px; 
+    max-width: 480px; 
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); 
     animation: popModal 0.15s ease-out;
 }
@@ -409,16 +408,14 @@ body {
 .btn-status-quick.active-saltata { border-color: #94a3b8; background: #f1f5f9; color: #475569; }
 .form-group { margin-bottom: 12px; }
 .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #475569; }
-.form-group input { width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-family: inherit; }
-.form-group input:focus { border-color: #7e22ce; outline: none; }
+.form-group input, .form-group select { width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-family: inherit; }
+.form-group input:focus, .form-group select:focus { border-color: #7e22ce; outline: none; }
 .form-row { display: flex; gap: 10px; }
 .modal-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f1f5f9; }
 .btn-delete { background: #fee2e2; color: #dc2626; border: none; padding: 9px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .btn-save-modal { background: #7e22ce; color: white; border: none; padding: 9px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
-/* ========================================================
-   MODALITÀ MOBILE & RESPONSIVE
-   ======================================================== */
+/* Responsive Mobile */
 @media (max-width: 768px) {
     body { padding: 4px; }
     .header { padding: 12px 14px; flex-direction: column; align-items: flex-start; }
@@ -470,7 +467,7 @@ body {
 
     .legend { gap: 10px; justify-content: flex-start; padding: 8px 12px; font-size: 11px; }
 
-    /* --- VISTA COMPATTA (DEFAULT SU MOBILE: NESSUNO SCROLL) --- */
+    /* VISTA COMPATTA (DEFAULT MOBILE) */
     .calendar-container.vista-compatta .calendar {
         min-width: 100% !important;
         width: 100% !important;
@@ -515,10 +512,10 @@ body {
         margin-top: 1px;
     }
     .calendar-container.vista-compatta .evento-docente {
-        display: none; /* Nasconde l'aula su vista compatta per leggibilità */
+        display: none;
     }
 
-    /* --- VISTA ESPANSA (SCROLLABILE) --- */
+    /* VISTA ESPANSA */
     .calendar-container.vista-espansa .calendar {
         min-width: 780px !important;
         grid-template-columns: 50px repeat(5, minmax(140px, 1fr)) !important;
@@ -583,7 +580,6 @@ body {
             </div>
             
             <div class="action-buttons">
-                <!-- Tasto commutazione Vista Compatta / Espansa -->
                 <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleVistaMobile()">📐 Espandi</button>
                 <button class="btn btn-export" onclick="exportICS()">🗓️ ICS</button>
                 <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset</button>
@@ -597,7 +593,7 @@ body {
             <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
         </div>
 
-        <!-- Vista Calendario (Google Calendar Style) -->
+        <!-- Vista Calendario -->
         <div class="calendar-container vista-compatta" id="calendarContainer">
             <div class="calendar" id="calendar"></div>
         </div>
@@ -609,11 +605,11 @@ body {
         </div>
     </div>
 
-    <!-- Modale Modifica Lezione -->
+    <!-- Modale Modifica / Creazione Lezione -->
     <div class="modal-overlay" id="editModal">
         <div class="modal">
             <div class="modal-header">
-                <h3>Modifica Lezione</h3>
+                <h3 id="modalTitle">Modifica Lezione</h3>
                 <button class="btn-close" onclick="chiudiModale()">&times;</button>
             </div>
             <div class="quick-status-buttons">
@@ -621,29 +617,91 @@ body {
                 <button type="button" class="btn-status-quick" id="btnStatoObbligatorio" onclick="impostaStato('obbligatorio')">⚠️ Obbligatoria</button>
                 <button type="button" class="btn-status-quick" id="btnStatoSaltata" onclick="impostaStato('saltata')">❌ Salta</button>
             </div>
-            <div class="form-group"><label>Materia</label><input type="text" id="editTitolo"></div>
-            <div class="form-group"><label>Docente</label><input type="text" id="editDocente"></div>
-            <div class="form-group"><label>Aula</label><input type="text" id="editLuogo"></div>
             
-            <!-- Orari con Input Time (Es. 08:30) -->
+            <!-- Selezione Giorno della Settimana -->
+            <div class="form-group">
+                <label for="editGiorno">Giorno</label>
+                <select id="editGiorno">
+                    <option value="lunedì">Lunedì</option>
+                    <option value="martedì">Martedì</option>
+                    <option value="mercoledì">Mercoledì</option>
+                    <option value="giovedì">Giovedì</option>
+                    <option value="venerdì">Venerdì</option>
+                </select>
+            </div>
+
+            <!-- Selezione Insegnamento a Cascata -->
+            <div class="form-group">
+                <label for="editInsegnamento">Insegnamento</label>
+                <select id="editInsegnamento" onchange="onInsegnamentoChange()">
+                    <option value="PATOLOGIA GENERALE">PATOLOGIA GENERALE</option>
+                    <option value="NEUROLESIONI">NEUROLESIONI</option>
+                    <option value="MALATTIE APPARATO LOCOMOTORE">MALATTIE APPARATO LOCOMOTORE</option>
+                    <option value="ALTRO">ALTRO / NON CATALOGATO (Nessun conteggio)</option>
+                </select>
+            </div>
+
+            <!-- Selezione Corso / Modulo Ufficiale -->
+            <div class="form-group" id="groupModuloSelect">
+                <label for="editModulo">Corso / Modulo</label>
+                <select id="editModulo"></select>
+            </div>
+
+            <!-- Campo Testo Libero per Opzione ALTRO -->
+            <div class="form-group" id="groupTitoloLibero" style="display:none;">
+                <label for="editTitoloLibero">Nome Attività / Lezione</label>
+                <input type="text" id="editTitoloLibero" placeholder="Es. Tirocinio, Seminario...">
+            </div>
+
+            <div class="form-group"><label for="editDocente">Docente</label><input type="text" id="editDocente" placeholder="Es. BOZZALI"></div>
+            <div class="form-group"><label for="editLuogo">Aula / Sede</label><input type="text" id="editLuogo" placeholder="Es. Aula Magna"></div>
+            
+            <!-- Orari Formattati HH:MM -->
             <div class="form-row">
                 <div class="form-group" style="flex:1">
-                    <label>Ora Inizio</label>
+                    <label for="editOraInizio">Ora Inizio</label>
                     <input type="time" id="editOraInizio">
                 </div>
                 <div class="form-group" style="flex:1">
-                    <label>Ora Fine</label>
+                    <label for="editOraFine">Ora Fine</label>
                     <input type="time" id="editOraFine">
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-delete" onclick="eliminaEventoCorrente()">🗑️ Elimina</button>
+                <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente()">🗑️ Elimina</button>
                 <button type="button" class="btn-save-modal" onclick="salvaModificheEvento()">Conferma</button>
             </div>
         </div>
     </div>
 
     <script>
+        // ============================================
+        // MAPPA MODULI E INSEGNAMENTI UFFICIALI
+        // ============================================
+        const strutturaCorsi = {
+            'PATOLOGIA GENERALE': [
+                { nome: 'PATOLOGIA GENERALE', searchKey: 'PATOLOGIA GENERALE LEZ' },
+                { nome: 'FARMACOLOGIA', searchKey: 'FARMACOLOGIA' },
+                { nome: 'GASTROENTEROLOGIA', searchKey: 'GASTROENTEROLOGIA' },
+                { nome: 'NEFROLOGIA', searchKey: 'NEFROLOGIA' },
+                { nome: 'OTORINOLARINGOIATRIA', searchKey: 'OTORINOLARINGOIATRIA' }
+            ],
+            'NEUROLESIONI': [
+                { nome: 'NEUROLOGIA II NEUROFISIOLOGIA', searchKey: 'NEUROLOGIA II' },
+                { nome: 'NEUROCHIRURGIA', searchKey: 'NEUROCHIRURGIA' },
+                { nome: 'MEDICINA FISICA RIABILITATIVA III', searchKey: 'RIABILITATIVA III' },
+                { nome: 'SCIENZE FISIOTERAPICHE 4', searchKey: 'FISIOTERAPICHE 4' },
+                { nome: 'SCIENZE FISIOTERAPICHE 5', searchKey: 'FISIOTERAPICHE 5' }
+            ],
+            'MALATTIE APPARATO LOCOMOTORE': [
+                { nome: 'MALATTIE APPARATO LOCOMOTORE', searchKey: 'MALATTIE APPARATO LOCOMOTORE LEZ' },
+                { nome: 'REUMATOLOGIA', searchKey: 'REUMATOLOGIA' },
+                { nome: 'MEDICINA FISICA RIABILITATIVA IV', searchKey: 'RIABILITATIVA IV' },
+                { nome: 'SCIENZE FISIOTERAPICHE 6', searchKey: 'FISIOTERAPICHE 6' },
+                { nome: 'SCIENZE FISIOTERAPICHE 7', searchKey: 'FISIOTERAPICHE 7' }
+            ]
+        };
+
         const firebaseConfig = {
             apiKey: "AIzaSyBU9IVD8kqpU7bE7QEwOvOnAgvhtl98Ktg",
             authDomain: "a2s-aadbf.firebaseapp.com",
@@ -808,7 +866,7 @@ body {
                         { oraInizio: 14, oraFine: 18, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
                     ],
                     giovedì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula Magna Psi. M.绘画Torre Molinette", tipo: "normale" },
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
                         { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
                         { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
                         { oraInizio: 16, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" }
@@ -941,6 +999,38 @@ body {
                 container.classList.add('vista-compatta');
                 btn.textContent = '📐 Espandi';
             }
+        }
+
+        // ============================================
+        // GESTIONE SWIPE DA MOBILE (VISTA COMPATTA)
+        // ============================================
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        function initSwipeGestures() {
+            const container = document.getElementById('calendarContainer');
+            
+            container.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            container.addEventListener('touchend', (e) => {
+                if (!container.classList.contains('vista-compatta')) return;
+
+                const touchEndX = e.changedTouches[0].screenX;
+                const touchEndY = e.changedTouches[0].screenY;
+                const diffX = touchEndX - touchStartX;
+                const diffY = touchEndY - touchStartY;
+
+                if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY)) {
+                    if (diffX < 0) {
+                        nextWeek();
+                    } else {
+                        prevWeek();
+                    }
+                }
+            }, { passive: true });
         }
 
         // ============================================
@@ -1108,7 +1198,7 @@ body {
                         <span class="day-name">${giornoBreve}</span>
                         <span class="day-number">${giornoNum}</span>
                     </div>
-                    <div class="day-grid">`;
+                    <div class="day-grid" onclick="creaNuovoEvento(event, ${settimanaCorrente}, '${giorno}')">`;
 
                 ore.forEach((ora, idx) => { 
                     html += `<div class="grid-line" style="top: ${idx * 64}px;"></div>`; 
@@ -1123,7 +1213,7 @@ body {
                     const classe = evento.tipo === 'obbligatorio' ? 'evento-obbligatorio' : evento.tipo === 'saltata' ? 'evento-saltata' : 'evento-normale';
                     const emoji = evento.tipo === 'obbligatorio' ? '⚠️' : evento.tipo === 'saltata' ? '❌' : '✅';
 
-                    html += `<div class="evento ${classe}" style="top: ${top}px; height: ${height}px;" onclick="apriModale(${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
+                    html += `<div class="evento ${classe}" style="top: ${top}px; height: ${height}px;" onclick="apriModale(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
                     html += `<div class="evento-title">${emoji} ${evento.titolo}</div>`;
                     html += `<div class="evento-time">${formattaOra(evento.oraInizio)} - ${formattaOra(evento.oraFine)}</div>`;
                     if (evento.docente || evento.luogo) {
@@ -1228,18 +1318,111 @@ body {
         }
 
         // ============================================
-        // MODIFICA EVENTI
+        // GESTIONE SELEZIONATORE INSEGNAMENTI & MODULI
+        // ============================================
+        function onInsegnamentoChange(moduloSelezionato = null) {
+            const insScelto = document.getElementById('editInsegnamento').value;
+            const groupModulo = document.getElementById('groupModuloSelect');
+            const groupLibero = document.getElementById('groupTitoloLibero');
+            const selectModulo = document.getElementById('editModulo');
+
+            if (insScelto === 'ALTRO') {
+                groupModulo.style.display = 'none';
+                groupLibero.style.display = 'block';
+            } else {
+                groupModulo.style.display = 'block';
+                groupLibero.style.display = 'none';
+                selectModulo.innerHTML = '';
+
+                const listaModuli = strutturaCorsi[insScelto] || [];
+                listaModuli.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.searchKey;
+                    opt.textContent = m.nome;
+                    selectModulo.appendChild(opt);
+                });
+
+                if (moduloSelezionato) {
+                    selectModulo.value = moduloSelezionato;
+                }
+            }
+        }
+
+        function compilaCampiTitolo(titoloCompleto) {
+            let trovato = false;
+
+            // Riconoscimento insegnamento e modulo dal titolo esistente
+            for (const [insNome, moduli] of Object.entries(strutturaCorsi)) {
+                if (titoloCompleto.includes(insNome)) {
+                    document.getElementById('editInsegnamento').value = insNome;
+                    onInsegnamentoChange();
+                    for (const m of moduli) {
+                        if (titoloCompleto.includes(m.searchKey)) {
+                            document.getElementById('editModulo').value = m.searchKey;
+                            trovato = true;
+                            break;
+                        }
+                    }
+                    if (trovato) break;
+                }
+            }
+
+            if (!trovato) {
+                // Se non rientra nei 3 ufficiali, è un'attività libera/altro
+                document.getElementById('editInsegnamento').value = 'ALTRO';
+                onInsegnamentoChange();
+                document.getElementById('editTitoloLibero').value = titoloCompleto;
+            }
+        }
+
+        // ============================================
+        // CREAZIONE & MODIFICA EVENTI
         // ============================================
         let tipoSelezionato = 'normale';
 
-        function apriModale(weekIdx, giorno, eventIdx) {
-            eventoSelezionatoRef = { weekIdx, giorno, eventIdx };
+        function creaNuovoEvento(e, weekIdx, giorno) {
+            if (e.target.closest('.evento')) return;
+
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickY = e.clientY - rect.top;
+            
+            let oraInizio = 8 + (clickY / 64);
+            oraInizio = Math.floor(oraInizio * 2) / 2;
+            if (oraInizio < 8) oraInizio = 8;
+            if (oraInizio > 19) oraInizio = 19;
+            const oraFine = Math.min(oraInizio + 2, 20);
+
+            eventoSelezionatoRef = { weekIdx, giorno, eventIdx: -1, isNew: true };
+
+            document.getElementById('modalTitle').textContent = "Nuova Lezione";
+            document.getElementById('btnDeleteEvent').style.display = 'none';
+
+            document.getElementById('editGiorno').value = giorno;
+            document.getElementById('editInsegnamento').value = 'PATOLOGIA GENERALE';
+            onInsegnamentoChange();
+            document.getElementById('editTitoloLibero').value = '';
+            document.getElementById('editDocente').value = '';
+            document.getElementById('editLuogo').value = '';
+            document.getElementById('editOraInizio').value = formattaOra(oraInizio);
+            document.getElementById('editOraFine').value = formattaOra(oraFine);
+
+            impostaStato('normale');
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function apriModale(e, weekIdx, giorno, eventIdx) {
+            if (e) e.stopPropagation();
+
+            eventoSelezionatoRef = { weekIdx, giorno, eventIdx, isNew: false };
             const ev = settimane[weekIdx].eventi[giorno][eventIdx];
-            document.getElementById('editTitolo').value = ev.titolo;
+
+            document.getElementById('modalTitle').textContent = "Modifica Lezione";
+            document.getElementById('btnDeleteEvent').style.display = 'block';
+
+            document.getElementById('editGiorno').value = giorno;
+            compilaCampiTitolo(ev.titolo);
             document.getElementById('editDocente').value = ev.docente || '';
             document.getElementById('editLuogo').value = ev.luogo || '';
-            
-            // Imposta gli orari formattati (es. "08:30" anziché 8.5)
             document.getElementById('editOraInizio').value = formattaOra(ev.oraInizio);
             document.getElementById('editOraFine').value = formattaOra(ev.oraFine);
 
@@ -1262,24 +1445,59 @@ body {
 
         function salvaModificheEvento() {
             if (!eventoSelezionatoRef) return;
-            const { weekIdx, giorno, eventIdx } = eventoSelezionatoRef;
-            const ev = settimane[weekIdx].eventi[giorno][eventIdx];
+            const { weekIdx, giorno: vecchioGiorno, eventIdx, isNew } = eventoSelezionatoRef;
+            const nuovoGiorno = document.getElementById('editGiorno').value;
             
-            ev.titolo = document.getElementById('editTitolo').value;
-            ev.docente = document.getElementById('editDocente').value;
-            ev.luogo = document.getElementById('editLuogo').value;
-            
-            // Converte le stringhe "HH:MM" di nuovo in valore decimale
-            ev.oraInizio = timeStringToDecimal(document.getElementById('editOraInizio').value);
-            ev.oraFine = timeStringToDecimal(document.getElementById('editOraFine').value);
-            ev.tipo = tipoSelezionato;
+            const insScelto = document.getElementById('editInsegnamento').value;
+            let titoloFinale = '';
+
+            if (insScelto === 'ALTRO') {
+                titoloFinale = document.getElementById('editTitoloLibero').value.trim() || 'Attività Extra';
+            } else {
+                const moduloScelto = document.getElementById('editModulo').value;
+                titoloFinale = `${insScelto} - ${moduloScelto}`;
+            }
+
+            const docente = document.getElementById('editDocente').value.trim();
+            const luogo = document.getElementById('editLuogo').value.trim();
+            const oraInizio = timeStringToDecimal(document.getElementById('editOraInizio').value);
+            const oraFine = timeStringToDecimal(document.getElementById('editOraFine').value);
+
+            if (oraFine <= oraInizio) {
+                alert("L'ora di fine deve essere successiva all'ora di inizio.");
+                return;
+            }
+
+            const datiEvento = {
+                titolo: titoloFinale,
+                docente,
+                luogo,
+                oraInizio,
+                oraFine,
+                tipo: tipoSelezionato
+            };
+
+            if (!settimane[weekIdx].eventi) settimane[weekIdx].eventi = {};
+            if (!settimane[weekIdx].eventi[nuovoGiorno]) settimane[weekIdx].eventi[nuovoGiorno] = [];
+
+            if (isNew) {
+                settimane[weekIdx].eventi[nuovoGiorno].push(datiEvento);
+            } else {
+                if (vecchioGiorno === nuovoGiorno) {
+                    settimane[weekIdx].eventi[vecchioGiorno][eventIdx] = datiEvento;
+                } else {
+                    settimane[weekIdx].eventi[vecchioGiorno].splice(eventIdx, 1);
+                    settimane[weekIdx].eventi[nuovoGiorno].push(datiEvento);
+                }
+            }
 
             chiudiModale();
             aggiornaInterfaccia();
         }
 
         function eliminaEventoCorrente() {
-            if (!eventoSelezionatoRef || !confirm("Vuoi eliminare questa lezione?")) return;
+            if (!eventoSelezionatoRef || eventoSelezionatoRef.isNew) return;
+            if (!confirm("Vuoi eliminare questa lezione?")) return;
             const { weekIdx, giorno, eventIdx } = eventoSelezionatoRef;
             settimane[weekIdx].eventi[giorno].splice(eventIdx, 1);
             chiudiModale();
@@ -1350,6 +1568,8 @@ body {
             });
 
             document.getElementById('groupSelector').value = gruppoSelezionato;
+
+            initSwipeGestures();
 
             if (currentUser) {
                 document.getElementById('usernameInput').value = currentUser;
