@@ -316,8 +316,6 @@ body {
 /* Eventi stile Google Calendar */
 .evento { 
     position: absolute; 
-    width: calc(100% - 6px); 
-    left: 3px; 
     padding: 6px 8px; 
     border-radius: 8px; 
     font-size: 11px; 
@@ -559,8 +557,6 @@ body {
     .calendar-container.vista-compatta .day-number { font-size: 12px; width: 22px; height: 22px; }
     .calendar-container.vista-compatta .evento {
         padding: 3px 2px;
-        width: calc(100% - 3px);
-        left: 1.5px;
         border-left-width: 3px;
         border-radius: 4px;
     }
@@ -1199,7 +1195,6 @@ body {
             return h + (m / 60);
         }
 
-        // Calcolo ore insegnamento: esclude categoricamente gli eventi di altri gruppi
         function calcolaOreModulo(searchTerm) {
             let totale = 0, seguite = 0;
             settimane.forEach(s => {
@@ -1246,6 +1241,81 @@ body {
                 settimanaCorrente = 0;
                 aggiornaInterfaccia(dir);
             }
+        }
+
+        // ============================================
+        // ALGORITMO SOVRAPPOSIZIONE EVENTI (STILE GCAL)
+        // ============================================
+        function calcolaLayoutEventi(eventiGiorno) {
+            if (!eventiGiorno || eventiGiorno.length === 0) return [];
+
+            // Mappiamo gli eventi con il loro indice originale
+            const items = eventiGiorno.map((ev, originalIndex) => ({
+                ev,
+                originalIndex,
+                start: ev.oraInizio,
+                end: ev.oraFine
+            }));
+
+            // Ordina per ora inizio, e poi per durata decrescente
+            items.sort((a, b) => (a.start - b.start) || ((b.end - b.start) - (a.end - a.start)));
+
+            // Raggruppa gli eventi in cluster di sovrapposizione connessi
+            const clusters = [];
+            let currentCluster = [];
+            let clusterEnd = -1;
+
+            items.forEach(item => {
+                if (currentCluster.length === 0) {
+                    currentCluster.push(item);
+                    clusterEnd = item.end;
+                } else {
+                    if (item.start < clusterEnd) {
+                        currentCluster.push(item);
+                        if (item.end > clusterEnd) clusterEnd = item.end;
+                    } else {
+                        clusters.push(currentCluster);
+                        currentCluster = [item];
+                        clusterEnd = item.end;
+                    }
+                }
+            });
+            if (currentCluster.length > 0) clusters.push(currentCluster);
+
+            // Per ciascun cluster calcola le sotto-colonne
+            const risultati = [];
+            clusters.forEach(cluster => {
+                const columns = []; // array di array di items per colonna
+
+                cluster.forEach(item => {
+                    let placed = false;
+                    for (let colIdx = 0; colIdx < columns.length; colIdx++) {
+                        const lastInCol = columns[colIdx][columns[colIdx].length - 1];
+                        if (item.start >= lastInCol.end) {
+                            columns[colIdx].push(item);
+                            item.colIndex = colIdx;
+                            placed = true;
+                            break;
+                        }
+                    }
+                    if (!placed) {
+                        columns.push([item]);
+                        item.colIndex = columns.length - 1;
+                    }
+                });
+
+                const totalCols = columns.length;
+                cluster.forEach(item => {
+                    risultati.push({
+                        evento: item.ev,
+                        eventIdx: item.originalIndex,
+                        colIndex: item.colIndex,
+                        totalCols: totalCols
+                    });
+                });
+            });
+
+            return risultati;
         }
 
         // ============================================
@@ -1321,14 +1391,22 @@ body {
                         html += `<div class="current-time-line" style="top: ${lineTop}px;" title="Ora attuale"></div>`;
                     }
 
-                    const eventi = (settimana.eventi && settimana.eventi[giorno]) ? settimana.eventi[giorno] : [];
-                    eventi.forEach((evento, eventIdx) => {
+                    const eventiGiorno = (settimana.eventi && settimana.eventi[giorno]) ? settimana.eventi[giorno] : [];
+                    
+                    // Calcolo sotto-colonne e affiancamento per eventi sovrapposti
+                    const eventiLayout = calcolaLayoutEventi(eventiGiorno);
+
+                    eventiLayout.forEach(({ evento, eventIdx, colIndex, totalCols }) => {
                         const appartiene = appartieneAlGruppo(evento, gruppoSelezionato);
 
                         const top = (evento.oraInizio - 8) * 64;
-                        const height = (evento.oraFine - evento.oraInizio) * 64;
+                        const height = Math.max((evento.oraFine - evento.oraInizio) * 64, 20);
 
-                        // Se non appartiene al gruppo selezionato, mostra la card trasparente con bordo tratteggiato
+                        // Calcolo posizionamento orizzontale affiancato stile Google Calendar
+                        const gapPx = 3;
+                        const widthCalc = `calc((100% - ${gapPx * (totalCols + 1)}px) / ${totalCols})`;
+                        const leftCalc = `calc(${gapPx}px + (${colIndex} * ((100% - ${gapPx * (totalCols + 1)}px) / ${totalCols} + ${gapPx}px)))`;
+
                         let classe = '';
                         let emoji = '';
 
@@ -1342,7 +1420,7 @@ body {
                                     evento.tipo === 'saltata' ? '❌' : '✅';
                         }
 
-                        html += `<div class="evento ${classe}" style="top: ${top}px; height: ${height}px;" onclick="apriModale(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
+                        html += `<div class="evento ${classe}" style="top: ${top}px; height: ${height}px; width: ${widthCalc}; left: ${leftCalc};" onclick="apriModale(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
                         html += `<div class="evento-title">${emoji} ${evento.titolo}</div>`;
                         html += `<div class="evento-time">${formattaOra(evento.oraInizio)} - ${formattaOra(evento.oraFine)}</div>`;
                         if (evento.docente || evento.luogo) {
@@ -1689,7 +1767,7 @@ body {
                         const dtE = new Date(dEv); dtE.setHours(hF, mF, 0);
                         const fmt = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
 
-                        let prefisso = ev.tipo === 'saltata' ? '❌ [SALTATA] ' : ev.tipo === 'obbligatorio' ? '⚠️ [OBBLIGATORIO] ' : '✅ ';
+                        let prefisso = ev.tipo === 'saltata' ? '❌ [SALTATA] ' : ev.tipo === 'obbligatorio' ? '⚠️️ [OBBLIGATORIO] ' : '✅ ';
                         ics += `BEGIN:VEVENT\r\nUID:${s.numero}-${g}-${ev.oraInizio}@fisioterapia\r\nDTSTART:${fmt(dtS)}\r\nDTEND:${fmt(dtE)}\r\nSUMMARY:${prefisso}${ev.titolo}\r\n`;
                         if (ev.docente) ics += `DESCRIPTION:Docente: ${ev.docente}\r\n`;
                         if (ev.luogo) ics += `LOCATION:${ev.luogo}\r\n`;
