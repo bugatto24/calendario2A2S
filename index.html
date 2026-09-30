@@ -59,7 +59,6 @@ body {
     box-shadow: 0 2px 8px rgba(126, 34, 206, 0.3);
 }
 .header h1 { font-size: 1.4rem; font-weight: 700; color: #0f172a; }
-.header p { color: #64748b; font-size: 0.88rem; margin-top: 2px; }
 
 /* Barra Utente e Gruppo */
 .user-bar { 
@@ -160,7 +159,7 @@ body {
     padding: 12px 20px; 
     display: flex; 
     justify-content: center; 
-    gap: 24px; 
+    gap: 20px; 
     flex-wrap: wrap; 
     border-bottom: 1px solid #e2e8f0; 
     font-size: 12px; 
@@ -171,9 +170,10 @@ body {
 .legend-verde { background: #dcfce7; border: 2px solid #22c55e; }
 .legend-giallo { background: #fef3c7; border: 2px solid #f59e0b; }
 .legend-grigio { background: #f1f5f9; border: 2px solid #94a3b8; }
+.legend-altrogruppo { background: #ffffff; border: 2px dashed #94a3b8; opacity: 0.6; }
 
 /* ========================================================
-   CALENDARIO & LINEA ORARIA CORRENTE (STYLE GOOGLE CALENDAR)
+   CALENDARIO & TRANSIZIONI RAPIDE
    ======================================================== */
 .calendar-container { 
     background: #ffffff; 
@@ -273,7 +273,6 @@ body {
     border-radius: 50%;
 }
 
-/* Evidenziazione Giorno Odierno */
 .is-today .day-name { color: #7e22ce; font-weight: 700; }
 .is-today .day-number { 
     background: #7e22ce; 
@@ -293,7 +292,7 @@ body {
     pointer-events: none;
 }
 
-/* Linea Ora Attuale Rossa stile Google Calendar */
+/* Linea Ora Attuale Rossa */
 .current-time-line {
     position: absolute;
     left: 0;
@@ -314,6 +313,7 @@ body {
     border-radius: 50%;
 }
 
+/* Eventi stile Google Calendar */
 .evento { 
     position: absolute; 
     width: calc(100% - 6px); 
@@ -375,6 +375,20 @@ body {
     color: #64748b; 
     opacity: 0.7;
     text-decoration: line-through;
+}
+
+/* Eventi di un altro gruppo: grafica trasparente e bordo tratteggiato */
+.evento-altrogruppo {
+    background: #f8fafc !important;
+    border: 1.5px dashed #94a3b8 !important;
+    border-left: 1.5px dashed #94a3b8 !important;
+    color: #64748b !important;
+    opacity: 0.35 !important;
+    box-shadow: none !important;
+}
+.evento-altrogruppo:hover {
+    opacity: 0.75 !important;
+    transform: translateY(-1px);
 }
 
 /* Statistiche */
@@ -523,7 +537,7 @@ body {
 
     .legend { gap: 10px; justify-content: flex-start; padding: 8px 12px; font-size: 11px; }
 
-    /* VISTA COMPATTA (DEFAULT MOBILE) */
+    /* Vista Compatta Mobile */
     .calendar-container.vista-compatta .calendar {
         min-width: 100% !important;
         width: 100% !important;
@@ -562,7 +576,7 @@ body {
     .calendar-container.vista-compatta .evento-time { font-size: 8.5px; margin-top: 1px; }
     .calendar-container.vista-compatta .evento-docente { display: none; }
 
-    /* VISTA ESPANSA: SCROLL ORIZZONTALE */
+    /* Vista Espansa Mobile */
     .calendar-container.vista-espansa .calendar {
         min-width: 900px !important;
         width: 900px !important;
@@ -591,7 +605,6 @@ body {
                 </div>
                 <div>
                     <h1>Calendario Fisioterapia 2025-2026</h1>
-                    
                 </div>
             </div>
             <div class="sync-badge" id="syncStatus">Stato: Non connesso</div>
@@ -621,7 +634,6 @@ body {
         <!-- Controlli Settimane e Navigazione -->
         <div class="controls">
             <div class="nav-buttons">
-                <!-- Tasto Oggi -->
                 <button class="btn btn-today" onclick="vaiAOggi()" title="Vai alla settimana con il giorno odierno">Oggi</button>
                 <button class="btn btn-nav" id="btnPrev" onclick="prevWeek()">◀</button>
                 <select id="weekSelector" onchange="changeWeek()"></select>
@@ -630,7 +642,7 @@ body {
             
             <div class="action-buttons">
                 <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleVistaMobile()">📐 Espandi</button>
-                <button class="btn btn-export" onclick="exportICS()">🗓️️ ICS</button>
+                <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
                 <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset</button>
             </div>
         </div>
@@ -640,6 +652,7 @@ body {
             <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
             <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
             <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
+            <div class="legend-item"><div class="legend-box legend-altrogruppo"></div><span>👥 Altro Gruppo</span></div>
         </div>
 
         <!-- Vista Calendario -->
@@ -1075,7 +1088,7 @@ body {
         }
 
         // ============================================
-        // FILTRAGGIO GRUPPI
+        // FILTRAGGIO GRUPPI (incluso A/B e C/D)
         // ============================================
         function appartieneAlGruppo(evento, gruppoTarget) {
             if (gruppoTarget === 'ALL') return true;
@@ -1186,6 +1199,7 @@ body {
             return h + (m / 60);
         }
 
+        // Calcolo ore insegnamento: esclude categoricamente gli eventi di altri gruppi
         function calcolaOreModulo(searchTerm) {
             let totale = 0, seguite = 0;
             settimane.forEach(s => {
@@ -1211,7 +1225,6 @@ body {
             const oggi = new Date();
             let trovata = false;
 
-            // Cerca la settimana che include la data odierna
             for (let i = 0; i < settimane.length; i++) {
                 const baseStr = dateMap[settimane[i].numero];
                 if (!baseStr) continue;
@@ -1229,7 +1242,6 @@ body {
             }
 
             if (!trovata) {
-                // Se oggi è fuori periodo, va alla settimana 0
                 const dir = 0 < settimanaCorrente ? 'prev' : null;
                 settimanaCorrente = 0;
                 aggiornaInterfaccia(dir);
@@ -1275,7 +1287,6 @@ body {
                 const nowYear = now.getFullYear();
                 const nowMonth = now.getMonth();
                 const nowDate = now.getDate();
-                const nowDayOfWeek = now.getDay(); // 0: Dom, 1: Lun ... 5: Ven, 6: Sab
                 const nowDecimalHour = now.getHours() + (now.getMinutes() / 60);
 
                 let html = '<div class="time-column"><div class="time-header">Ora</div>';
@@ -1290,7 +1301,6 @@ body {
                     const giornoNum = dataGiorno.getDate();
                     const giornoBreve = giorno.substring(0, 3).toUpperCase();
 
-                    // Verifica se questo giorno è "oggi"
                     const isToday = (dataGiorno.getFullYear() === nowYear &&
                                      dataGiorno.getMonth() === nowMonth &&
                                      dataGiorno.getDate() === nowDate);
@@ -1302,12 +1312,10 @@ body {
                         </div>
                         <div class="day-grid" onclick="creaNuovoEvento(event, ${settimanaCorrente}, '${giorno}')">`;
 
-                    // Linee orarie
                     ore.forEach((ora, idx) => { 
                         html += `<div class="grid-line" style="top: ${idx * 64}px;"></div>`; 
                     });
 
-                    // Linea dell'ora attuale (se oggi è feriale e compreso nell'orario 8-21)
                     if (isToday && nowDecimalHour >= 8 && nowDecimalHour <= 21) {
                         const lineTop = (nowDecimalHour - 8) * 64;
                         html += `<div class="current-time-line" style="top: ${lineTop}px;" title="Ora attuale"></div>`;
@@ -1315,12 +1323,24 @@ body {
 
                     const eventi = (settimana.eventi && settimana.eventi[giorno]) ? settimana.eventi[giorno] : [];
                     eventi.forEach((evento, eventIdx) => {
-                        if (!appartieneAlGruppo(evento, gruppoSelezionato)) return;
+                        const appartiene = appartieneAlGruppo(evento, gruppoSelezionato);
 
                         const top = (evento.oraInizio - 8) * 64;
                         const height = (evento.oraFine - evento.oraInizio) * 64;
-                        const classe = evento.tipo === 'obbligatorio' ? 'evento-obbligatorio' : evento.tipo === 'saltata' ? 'evento-saltata' : 'evento-normale';
-                        const emoji = evento.tipo === 'obbligatorio' ? '⚠️️' : evento.tipo === 'saltata' ? '❌' : '✅';
+
+                        // Se non appartiene al gruppo selezionato, mostra la card trasparente con bordo tratteggiato
+                        let classe = '';
+                        let emoji = '';
+
+                        if (!appartiene) {
+                            classe = 'evento-altrogruppo';
+                            emoji = '👥';
+                        } else {
+                            classe = evento.tipo === 'obbligatorio' ? 'evento-obbligatorio' : 
+                                     evento.tipo === 'saltata' ? 'evento-saltata' : 'evento-normale';
+                            emoji = evento.tipo === 'obbligatorio' ? '⚠️' : 
+                                    evento.tipo === 'saltata' ? '❌' : '✅';
+                        }
 
                         html += `<div class="evento ${classe}" style="top: ${top}px; height: ${height}px;" onclick="apriModale(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
                         html += `<div class="evento-title">${emoji} ${evento.titolo}</div>`;
@@ -1699,7 +1719,6 @@ body {
 
             initSwipeGestures();
 
-            // Aggiorna l'indicatore orario ogni minuto
             setInterval(() => {
                 renderCalendario();
             }, 60000);
