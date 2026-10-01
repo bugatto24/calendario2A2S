@@ -64,7 +64,7 @@ body {
 .user-bar { 
     background: #f8fafc; 
     padding: 14px 20px; 
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
@@ -155,7 +155,7 @@ body {
 .btn-reset { background: #ffffff; color: #64748b; border: 1px solid #e2e8f0; }
 .btn-reset:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
 
-/* Legenda a due sezioni: Stato + Insegnamenti */
+/* Legenda */
 .legend { 
     background: #f8fafc; 
     padding: 12px 20px; 
@@ -313,7 +313,6 @@ body {
     pointer-events: none;
 }
 
-/* Linea Ora Attuale */
 .current-time-line {
     position: absolute;
     left: 0;
@@ -334,7 +333,6 @@ body {
     border-radius: 50%;
 }
 
-/* Eventi stile Google Calendar */
 .evento { 
     position: absolute; 
     padding: 6px 8px; 
@@ -738,7 +736,6 @@ body {
                 </select>
             </div>
 
-            <!-- Menu Insegnamento -->
             <div class="form-group">
                 <label for="editInsegnamento">Insegnamento</label>
                 <select id="editInsegnamento" onchange="onInsegnamentoChange()">
@@ -749,7 +746,6 @@ body {
                 </select>
             </div>
 
-            <!-- Menu Modulo con etichetta pulita e valore con stringa esatta originale -->
             <div class="form-group" id="groupModuloSelect">
                 <label for="editModulo">Corso / Modulo</label>
                 <select id="editModulo"></select>
@@ -802,7 +798,6 @@ body {
     </div>
 
     <script>
-        // Mappatura con label pulita a video e stringa esatta originale come valore
         const corsiConfig = {
             'PATOLOGIA GENERALE': [
                 { label: 'PATOLOGIA GENERALE', valoreEsatto: 'PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ', searchKey: 'PATOLOGIA GENERALE LEZ' },
@@ -1393,9 +1388,28 @@ body {
         }
 
         // ============================================
-        // SMART MERGE & CONFLICT RESOLUTION
+        // SMART MERGE INTELLIGENTE (FUZZY MATCHING)
         // ============================================
         let mergedSettimanePending = null;
+
+        // Estrae la chiave semantica del corso ignorando formattazioni diverse
+        function getChiaveSemantica(titolo) {
+            const t = (titolo || '').toUpperCase();
+            for (const moduli of Object.values(corsiConfig)) {
+                for (const m of moduli) {
+                    if (t.includes(m.searchKey)) return m.searchKey;
+                }
+            }
+            return t; // Se non appartiene ai corsi ufficiali, ritorna il titolo grezzo
+        }
+
+        function sonoStessaLezioneUfficiale(ev1, ev2) {
+            // Se le ore sono coincidenti e appartengono allo stesso corso semantico
+            const stessoOrario = Math.abs(ev1.oraInizio - ev2.oraInizio) < 0.25;
+            const chiave1 = getChiaveSemantica(ev1.titolo);
+            const chiave2 = getChiaveSemantica(ev2.titolo);
+            return stessoOrario && (chiave1 === chiave2);
+        }
 
         function avviaSmartMerge() {
             const conflitti = [];
@@ -1410,33 +1424,37 @@ body {
                     const eventiUtente = utenteW.eventi[giorno] || [];
                     const eventiNuovi = nuovaW.eventi[giorno] || [];
 
+                    // 1. Preserva lo stato ('saltata', 'obbligatorio') se la lezione è la stessa
                     eventiNuovi.forEach(evNuovo => {
-                        const matchUtente = eventiUtente.find(u => 
-                            u.titolo === evNuovo.titolo && 
-                            Math.abs(u.oraInizio - evNuovo.oraInizio) < 0.1
-                        );
+                        const matchUtente = eventiUtente.find(u => sonoStessaLezioneUfficiale(u, evNuovo));
                         if (matchUtente) {
-                            evNuovo.tipo = matchUtente.tipo;
+                            evNuovo.tipo = matchUtente.tipo; // Mantieni lo stato dell'utente
                         }
                     });
 
+                    // 2. Preserva tutti gli eventi custom 'ALTRO' dell'utente
                     eventiUtente.forEach(evU => {
                         const isCustom = evU.titolo && (evU.titolo.startsWith('ALTRO') || !Object.keys(corsiConfig).some(k => evU.titolo.includes(k)));
                         if (isCustom) {
+                            // Verifica se si sovrappone a una lezione ufficiale
                             const sovrapposto = eventiNuovi.find(n => n.oraInizio < evU.oraFine && n.oraFine > evU.oraInizio);
-                            if (sovrapposto) {
+                            if (sovrapposto && evU.titolo !== sovrapposto.titolo) {
                                 conflitti.push(`W${wNumero} (${giorno}): L'evento "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) si sovrappone alla lezione ufficiale "${sovrapposto.titolo}".`);
                             }
-                            eventiNuovi.push(evU);
+                            // Se non è già presente come evento identico, preservalo
+                            if (!eventiNuovi.some(n => n.titolo === evU.titolo && Math.abs(n.oraInizio - evU.oraInizio) < 0.1)) {
+                                eventiNuovi.push(evU);
+                            }
                         }
                     });
 
+                    // 3. Rileva solo le REALI lezioni ufficiali cancellate (es. Farmacologia giovedì 8/10)
                     eventiUtente.forEach(evU => {
-                        const eraUfficiale = Object.keys(corsiConfig).some(k => (evU.titolo||'').includes(k));
+                        const eraUfficiale = Object.keys(corsiConfig).some(k => (evU.titolo || '').includes(k));
                         if (eraUfficiale) {
-                            const esisteAncora = eventiNuovi.some(n => n.titolo === evU.titolo && Math.abs(n.oraInizio - evU.oraInizio) < 0.1);
+                            const esisteAncora = eventiNuovi.some(n => sonoStessaLezioneUfficiale(n, evU));
                             if (!esisteAncora && evU.tipo !== 'normale') {
-                                conflitti.push(`W${wNumero} (${giorno}): La lezione "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) è stata cancellata dall'orario ufficiale, ma era segnata come "${evU.tipo}". Verrà rimossa.`);
+                                conflitti.push(`W${wNumero} (${giorno}): La lezione "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) è stata cancellata dall'orario ufficiale, ma l'avevi contrassegnata come "${evU.tipo}". Verrà rimossa.`);
                             }
                         }
                     });
@@ -1698,8 +1716,8 @@ body {
                 const listaModuli = corsiConfig[insScelto] || [];
                 listaModuli.forEach(m => {
                     const opt = document.createElement('option');
-                    opt.value = m.valoreEsatto; // Stringa esatta originale
-                    opt.textContent = m.label;  // Etichetta pulita a video
+                    opt.value = m.valoreEsatto;
+                    opt.textContent = m.label;
                     selectModulo.appendChild(opt);
                 });
 
@@ -1717,7 +1735,6 @@ body {
                     document.getElementById('editInsegnamento').value = insNome;
                     onInsegnamentoChange();
                     for (const m of moduli) {
-                        // Abbina sia la formula esatta completa che la chiave di ricerca per retrocompatibilità
                         if (titoloCompleto === m.valoreEsatto || titoloCompleto.includes(m.searchKey)) {
                             document.getElementById('editModulo').value = m.valoreEsatto;
                             trovato = true;
@@ -1814,7 +1831,6 @@ body {
             if (insScelto === 'ALTRO') {
                 titoloFinale = document.getElementById('editTitoloLibero').value.trim() || 'Attività Extra';
             } else {
-                // Prende direttamente la stringa originale dal value della option
                 titoloFinale = document.getElementById('editModulo').value;
             }
 
