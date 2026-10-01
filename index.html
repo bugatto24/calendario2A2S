@@ -118,6 +118,8 @@ body {
 .btn-today:hover { background: #e2e8f0; border-color: #94a3b8; }
 .btn-toggle-view { background: #e0e7ff; color: #4338ca; font-weight: 600; border: 1px solid #c7d2fe; }
 .btn-toggle-view:hover { background: #c7d2fe; }
+.btn-sync-merge { background: #0284c7; color: white; font-weight: 600; }
+.btn-sync-merge:hover { background: #0369a1; }
 .sync-badge { 
     font-size: 12px; 
     padding: 6px 12px; 
@@ -148,18 +150,18 @@ body {
 .btn-nav { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; }
 .btn-nav:hover:not(:disabled) { background: #e2e8f0; }
 .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-export { background: #0284c7; color: white; }
-.btn-export:hover { background: #0369a1; }
+.btn-export { background: #10b981; color: white; }
+.btn-export:hover { background: #059669; }
 .btn-reset { background: #ffffff; color: #64748b; border: 1px solid #e2e8f0; }
 .btn-reset:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
 
-/* Nuova Legenda a due sezioni: Stato + Insegnamenti */
+/* Legenda a due sezioni: Stato + Insegnamenti */
 .legend { 
     background: #f8fafc; 
     padding: 12px 20px; 
     display: flex; 
     justify-content: center; 
-    align-items: center;
+    align-items: center; 
     gap: 16px; 
     flex-wrap: wrap; 
     border-bottom: 1px solid #e2e8f0; 
@@ -180,13 +182,11 @@ body {
 .legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-box { width: 14px; height: 14px; border-radius: 4px; }
 
-/* Indicatori Legenda Stati */
 .legend-verde { background: #ecfdf5; border: 1.5px solid #10b981; }
 .legend-giallo { background: #fffbeb; border: 1.5px solid #f59e0b; }
 .legend-grigio { background: #f8fafc; border: 1.5px solid #94a3b8; }
 .legend-altrogruppo { background: #ffffff; border: 1.5px dashed #94a3b8; opacity: 0.6; }
 
-/* Indicatori Legenda Materie */
 .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 .dot-patologia { background: #a855f7; }
 .dot-neuro { background: #0284c7; }
@@ -334,9 +334,7 @@ body {
     border-radius: 50%;
 }
 
-/* ========================================================
-   EVENTI: BORDO LATERALE PER INSEGNAMENTO + SFONDO PER STATO
-   ======================================================== */
+/* Eventi stile Google Calendar */
 .evento { 
     position: absolute; 
     padding: 6px 8px; 
@@ -378,7 +376,6 @@ body {
     text-overflow: ellipsis;
 }
 
-/* 1. Sfondo e Testo in base allo STATO */
 .evento-normale { 
     background: #ecfdf5; 
     color: #065f46; 
@@ -397,21 +394,11 @@ body {
     border-color: #e2e8f0;
 }
 
-/* 2. Bordo sinistro in base all'INSEGNAMENTO */
-.bordo-patologia { 
-    border-left-color: #a855f7 !important; 
-}
-.bordo-neuro { 
-    border-left-color: #0284c7 !important; 
-}
-.bordo-locomotore { 
-    border-left-color: #f97316 !important; 
-}
-.bordo-altro { 
-    border-left-color: #64748b !important; 
-}
+.bordo-patologia { border-left-color: #a855f7 !important; }
+.bordo-neuro { border-left-color: #0284c7 !important; }
+.bordo-locomotore { border-left-color: #f97316 !important; }
+.bordo-altro { border-left-color: #64748b !important; }
 
-/* 3. Eventi Altro Gruppo (Trasparenza neutra) */
 .evento-altrogruppo {
     background: #ffffff !important;
     border: 1.5px dashed #94a3b8 !important;
@@ -476,14 +463,14 @@ body {
 .modulo-percent { font-size: 0.88rem; font-weight: 700; }
 .modulo-progress { width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
 
-/* Modale */
+/* Modali */
 .modal-overlay { 
     position: fixed; 
     top: 0; 
     left: 0; 
     width: 100%; 
     height: 100%; 
-    background: rgba(15, 23, 42, 0.4); 
+    background: rgba(15, 23, 42, 0.45); 
     backdrop-filter: blur(2px);
     display: none; 
     justify-content: center; 
@@ -518,6 +505,25 @@ body {
 .modal-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f1f5f9; }
 .btn-delete { background: #fee2e2; color: #dc2626; border: none; padding: 9px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 .btn-save-modal { background: #7e22ce; color: white; border: none; padding: 9px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+
+/* Modale Conflitti */
+.conflict-list {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 14px 0;
+    max-height: 240px;
+    overflow-y: auto;
+    font-size: 12px;
+    color: #991b1b;
+}
+.conflict-list li {
+    margin-bottom: 8px;
+    line-height: 1.35;
+    margin-left: 18px;
+}
+.conflict-list li:last-child { margin-bottom: 0; }
 
 /* Responsive Mobile */
 @media (max-width: 768px) {
@@ -564,7 +570,7 @@ body {
     .action-buttons { 
         width: 100%; 
         display: grid; 
-        grid-template-columns: 1fr 1fr 1fr; 
+        grid-template-columns: 1fr 1fr; 
         gap: 6px; 
     }
     .action-buttons .btn { justify-content: center; width: 100%; padding: 8px 6px; font-size: 11px; }
@@ -572,7 +578,6 @@ body {
     .legend { gap: 10px; justify-content: flex-start; padding: 8px 12px; font-size: 11px; }
     .legend-divider { display: none; }
 
-    /* Vista Compatta Mobile */
     .calendar-container.vista-compatta .calendar {
         min-width: 100% !important;
         width: 100% !important;
@@ -609,7 +614,6 @@ body {
     .calendar-container.vista-compatta .evento-time { font-size: 8.5px; margin-top: 1px; }
     .calendar-container.vista-compatta .evento-docente { display: none; }
 
-    /* Vista Espansa Mobile */
     .calendar-container.vista-espansa .calendar {
         min-width: 900px !important;
         width: 900px !important;
@@ -664,7 +668,7 @@ body {
             </div>
         </div>
 
-        <!-- Controlli Settimane e Navigazione -->
+        <!-- Controlli Settimane e Azioni -->
         <div class="controls">
             <div class="nav-buttons">
                 <button class="btn btn-today" onclick="vaiAOggi()" title="Vai alla settimana con il giorno odierno">Oggi</button>
@@ -674,13 +678,15 @@ body {
             </div>
             
             <div class="action-buttons">
+                <!-- Tasto Smart Merge / Aggiorna -->
+                <button class="btn btn-sync-merge" onclick="avviaSmartMerge()" title="Confronta e aggiorna il calendario preservando le tue personalizzazioni">🔄 Sincronizza Orario</button>
                 <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleVistaMobile()">📐 Espandi</button>
                 <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
-                <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset</button>
+                <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset Totale</button>
             </div>
         </div>
 
-        <!-- Nuova Legenda Ordinata (Stati e Materie) -->
+        <!-- Legenda Ordinata (Stati e Materie) -->
         <div class="legend">
             <div class="legend-group">
                 <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
@@ -769,6 +775,27 @@ body {
             <div class="modal-footer">
                 <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente()">🗑 Elimina</button>
                 <button type="button" class="btn-save-modal" onclick="salvaModificheEvento()">Conferma</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modale Conflitti Smart Merge -->
+    <div class="modal-overlay" id="conflictModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 style="color:#b91c1c;">⚠️ Rilevati Conflitti durante l'aggiornamento</h3>
+                <button class="btn-close" onclick="chiudiModalConflitti()">&times;</button>
+            </div>
+            <p style="font-size:13px; color:#475569; margin-bottom:8px;">
+                Il nuovo orario ufficiale presenta modifiche che contrastano con alcune delle tue lezioni personalizzate:
+            </p>
+            <ul class="conflict-list" id="conflictList"></ul>
+            <p style="font-size:12px; color:#64748b;">
+                Scegliendo "Aggiorna comunque", le lezioni ufficiali verranno allineate al nuovo orario, mantenendo comunque le lezioni extra inserite da te e le tue preferenze di frequenza dove possibile.
+            </p>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-reset" onclick="chiudiModalConflitti()">Annulla</button>
+                <button type="button" class="btn" style="background:#b91c1c; color:white; font-weight:600;" onclick="applicaMergeConfermato()">Aggiorna comunque</button>
             </div>
         </div>
     </div>
@@ -866,7 +893,6 @@ body {
                     ],
                     giovedì: [
                         { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        // 8/10: Tolta farmacologia e inserito incontro tirocinio obbligatorio
                         { oraInizio: 11, oraFine: 12.5, titolo: "ALTRO - Incontro Tirocinio", docente: "C. Sorba", luogo: "via Chiabrera", tipo: "obbligatorio" },
                         { oraInizio: 14, oraFine: 16, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
                         { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
@@ -1011,7 +1037,6 @@ body {
                 numero: 7, periodo: "9-13 novembre 2026",
                 eventi: {
                     lunedì: [
-                        // 9/11: Aggiunto recupero di Farmacologia ore 8:30-10:30
                         { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
                         { oraInizio: 10.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
                         { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
@@ -1244,7 +1269,6 @@ body {
             return h + (m / 60);
         }
 
-        // Calcolo ore insegnamento: esclude categoricamente gli eventi di altri gruppi
         function calcolaOreModulo(searchTerm) {
             let totale = 0, seguite = 0;
             settimane.forEach(s => {
@@ -1263,9 +1287,6 @@ body {
             return { totale, seguite, percentuale: totale > 0 ? Math.round((seguite / totale) * 100) : 0 };
         }
 
-        // ============================================
-        // RICONOSCIMENTO INSEGNAMENTO PER BORDO LATERALE
-        // ============================================
         function getClasseInsegnamento(titolo) {
             const t = (titolo || '').toUpperCase();
             if (t.includes('PATOLOGIA GENERALE')) return 'bordo-patologia';
@@ -1274,9 +1295,6 @@ body {
             return 'bordo-altro';
         }
 
-        // ============================================
-        // GESTIONE "OGGI" E LINEA ORA ATTUALE
-        // ============================================
         function vaiAOggi() {
             const oggi = new Date();
             let trovata = false;
@@ -1304,9 +1322,6 @@ body {
             }
         }
 
-        // ============================================
-        // ALGORITMO SOVRAPPOSIZIONE EVENTI (STILE GCAL)
-        // ============================================
         function calcolaLayoutEventi(eventiGiorno) {
             if (!eventiGiorno || eventiGiorno.length === 0) return [];
 
@@ -1373,6 +1388,96 @@ body {
             });
 
             return risultati;
+        }
+
+        // ============================================
+        // SMART MERGE & CONFLICT RESOLUTION
+        // ============================================
+        let mergedSettimanePending = null;
+
+        function eventoIdLogico(ev) {
+            return `${(ev.titolo||'').trim()}_${(ev.docente||'').trim()}_${ev.oraInizio}_${ev.oraFine}`;
+        }
+
+        function avviaSmartMerge() {
+            const conflitti = [];
+            const nuoveSettimane = JSON.parse(JSON.stringify(defaultSettimane));
+
+            // Scansiona settimana per settimana
+            nuoveSettimane.forEach((nuovaW, wIdx) => {
+                const wNumero = nuovaW.numero;
+                const utenteW = settimane.find(s => s && s.numero === wNumero);
+                if (!utenteW || !utenteW.eventi) return;
+
+                giorni.forEach(giorno => {
+                    const eventiUtente = utenteW.eventi[giorno] || [];
+                    const eventiNuovi = nuovaW.eventi[giorno] || [];
+
+                    // 1. Mantieni lo stato per le lezioni ufficiali confermate
+                    eventiNuovi.forEach(evNuovo => {
+                        const matchUtente = eventiUtente.find(u => 
+                            u.titolo === evNuovo.titolo && 
+                            Math.abs(u.oraInizio - evNuovo.oraInizio) < 0.1
+                        );
+                        if (matchUtente) {
+                            evNuovo.tipo = matchUtente.tipo; // Preserva 'saltata', 'obbligatorio', 'normale'
+                        }
+                    });
+
+                    // 2. Preserva tutti gli eventi personalizzati creati dall'utente ('ALTRO')
+                    eventiUtente.forEach(evU => {
+                        const isCustom = evU.titolo && (evU.titolo.startsWith('ALTRO') || !Object.keys(strutturaCorsi).some(k => evU.titolo.includes(k)));
+                        if (isCustom) {
+                            // Verifica se si sovrappone a un nuovo evento ufficiale
+                            const sovrapposto = eventiNuovi.find(n => n.oraInizio < evU.oraFine && n.oraFine > evU.oraInizio);
+                            if (sovrapposto) {
+                                conflitti.push(`W${wNumero} (${giorno}): Il tuo evento "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) si sovrappone alla nuova lezione ufficiale "${sovrapposto.titolo}".`);
+                            }
+                            eventiNuovi.push(evU);
+                        }
+                    });
+
+                    // 3. Rileva se lezioni ufficiali eliminate erano state personalizzate dall'utente
+                    eventiUtente.forEach(evU => {
+                        const eraUfficiale = Object.keys(strutturaCorsi).some(k => (evU.titolo||'').includes(k));
+                        if (eraUfficiale) {
+                            const esisteAncora = eventiNuovi.some(n => n.titolo === evU.titolo && Math.abs(n.oraInizio - evU.oraInizio) < 0.1);
+                            if (!esisteAncora && evU.tipo !== 'normale') {
+                                conflitti.push(`W${wNumero} (${giorno}): La lezione "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) è stata cancellata dall'orario ufficiale, ma l'avevi contrassegnata come "${evU.tipo}". Verrà rimossa.`);
+                            }
+                        }
+                    });
+                });
+            });
+
+            mergedSettimanePending = nuoveSettimane;
+
+            if (conflitti.length > 0) {
+                const listElem = document.getElementById('conflictList');
+                listElem.innerHTML = '';
+                conflitti.forEach(c => {
+                    const li = document.createElement('li');
+                    li.textContent = c;
+                    listElem.appendChild(li);
+                });
+                document.getElementById('conflictModal').classList.add('active');
+            } else {
+                applicaMergeConfermato();
+                alert("✅ Calendario sincronizzato con l'orario ufficiale! Tutte le tue preferenze sono state mantenute.");
+            }
+        }
+
+        function applicaMergeConfermato() {
+            if (!mergedSettimanePending) return;
+            settimane = mergedSettimanePending;
+            mergedSettimanePending = null;
+            chiudiModalConflitti();
+            aggiornaInterfaccia();
+            salvaSuCloudSilenzioso();
+        }
+
+        function chiudiModalConflitti() {
+            document.getElementById('conflictModal').classList.remove('active');
         }
 
         // ============================================
@@ -1768,7 +1873,7 @@ body {
         }
 
         function ripristinaDati() {
-            if (confirm("Vuoi ripristinare il calendario predefinito sul Cloud?")) {
+            if (confirm("ATTENZIONE: Il Reset Totale sovrascrive tutto il tuo calendario con l'orario iniziale, cancellando tutte le tue personalizzazioni e lezioni extra. Vuoi procedere?")) {
                 settimane = JSON.parse(JSON.stringify(defaultSettimane));
                 aggiornaInterfaccia();
                 salvaSuCloudSilenzioso();
