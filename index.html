@@ -199,7 +199,7 @@ body {
 .calendar-container { 
     background: #ffffff; 
     overflow-x: auto; 
-    position: relative;
+    position: relative; 
     -webkit-overflow-scrolling: touch;
 }
 
@@ -678,7 +678,6 @@ body {
             </div>
             
             <div class="action-buttons">
-                <!-- Tasto Smart Merge / Aggiorna -->
                 <button class="btn btn-sync-merge" onclick="avviaSmartMerge()" title="Confronta e aggiorna il calendario preservando le tue personalizzazioni">🔄 Sincronizza Orario</button>
                 <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleVistaMobile()">📐 Espandi</button>
                 <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
@@ -739,6 +738,7 @@ body {
                 </select>
             </div>
 
+            <!-- Menu Insegnamento -->
             <div class="form-group">
                 <label for="editInsegnamento">Insegnamento</label>
                 <select id="editInsegnamento" onchange="onInsegnamentoChange()">
@@ -749,6 +749,7 @@ body {
                 </select>
             </div>
 
+            <!-- Menu Modulo con etichetta pulita e valore con stringa esatta originale -->
             <div class="form-group" id="groupModuloSelect">
                 <label for="editModulo">Corso / Modulo</label>
                 <select id="editModulo"></select>
@@ -801,27 +802,28 @@ body {
     </div>
 
     <script>
-        const strutturaCorsi = {
+        // Mappatura con label pulita a video e stringa esatta originale come valore
+        const corsiConfig = {
             'PATOLOGIA GENERALE': [
-                { nome: 'PATOLOGIA GENERALE', searchKey: 'PATOLOGIA GENERALE LEZ' },
-                { nome: 'FARMACOLOGIA', searchKey: 'FARMACOLOGIA' },
-                { nome: 'GASTROENTEROLOGIA', searchKey: 'GASTROENTEROLOGIA' },
-                { nome: 'NEFROLOGIA', searchKey: 'NEFROLOGIA' },
-                { nome: 'OTORINOLARINGOIATRIA', searchKey: 'OTORINOLARINGOIATRIA' }
+                { label: 'PATOLOGIA GENERALE', valoreEsatto: 'PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ', searchKey: 'PATOLOGIA GENERALE LEZ' },
+                { label: 'FARMACOLOGIA', valoreEsatto: 'PATOLOGIA GENERALE - FARMACOLOGIA', searchKey: 'FARMACOLOGIA' },
+                { label: 'GASTROENTEROLOGIA', valoreEsatto: 'PATOLOGIA GENERALE - GASTROENTEROLOGIA', searchKey: 'GASTROENTEROLOGIA' },
+                { label: 'NEFROLOGIA', valoreEsatto: 'PATOLOGIA GENERALE - NEFROLOGIA', searchKey: 'NEFROLOGIA' },
+                { label: 'OTORINOLARINGOIATRIA', valoreEsatto: 'PATOLOGIA GENERALE - OTORINOLARINGOIATRIA', searchKey: 'OTORINOLARINGOIATRIA' }
             ],
             'NEUROLESIONI': [
-                { nome: 'NEUROLOGIA II NEUROFISIOLOGIA', searchKey: 'NEUROLOGIA II' },
-                { nome: 'NEUROCHIRURGIA', searchKey: 'NEUROCHIRURGIA' },
-                { nome: 'MEDICINA FISICA RIABILITATIVA III', searchKey: 'RIABILITATIVA III' },
-                { nome: 'SCIENZE FISIOTERAPICHE 4', searchKey: 'FISIOTERAPICHE 4' },
-                { nome: 'SCIENZE FISIOTERAPICHE 5', searchKey: 'FISIOTERAPICHE 5' }
+                { label: 'NEUROLOGIA II NEUROFISIOLOGIA', valoreEsatto: 'NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA', searchKey: 'NEUROLOGIA II' },
+                { label: 'NEUROCHIRURGIA', valoreEsatto: 'NEUROLESIONI - NEUROCHIRURGIA', searchKey: 'NEUROCHIRURGIA' },
+                { label: 'MEDICINA FISICA E RIABILITATIVA III', valoreEsatto: 'NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III', searchKey: 'RIABILITATIVA III' },
+                { label: 'SCIENZE FISIOTERAPICHE 4', valoreEsatto: 'NEUROLESIONI - SCIENZE FISIOTERAPICHE 4', searchKey: 'FISIOTERAPICHE 4' },
+                { label: 'SCIENZE FISIOTERAPICHE 5', valoreEsatto: 'NEUROLESIONI - SCIENZE FISIOTERAPICHE 5', searchKey: 'FISIOTERAPICHE 5' }
             ],
             'MALATTIE APPARATO LOCOMOTORE': [
-                { nome: 'MALATTIE APPARATO LOCOMOTORE', searchKey: 'MALATTIE APPARATO LOCOMOTORE LEZ' },
-                { nome: 'REUMATOLOGIA', searchKey: 'REUMATOLOGIA' },
-                { nome: 'MEDICINA FISICA RIABILITATIVA IV', searchKey: 'RIABILITATIVA IV' },
-                { nome: 'SCIENZE FISIOTERAPICHE 6', searchKey: 'FISIOTERAPICHE 6' },
-                { nome: 'SCIENZE FISIOTERAPICHE 7', searchKey: 'FISIOTERAPICHE 7' }
+                { label: 'MALATTIE APPARATO LOCOMOTORE', valoreEsatto: 'MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ', searchKey: 'MALATTIE APPARATO LOCOMOTORE LEZ' },
+                { label: 'REUMATOLOGIA', valoreEsatto: 'MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA', searchKey: 'REUMATOLOGIA' },
+                { label: 'MEDICINA FISICA E RIABILITATIVA IV', valoreEsatto: 'MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV', searchKey: 'RIABILITATIVA IV' },
+                { label: 'SCIENZE FISIOTERAPICHE 6', valoreEsatto: 'MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6', searchKey: 'FISIOTERAPICHE 6' },
+                { label: 'SCIENZE FISIOTERAPICHE 7', valoreEsatto: 'MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7', searchKey: 'FISIOTERAPICHE 7' }
             ]
         };
 
@@ -1395,16 +1397,11 @@ body {
         // ============================================
         let mergedSettimanePending = null;
 
-        function eventoIdLogico(ev) {
-            return `${(ev.titolo||'').trim()}_${(ev.docente||'').trim()}_${ev.oraInizio}_${ev.oraFine}`;
-        }
-
         function avviaSmartMerge() {
             const conflitti = [];
             const nuoveSettimane = JSON.parse(JSON.stringify(defaultSettimane));
 
-            // Scansiona settimana per settimana
-            nuoveSettimane.forEach((nuovaW, wIdx) => {
+            nuoveSettimane.forEach((nuovaW) => {
                 const wNumero = nuovaW.numero;
                 const utenteW = settimane.find(s => s && s.numero === wNumero);
                 if (!utenteW || !utenteW.eventi) return;
@@ -1413,37 +1410,33 @@ body {
                     const eventiUtente = utenteW.eventi[giorno] || [];
                     const eventiNuovi = nuovaW.eventi[giorno] || [];
 
-                    // 1. Mantieni lo stato per le lezioni ufficiali confermate
                     eventiNuovi.forEach(evNuovo => {
                         const matchUtente = eventiUtente.find(u => 
                             u.titolo === evNuovo.titolo && 
                             Math.abs(u.oraInizio - evNuovo.oraInizio) < 0.1
                         );
                         if (matchUtente) {
-                            evNuovo.tipo = matchUtente.tipo; // Preserva 'saltata', 'obbligatorio', 'normale'
+                            evNuovo.tipo = matchUtente.tipo;
                         }
                     });
 
-                    // 2. Preserva tutti gli eventi personalizzati creati dall'utente ('ALTRO')
                     eventiUtente.forEach(evU => {
-                        const isCustom = evU.titolo && (evU.titolo.startsWith('ALTRO') || !Object.keys(strutturaCorsi).some(k => evU.titolo.includes(k)));
+                        const isCustom = evU.titolo && (evU.titolo.startsWith('ALTRO') || !Object.keys(corsiConfig).some(k => evU.titolo.includes(k)));
                         if (isCustom) {
-                            // Verifica se si sovrappone a un nuovo evento ufficiale
                             const sovrapposto = eventiNuovi.find(n => n.oraInizio < evU.oraFine && n.oraFine > evU.oraInizio);
                             if (sovrapposto) {
-                                conflitti.push(`W${wNumero} (${giorno}): Il tuo evento "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) si sovrappone alla nuova lezione ufficiale "${sovrapposto.titolo}".`);
+                                conflitti.push(`W${wNumero} (${giorno}): L'evento "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) si sovrappone alla lezione ufficiale "${sovrapposto.titolo}".`);
                             }
                             eventiNuovi.push(evU);
                         }
                     });
 
-                    // 3. Rileva se lezioni ufficiali eliminate erano state personalizzate dall'utente
                     eventiUtente.forEach(evU => {
-                        const eraUfficiale = Object.keys(strutturaCorsi).some(k => (evU.titolo||'').includes(k));
+                        const eraUfficiale = Object.keys(corsiConfig).some(k => (evU.titolo||'').includes(k));
                         if (eraUfficiale) {
                             const esisteAncora = eventiNuovi.some(n => n.titolo === evU.titolo && Math.abs(n.oraInizio - evU.oraInizio) < 0.1);
                             if (!esisteAncora && evU.tipo !== 'normale') {
-                                conflitti.push(`W${wNumero} (${giorno}): La lezione "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) è stata cancellata dall'orario ufficiale, ma l'avevi contrassegnata come "${evU.tipo}". Verrà rimossa.`);
+                                conflitti.push(`W${wNumero} (${giorno}): La lezione "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) è stata cancellata dall'orario ufficiale, ma era segnata come "${evU.tipo}". Verrà rimossa.`);
                             }
                         }
                     });
@@ -1612,7 +1605,7 @@ body {
                     moduli: [
                         { nome: 'NEUROLOGIA II NEUROFISIOLOGIA', search: 'NEUROLOGIA II' },
                         { nome: 'NEUROCHIRURGIA', search: 'NEUROCHIRURGIA' },
-                        { nome: 'MEDICINA FISICA RIABILITATIVA III', search: 'RIABILITATIVA III' },
+                        { nome: 'MEDICINA FISICA E RIABILITATIVA III', search: 'RIABILITATIVA III' },
                         { nome: 'SCIENZE FISIOTERAPICHE 4', search: 'FISIOTERAPICHE 4' },
                         { nome: 'SCIENZE FISIOTERAPICHE 5', search: 'FISIOTERAPICHE 5' }
                     ]
@@ -1622,7 +1615,7 @@ body {
                     moduli: [
                         { nome: 'MALATTIE APPARATO LOCOMOTORE', search: 'MALATTIE APPARATO LOCOMOTORE LEZ' },
                         { nome: 'REUMATOLOGIA', search: 'REUMATOLOGIA' },
-                        { nome: 'MEDICINA FISICA RIABILITATIVA IV', search: 'RIABILITATIVA IV' },
+                        { nome: 'MEDICINA FISICA E RIABILITATIVA IV', search: 'RIABILITATIVA IV' },
                         { nome: 'SCIENZE FISIOTERAPICHE 6', search: 'FISIOTERAPICHE 6' },
                         { nome: 'SCIENZE FISIOTERAPICHE 7', search: 'FISIOTERAPICHE 7' }
                     ]
@@ -1688,7 +1681,7 @@ body {
         // ============================================
         // GESTIONE SELEZIONATORE INSEGNAMENTI & MODULI
         // ============================================
-        function onInsegnamentoChange(moduloSelezionato = null) {
+        function onInsegnamentoChange(valoreEsattoPredefinito = null) {
             const insScelto = document.getElementById('editInsegnamento').value;
             const groupModulo = document.getElementById('groupModuloSelect');
             const groupLibero = document.getElementById('groupTitoloLibero');
@@ -1702,16 +1695,16 @@ body {
                 groupLibero.style.display = 'none';
                 selectModulo.innerHTML = '';
 
-                const listaModuli = strutturaCorsi[insScelto] || [];
+                const listaModuli = corsiConfig[insScelto] || [];
                 listaModuli.forEach(m => {
                     const opt = document.createElement('option');
-                    opt.value = m.searchKey;
-                    opt.textContent = m.nome;
+                    opt.value = m.valoreEsatto; // Stringa esatta originale
+                    opt.textContent = m.label;  // Etichetta pulita a video
                     selectModulo.appendChild(opt);
                 });
 
-                if (moduloSelezionato) {
-                    selectModulo.value = moduloSelezionato;
+                if (valoreEsattoPredefinito) {
+                    selectModulo.value = valoreEsattoPredefinito;
                 }
             }
         }
@@ -1719,13 +1712,14 @@ body {
         function compilaCampiTitolo(titoloCompleto) {
             let trovato = false;
 
-            for (const [insNome, moduli] of Object.entries(strutturaCorsi)) {
+            for (const [insNome, moduli] of Object.entries(corsiConfig)) {
                 if (titoloCompleto.includes(insNome)) {
                     document.getElementById('editInsegnamento').value = insNome;
                     onInsegnamentoChange();
                     for (const m of moduli) {
-                        if (titoloCompleto.includes(m.searchKey)) {
-                            document.getElementById('editModulo').value = m.searchKey;
+                        // Abbina sia la formula esatta completa che la chiave di ricerca per retrocompatibilità
+                        if (titoloCompleto === m.valoreEsatto || titoloCompleto.includes(m.searchKey)) {
+                            document.getElementById('editModulo').value = m.valoreEsatto;
                             trovato = true;
                             break;
                         }
@@ -1820,8 +1814,8 @@ body {
             if (insScelto === 'ALTRO') {
                 titoloFinale = document.getElementById('editTitoloLibero').value.trim() || 'Attività Extra';
             } else {
-                const moduloScelto = document.getElementById('editModulo').value;
-                titoloFinale = `${insScelto} - ${moduloScelto}`;
+                // Prende direttamente la stringa originale dal value della option
+                titoloFinale = document.getElementById('editModulo').value;
             }
 
             const docente = document.getElementById('editDocente').value.trim();
