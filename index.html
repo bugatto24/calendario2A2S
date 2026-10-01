@@ -647,4 +647,1224 @@ body {
         <div class="user-bar">
             <div class="user-bar-left">
                 <div class="user-bar-input-group">
-                    <input type="text" id="usernameInput"
+                    <input type="text" id="usernameInput" placeholder="Nome utente (es. mario_rossi)">
+                    <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica o crea profilo">Carica/Crea</button>
+                </div>
+                
+                <div class="user-bar-input-group" style="grid-template-columns: auto 1fr;">
+                    <span style="font-weight: 600; color: #475569;">Gruppo:</span>
+                    <select id="groupSelector" onchange="cambiaGruppo()">
+                        <option value="ALL">Tutti i Gruppi</option>
+                        <option value="A">Gruppo A</option>
+                        <option value="B">Gruppo B</option>
+                        <option value="C">Gruppo C</option>
+                        <option value="D">Gruppo D</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controlli Settimane e Navigazione -->
+        <div class="controls">
+            <div class="nav-buttons">
+                <button class="btn btn-today" onclick="vaiAOggi()" title="Vai alla settimana con il giorno odierno">Oggi</button>
+                <button class="btn btn-nav" id="btnPrev" onclick="prevWeek()">◀</button>
+                <select id="weekSelector" onchange="changeWeek()"></select>
+                <button class="btn btn-nav" id="btnNext" onclick="nextWeek()">▶</button>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleVistaMobile()">📐 Espandi</button>
+                <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
+                <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset</button>
+            </div>
+        </div>
+
+        <!-- Nuova Legenda Ordinata (Stati e Materie) -->
+        <div class="legend">
+            <div class="legend-group">
+                <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
+                <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
+                <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
+                <div class="legend-item"><div class="legend-box legend-altrogruppo"></div><span>👥 Altro Gruppo</span></div>
+            </div>
+            <div class="legend-divider"></div>
+            <div class="legend-group">
+                <div class="legend-item"><span class="legend-dot dot-patologia"></span><span>Patologia Gen.</span></div>
+                <div class="legend-item"><span class="legend-dot dot-neuro"></span><span>Neurolesioni</span></div>
+                <div class="legend-item"><span class="legend-dot dot-locomotore"></span><span>App. Locomotore</span></div>
+                <div class="legend-item"><span class="legend-dot dot-altro"></span><span>Altro</span></div>
+            </div>
+        </div>
+
+        <!-- Vista Calendario -->
+        <div class="calendar-container vista-compatta" id="calendarContainer">
+            <div class="calendar" id="calendar"></div>
+        </div>
+
+        <!-- Statistiche / Progressi Insegnamenti -->
+        <div class="stats-container">
+            <h3 class="stats-title">📊 Piano Frequenza Personalizzato</h3>
+            <div class="insegnamenti-container" id="insegnamentiContainer"></div>
+        </div>
+    </div>
+
+    <!-- Modale Modifica / Creazione Lezione -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Modifica Lezione</h3>
+                <button class="btn-close" onclick="chiudiModale()">&times;</button>
+            </div>
+            <div class="quick-status-buttons">
+                <button type="button" class="btn-status-quick" id="btnStatoNormale" onclick="impostaStato('normale')">✅ Segui</button>
+                <button type="button" class="btn-status-quick" id="btnStatoObbligatorio" onclick="impostaStato('obbligatorio')">⚠️ Obbligatoria</button>
+                <button type="button" class="btn-status-quick" id="btnStatoSaltata" onclick="impostaStato('saltata')">❌ Salta</button>
+            </div>
+            
+            <div class="form-group">
+                <label for="editGiorno">Giorno</label>
+                <select id="editGiorno">
+                    <option value="lunedì">Lunedì</option>
+                    <option value="martedì">Martedì</option>
+                    <option value="mercoledì">Mercoledì</option>
+                    <option value="giovedì">Giovedì</option>
+                    <option value="venerdì">Venerdì</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="editInsegnamento">Insegnamento</label>
+                <select id="editInsegnamento" onchange="onInsegnamentoChange()">
+                    <option value="PATOLOGIA GENERALE">PATOLOGIA GENERALE</option>
+                    <option value="NEUROLESIONI">NEUROLESIONI</option>
+                    <option value="MALATTIE APPARATO LOCOMOTORE">MALATTIE APPARATO LOCOMOTORE</option>
+                    <option value="ALTRO">ALTRO / NON CATALOGATO (Nessun conteggio)</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="groupModuloSelect">
+                <label for="editModulo">Corso / Modulo</label>
+                <select id="editModulo"></select>
+            </div>
+
+            <div class="form-group" id="groupTitoloLibero" style="display:none;">
+                <label for="editTitoloLibero">Nome Attività / Lezione</label>
+                <input type="text" id="editTitoloLibero" placeholder="Es. Tirocinio, Seminario...">
+            </div>
+
+            <div class="form-group"><label for="editDocente">Docente</label><input type="text" id="editDocente" placeholder="Es. BOZZALI"></div>
+            <div class="form-group"><label for="editLuogo">Aula / Sede</label><input type="text" id="editLuogo" placeholder="Es. Aula Magna"></div>
+            
+            <div class="form-row">
+                <div class="form-group" style="flex:1">
+                    <label for="editOraInizio">Ora Inizio</label>
+                    <input type="time" id="editOraInizio">
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label for="editOraFine">Ora Fine</label>
+                    <input type="time" id="editOraFine">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente()">🗑 Elimina</button>
+                <button type="button" class="btn-save-modal" onclick="salvaModificheEvento()">Conferma</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const strutturaCorsi = {
+            'PATOLOGIA GENERALE': [
+                { nome: 'PATOLOGIA GENERALE', searchKey: 'PATOLOGIA GENERALE LEZ' },
+                { nome: 'FARMACOLOGIA', searchKey: 'FARMACOLOGIA' },
+                { nome: 'GASTROENTEROLOGIA', searchKey: 'GASTROENTEROLOGIA' },
+                { nome: 'NEFROLOGIA', searchKey: 'NEFROLOGIA' },
+                { nome: 'OTORINOLARINGOIATRIA', searchKey: 'OTORINOLARINGOIATRIA' }
+            ],
+            'NEUROLESIONI': [
+                { nome: 'NEUROLOGIA II NEUROFISIOLOGIA', searchKey: 'NEUROLOGIA II' },
+                { nome: 'NEUROCHIRURGIA', searchKey: 'NEUROCHIRURGIA' },
+                { nome: 'MEDICINA FISICA RIABILITATIVA III', searchKey: 'RIABILITATIVA III' },
+                { nome: 'SCIENZE FISIOTERAPICHE 4', searchKey: 'FISIOTERAPICHE 4' },
+                { nome: 'SCIENZE FISIOTERAPICHE 5', searchKey: 'FISIOTERAPICHE 5' }
+            ],
+            'MALATTIE APPARATO LOCOMOTORE': [
+                { nome: 'MALATTIE APPARATO LOCOMOTORE', searchKey: 'MALATTIE APPARATO LOCOMOTORE LEZ' },
+                { nome: 'REUMATOLOGIA', searchKey: 'REUMATOLOGIA' },
+                { nome: 'MEDICINA FISICA RIABILITATIVA IV', searchKey: 'RIABILITATIVA IV' },
+                { nome: 'SCIENZE FISIOTERAPICHE 6', searchKey: 'FISIOTERAPICHE 6' },
+                { nome: 'SCIENZE FISIOTERAPICHE 7', searchKey: 'FISIOTERAPICHE 7' }
+            ]
+        };
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBU9IVD8kqpU7bE7QEwOvOnAgvhtl98Ktg",
+            authDomain: "a2s-aadbf.firebaseapp.com",
+            databaseURL: "https://a2s-aadbf-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "a2s-aadbf",
+            storageBucket: "a2s-aadbf.firebasestorage.app",
+            messagingSenderId: "646624892228",
+            appId: "1:646624892228:web:9e1d57aef5a6cc14913311"
+        };
+
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        } catch(e) {
+            console.error("Firebase err:", e);
+        }
+
+        let currentUser = '';
+        let gruppoSelezionato = 'ALL';
+        try {
+            currentUser = localStorage.getItem('currentUser_fisioterapia') || '';
+            gruppoSelezionato = localStorage.getItem('currentGroup_fisioterapia') || 'ALL';
+        } catch(e) {}
+
+        let settimanaCorrente = 0;
+        let eventoSelezionatoRef = null;
+
+        const defaultSettimane = [
+            {
+                numero: 1, periodo: "1-2 ottobre 2026",
+                eventi: {
+                    giovedì: [
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    venerdì: [
+                        { oraInizio: 8, oraFine: 10, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 10, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ]
+                }
+            },
+            {
+                numero: 2, periodo: "5-9 ottobre 2026",
+                eventi: {
+                    lunedì: [
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+                    ],
+                    martedì: [
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+                    ],
+                    mercoledì: [
+                        { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+                    ],
+                    giovedì: [
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        // 8/10: Tolta farmacologia e inserito incontro tirocinio obbligatorio
+                        { oraInizio: 11, oraFine: 12.5, titolo: "ALTRO - Incontro Tirocinio", docente: "C. Sorba", luogo: "via Chiabrera", tipo: "obbligatorio" },
+                        { oraInizio: 14, oraFine: 16, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+                    ],
+                    venerdì: [
+                        { oraInizio: 8, oraFine: 10, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 10, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+                    ]
+                }
+            },
+            {
+                numero: 3, periodo: "12-16 ottobre 2026",
+                eventi: {
+                    lunedì: [
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+                    ],
+                    martedì: [
+                        { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+                    ],
+                    mercoledì: [
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+                    ],
+                    giovedì: [
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+                    ],
+                    venerdì: [
+                        { oraInizio: 9, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+                    ]
+                }
+            },
+            {
+                numero: 4, periodo: "19-23 ottobre 2026",
+                eventi: {
+                    lunedì: [
+                        { oraInizio: 8, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    martedì: [
+                        { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    mercoledì: [
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    giovedì: [
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    venerdì: [
+                        { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO (GRUPPI A/B)", luogo: "Aula 2 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO (GRUPPI C/D)", luogo: "Aula 2 CTO", tipo: "normale" }
+                    ]
+                }
+            },
+            {
+                numero: 5, periodo: "26-30 ottobre 2026",
+                eventi: {
+                    lunedì: [
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    martedì: [
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
+                    ],
+                    mercoledì: [
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
+                    ],
+                    giovedì: [
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" }
+                    ],
+                    venerdì: [
+                        { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO (GRUPPI A/B)", luogo: "Aula 1 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO (GRUPPI C/D)", luogo: "Aula 1 CTO", tipo: "normale" }
+                    ]
+                }
+            },
+            {
+                numero: 6, periodo: "2-6 novembre 2026",
+                eventi: {
+                    lunedì: [
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    martedì: [
+                        { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    mercoledì: [
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    giovedì: [
+                        { oraInizio: 8, oraFine: 10, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 10, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 13, oraFine: 15, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 15, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    venerdì: [
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO B)", luogo: "Aula 1 CTO", tipo: "normale" },
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO A)", luogo: "Aula 1 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" }
+                    ]
+                }
+            },
+            {
+                numero: 7, periodo: "9-13 novembre 2026",
+                eventi: {
+                    lunedì: [
+                        // 9/11: Aggiunto recupero di Farmacologia ore 8:30-10:30
+                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 10.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    martedì: [
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    mercoledì: [
+                        { oraInizio: 8, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                        { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
+                    ],
+                    giovedì: [
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO A)", luogo: "Aula 1 CTO", tipo: "normale" },
+                        { oraInizio: 9, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    venerdì: [
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO C)", luogo: "Aula 1 CTO", tipo: "normale" },
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO D)", luogo: "Aula 2 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO D)", luogo: "Aula 1 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO C)", luogo: "Aula 2 CTO", tipo: "normale" }
+                    ]
+                }
+            },
+            {
+                numero: 8, periodo: "16-20 novembre 2026",
+                eventi: {
+                    lunedì: [
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 16, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    martedì: [
+                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    mercoledì: [
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPI C/D)", luogo: "Aula 1 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+                    ],
+                    giovedì: [
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO B)", luogo: "Aula 1 CTO", tipo: "normale" },
+                        { oraInizio: 9, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO D)", luogo: "Aula 1 CTO", tipo: "normale" }
+                    ],
+                    venerdì: [
+                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO C)", luogo: "Aula 1 CTO", tipo: "normale" },
+                        { oraInizio: 9, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO D)", luogo: "Aula 2 CTO", tipo: "normale" },
+                        { oraInizio: 14, oraFine: 17, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO C)", luogo: "Aula 2 CTO", tipo: "normale" }
+                    ]
+                }
+            }
+        ];
+
+        let settimane = JSON.parse(JSON.stringify(defaultSettimane));
+        const giorni = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì'];
+        const ore = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+        const dateMap = {
+            1: '2026-09-28', 2: '2026-10-05', 3: '2026-10-12', 4: '2026-10-19',
+            5: '2026-10-26', 6: '2026-11-02', 7: '2026-11-09', 8: '2026-11-16'
+        };
+        const giornoOffset = { 'lunedì': 0, 'martedì': 1, 'mercoledì': 2, 'giovedì': 3, 'venerdì': 4 };
+
+        function sanitizeUsername(name) {
+            return name.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+        }
+
+        // ============================================
+        // VISTA COMPATTA / ESPANSA (MOBILE)
+        // ============================================
+        function toggleVistaMobile() {
+            const container = document.getElementById('calendarContainer');
+            const btn = document.getElementById('btnToggleView');
+            if (container.classList.contains('vista-compatta')) {
+                container.classList.remove('vista-compatta');
+                container.classList.add('vista-espansa');
+                btn.textContent = '📐 Compatta';
+            } else {
+                container.classList.remove('vista-espansa');
+                container.classList.add('vista-compatta');
+                btn.textContent = '📐 Espandi';
+            }
+        }
+
+        // ============================================
+        // GESTIONE SWIPE RAPIDO DA MOBILE (SOLO COMPATTA)
+        // ============================================
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        function initSwipeGestures() {
+            const container = document.getElementById('calendarContainer');
+            
+            container.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            container.addEventListener('touchend', (e) => {
+                if (!container.classList.contains('vista-compatta')) return;
+
+                const touchEndX = e.changedTouches[0].screenX;
+                const touchEndY = e.changedTouches[0].screenY;
+                const diffX = touchEndX - touchStartX;
+                const diffY = touchEndY - touchStartY;
+
+                if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY)) {
+                    if (diffX < 0) {
+                        nextWeek();
+                    } else {
+                        prevWeek();
+                    }
+                }
+            }, { passive: true });
+        }
+
+        // ============================================
+        // FILTRAGGIO GRUPPI (incluso A/B e C/D)
+        // ============================================
+        function appartieneAlGruppo(evento, gruppoTarget) {
+            if (gruppoTarget === 'ALL') return true;
+            const text = ((evento.docente || '') + ' ' + (evento.titolo || '')).toUpperCase();
+            
+            if (!text.includes('GRUPPO') && !text.includes('GRUPPI')) return true;
+
+            if (gruppoTarget === 'A') return text.includes('GRUPPO A') || text.includes('GRUPPI A') || text.includes('A/B');
+            if (gruppoTarget === 'B') return text.includes('GRUPPO B') || text.includes('GRUPPI B') || text.includes('A/B');
+            if (gruppoTarget === 'C') return text.includes('GRUPPO C') || text.includes('GRUPPI C') || text.includes('C/D');
+            if (gruppoTarget === 'D') return text.includes('GRUPPO D') || text.includes('GRUPPI D') || text.includes('C/D');
+            return true;
+        }
+
+        function cambiaGruppo() {
+            gruppoSelezionato = document.getElementById('groupSelector').value;
+            try {
+                localStorage.setItem('currentGroup_fisioterapia', gruppoSelezionato);
+            } catch(e) {}
+            aggiornaInterfaccia();
+            salvaSuCloudSilenzioso();
+        }
+
+        // ============================================
+        // CLOUD PROFILE & SALVATAGGIO AUTOMATICO
+        // ============================================
+        function caricaOCreaProfilo() {
+            const inputVal = document.getElementById('usernameInput').value;
+            const sanitized = sanitizeUsername(inputVal);
+            if (!sanitized) {
+                alert("Inserisci un nome utente (es. mario_rossi).");
+                return;
+            }
+            currentUser = sanitized;
+            try {
+                localStorage.setItem('currentUser_fisioterapia', currentUser);
+            } catch(e) {}
+            document.getElementById('usernameInput').value = currentUser;
+
+            const statusBadge = document.getElementById('syncStatus');
+            statusBadge.textContent = "Connessione...";
+
+            if (!db) {
+                statusBadge.textContent = "🔴 Errore DB";
+                return;
+            }
+
+            db.ref('utenti/' + currentUser).once('value').then(snapshot => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.settimane) {
+                        settimane = Array.isArray(data.settimane) ? data.settimane : Object.values(data.settimane);
+                        if (data.gruppo) {
+                            gruppoSelezionato = data.gruppo;
+                            document.getElementById('groupSelector').value = gruppoSelezionato;
+                            try { localStorage.setItem('currentGroup_fisioterapia', gruppoSelezionato); } catch(e) {}
+                        }
+                    } else {
+                        settimane = Array.isArray(data) ? data : Object.values(data);
+                    }
+                    statusBadge.textContent = `🟢 Connesso: ${currentUser}`;
+                } else {
+                    settimane = JSON.parse(JSON.stringify(defaultSettimane));
+                    salvaSuCloudSilenzioso();
+                    statusBadge.textContent = `🟢 Creato: ${currentUser}`;
+                }
+                aggiornaInterfaccia();
+            }).catch(err => {
+                console.error("Errore fetch Firebase:", err);
+                statusBadge.textContent = "🔴 Errore caricamento";
+            });
+        }
+
+        function salvaSuCloudSilenzioso() {
+            if (!currentUser || !db) return;
+
+            const statusBadge = document.getElementById('syncStatus');
+            statusBadge.textContent = "Salvataggio...";
+
+            const payload = {
+                settimane: settimane,
+                gruppo: gruppoSelezionato,
+                lastUpdate: new Date().toISOString()
+            };
+
+            db.ref('utenti/' + currentUser).set(payload)
+              .then(() => {
+                  statusBadge.textContent = `🟢 Sincronizzato`;
+              })
+              .catch(err => {
+                  console.error("Errore autosave:", err);
+                  statusBadge.textContent = "🔴 Non salvato";
+              });
+        }
+
+        // ============================================
+        // CONVERSIONI ORARI
+        // ============================================
+        function formattaOra(decimalHour) {
+            const h = Math.floor(decimalHour);
+            const m = Math.round((decimalHour - h) * 60);
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        }
+
+        function timeStringToDecimal(timeStr) {
+            if (!timeStr) return 8;
+            const [h, m] = timeStr.split(':').map(Number);
+            return h + (m / 60);
+        }
+
+        // Calcolo ore insegnamento: esclude categoricamente gli eventi di altri gruppi
+        function calcolaOreModulo(searchTerm) {
+            let totale = 0, seguite = 0;
+            settimane.forEach(s => {
+                if (!s || !s.eventi) return;
+                giorni.forEach(g => {
+                    const eventi = s.eventi[g] || [];
+                    eventi.forEach(e => {
+                        if (e.titolo && e.titolo.includes(searchTerm) && appartieneAlGruppo(e, gruppoSelezionato)) {
+                            const d = e.oraFine - e.oraInizio;
+                            totale += d;
+                            if (e.tipo === 'normale' || e.tipo === 'obbligatorio') seguite += d;
+                        }
+                    });
+                });
+            });
+            return { totale, seguite, percentuale: totale > 0 ? Math.round((seguite / totale) * 100) : 0 };
+        }
+
+        // ============================================
+        // RICONOSCIMENTO INSEGNAMENTO PER BORDO LATERALE
+        // ============================================
+        function getClasseInsegnamento(titolo) {
+            const t = (titolo || '').toUpperCase();
+            if (t.includes('PATOLOGIA GENERALE')) return 'bordo-patologia';
+            if (t.includes('NEUROLESIONI')) return 'bordo-neuro';
+            if (t.includes('MALATTIE APPARATO LOCOMOTORE')) return 'bordo-locomotore';
+            return 'bordo-altro';
+        }
+
+        // ============================================
+        // GESTIONE "OGGI" E LINEA ORA ATTUALE
+        // ============================================
+        function vaiAOggi() {
+            const oggi = new Date();
+            let trovata = false;
+
+            for (let i = 0; i < settimane.length; i++) {
+                const baseStr = dateMap[settimane[i].numero];
+                if (!baseStr) continue;
+                const lunediSettimana = new Date(baseStr);
+                const domenicaSettimana = new Date(baseStr);
+                domenicaSettimana.setDate(lunediSettimana.getDate() + 6);
+
+                if (oggi >= lunediSettimana && oggi <= domenicaSettimana) {
+                    const dir = i > settimanaCorrente ? 'next' : 'prev';
+                    settimanaCorrente = i;
+                    aggiornaInterfaccia(dir);
+                    trovata = true;
+                    break;
+                }
+            }
+
+            if (!trovata) {
+                const dir = 0 < settimanaCorrente ? 'prev' : null;
+                settimanaCorrente = 0;
+                aggiornaInterfaccia(dir);
+            }
+        }
+
+        // ============================================
+        // ALGORITMO SOVRAPPOSIZIONE EVENTI (STILE GCAL)
+        // ============================================
+        function calcolaLayoutEventi(eventiGiorno) {
+            if (!eventiGiorno || eventiGiorno.length === 0) return [];
+
+            const items = eventiGiorno.map((ev, originalIndex) => ({
+                ev,
+                originalIndex,
+                start: ev.oraInizio,
+                end: ev.oraFine
+            }));
+
+            items.sort((a, b) => (a.start - b.start) || ((b.end - b.start) - (a.end - a.start)));
+
+            const clusters = [];
+            let currentCluster = [];
+            let clusterEnd = -1;
+
+            items.forEach(item => {
+                if (currentCluster.length === 0) {
+                    currentCluster.push(item);
+                    clusterEnd = item.end;
+                } else {
+                    if (item.start < clusterEnd) {
+                        currentCluster.push(item);
+                        if (item.end > clusterEnd) clusterEnd = item.end;
+                    } else {
+                        clusters.push(currentCluster);
+                        currentCluster = [item];
+                        clusterEnd = item.end;
+                    }
+                }
+            });
+            if (currentCluster.length > 0) clusters.push(currentCluster);
+
+            const risultati = [];
+            clusters.forEach(cluster => {
+                const columns = [];
+
+                cluster.forEach(item => {
+                    let placed = false;
+                    for (let colIdx = 0; colIdx < columns.length; colIdx++) {
+                        const lastInCol = columns[colIdx][columns[colIdx].length - 1];
+                        if (item.start >= lastInCol.end) {
+                            columns[colIdx].push(item);
+                            item.colIndex = colIdx;
+                            placed = true;
+                            break;
+                        }
+                    }
+                    if (!placed) {
+                        columns.push([item]);
+                        item.colIndex = columns.length - 1;
+                    }
+                });
+
+                const totalCols = columns.length;
+                cluster.forEach(item => {
+                    risultati.push({
+                        evento: item.ev,
+                        eventIdx: item.originalIndex,
+                        colIndex: item.colIndex,
+                        totalCols: totalCols
+                    });
+                });
+            });
+
+            return risultati;
+        }
+
+        // ============================================
+        // RENDER GRAFICO CON TRANSIZIONE VELOCE (120ms)
+        // ============================================
+        let isTransitioning = false;
+
+        function renderCalendario(animationDirection = null) {
+            const calElem = document.getElementById('calendar');
+            const settimana = settimane[settimanaCorrente];
+            if (!settimana) return;
+
+            if (animationDirection && !isTransitioning) {
+                isTransitioning = true;
+                const outClass = animationDirection === 'next' ? 'slide-out-left' : 'slide-out-right';
+                const inClass = animationDirection === 'next' ? 'slide-in-right' : 'slide-in-left';
+
+                calElem.classList.add(outClass);
+
+                setTimeout(() => {
+                    calElem.classList.remove(outClass);
+                    buildCalendarHTML();
+                    calElem.classList.add(inClass);
+
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            calElem.classList.remove(inClass);
+                            isTransitioning = false;
+                        });
+                    });
+                }, 100);
+            } else {
+                buildCalendarHTML();
+            }
+
+            function buildCalendarHTML() {
+                const baseDate = new Date(dateMap[settimana.numero] || '2026-09-28');
+                const now = new Date();
+                const nowYear = now.getFullYear();
+                const nowMonth = now.getMonth();
+                const nowDate = now.getDate();
+                const nowDecimalHour = now.getHours() + (now.getMinutes() / 60);
+
+                let html = '<div class="time-column"><div class="time-header">Ora</div>';
+                ore.forEach(ora => { 
+                    html += `<div class="time-slot">${String(ora).padStart(2, '0')}:00</div>`; 
+                });
+                html += '</div>';
+
+                giorni.forEach(giorno => {
+                    const dataGiorno = new Date(baseDate);
+                    dataGiorno.setDate(baseDate.getDate() + (giornoOffset[giorno] || 0));
+                    const giornoNum = dataGiorno.getDate();
+                    const giornoBreve = giorno.substring(0, 3).toUpperCase();
+
+                    const isToday = (dataGiorno.getFullYear() === nowYear &&
+                                     dataGiorno.getMonth() === nowMonth &&
+                                     dataGiorno.getDate() === nowDate);
+
+                    html += `<div class="day-column ${isToday ? 'is-today' : ''}">
+                        <div class="day-header">
+                            <span class="day-name">${giornoBreve}</span>
+                            <span class="day-number">${giornoNum}</span>
+                        </div>
+                        <div class="day-grid" onclick="creaNuovoEvento(event, ${settimanaCorrente}, '${giorno}')">`;
+
+                    ore.forEach((ora, idx) => { 
+                        html += `<div class="grid-line" style="top: ${idx * 64}px;"></div>`; 
+                    });
+
+                    if (isToday && nowDecimalHour >= 8 && nowDecimalHour <= 21) {
+                        const lineTop = (nowDecimalHour - 8) * 64;
+                        html += `<div class="current-time-line" style="top: ${lineTop}px;" title="Ora attuale"></div>`;
+                    }
+
+                    const eventiGiorno = (settimana.eventi && settimana.eventi[giorno]) ? settimana.eventi[giorno] : [];
+                    const eventiLayout = calcolaLayoutEventi(eventiGiorno);
+
+                    eventiLayout.forEach(({ evento, eventIdx, colIndex, totalCols }) => {
+                        const appartiene = appartieneAlGruppo(evento, gruppoSelezionato);
+
+                        const top = (evento.oraInizio - 8) * 64;
+                        const height = Math.max((evento.oraFine - evento.oraInizio) * 64, 20);
+
+                        const gapPx = 3;
+                        const widthCalc = `calc((100% - ${gapPx * (totalCols + 1)}px) / ${totalCols})`;
+                        const leftCalc = `calc(${gapPx}px + (${colIndex} * ((100% - ${gapPx * (totalCols + 1)}px) / ${totalCols} + ${gapPx}px)))`;
+
+                        let classeStato = '';
+                        let classeBordo = getClasseInsegnamento(evento.titolo);
+                        let emoji = '';
+
+                        if (!appartiene) {
+                            classeStato = 'evento-altrogruppo';
+                            emoji = '👥';
+                        } else {
+                            classeStato = evento.tipo === 'obbligatorio' ? 'evento-obbligatorio' : 
+                                          evento.tipo === 'saltata' ? 'evento-saltata' : 'evento-normale';
+                            emoji = evento.tipo === 'obbligatorio' ? '⚠️' : 
+                                    evento.tipo === 'saltata' ? '❌' : '✅';
+                        }
+
+                        html += `<div class="evento ${classeStato} ${classeBordo}" style="top: ${top}px; height: ${height}px; width: ${widthCalc}; left: ${leftCalc};" onclick="apriModale(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
+                        html += `<div class="evento-title">${emoji} ${evento.titolo}</div>`;
+                        html += `<div class="evento-time">${formattaOra(evento.oraInizio)} - ${formattaOra(evento.oraFine)}</div>`;
+                        if (evento.docente || evento.luogo) {
+                            html += `<div class="evento-docente">${[evento.docente, evento.luogo].filter(Boolean).join(' • ')}</div>`;
+                        }
+                        html += `</div>`;
+                    });
+                    html += '</div></div>';
+                });
+                calElem.innerHTML = html;
+            }
+        }
+
+        function renderInsegnamenti() {
+            const container = document.getElementById('insegnamentiContainer');
+            const insegnamenti = [
+                {
+                    nome: 'PATOLOGIA GENERALE',
+                    moduli: [
+                        { nome: 'PATOLOGIA GENERALE', search: 'PATOLOGIA GENERALE LEZ' },
+                        { nome: 'FARMACOLOGIA', search: 'FARMACOLOGIA' },
+                        { nome: 'GASTROENTEROLOGIA', search: 'GASTROENTEROLOGIA' },
+                        { nome: 'NEFROLOGIA', search: 'NEFROLOGIA' },
+                        { nome: 'OTORINOLARINGOIATRIA', search: 'OTORINOLARINGOIATRIA' }
+                    ]
+                },
+                {
+                    nome: 'NEUROLESIONI',
+                    moduli: [
+                        { nome: 'NEUROLOGIA II NEUROFISIOLOGIA', search: 'NEUROLOGIA II' },
+                        { nome: 'NEUROCHIRURGIA', search: 'NEUROCHIRURGIA' },
+                        { nome: 'MEDICINA FISICA RIABILITATIVA III', search: 'RIABILITATIVA III' },
+                        { nome: 'SCIENZE FISIOTERAPICHE 4', search: 'FISIOTERAPICHE 4' },
+                        { nome: 'SCIENZE FISIOTERAPICHE 5', search: 'FISIOTERAPICHE 5' }
+                    ]
+                },
+                {
+                    nome: 'MALATTIE APPARATO LOCOMOTORE',
+                    moduli: [
+                        { nome: 'MALATTIE APPARATO LOCOMOTORE', search: 'MALATTIE APPARATO LOCOMOTORE LEZ' },
+                        { nome: 'REUMATOLOGIA', search: 'REUMATOLOGIA' },
+                        { nome: 'MEDICINA FISICA RIABILITATIVA IV', search: 'RIABILITATIVA IV' },
+                        { nome: 'SCIENZE FISIOTERAPICHE 6', search: 'FISIOTERAPICHE 6' },
+                        { nome: 'SCIENZE FISIOTERAPICHE 7', search: 'FISIOTERAPICHE 7' }
+                    ]
+                }
+            ];
+
+            let html = '';
+            insegnamenti.forEach((ins, idx) => {
+                const moduliData = ins.moduli.map(m => ({ ...m, ...calcolaOreModulo(m.search) }));
+                const totaleIns = moduliData.reduce((acc, m) => acc + m.totale, 0);
+                const seguitoIns = moduliData.reduce((acc, m) => acc + m.seguite, 0);
+                const percIns = totaleIns > 0 ? Math.round((seguitoIns / totaleIns) * 100) : 0;
+                const colorClass = percIns >= 70 ? 'percent-ok' : percIns >= 60 ? 'percent-warn' : 'percent-bad';
+                const progressColor = percIns >= 70 ? '#16a34a' : percIns >= 60 ? '#d97706' : '#dc2626';
+
+                const existingContainer = document.getElementById(`moduli-${idx}`);
+                const isExpanded = existingContainer && existingContainer.classList.contains('visible');
+
+                html += `<div class="insegnamento">
+                    <div class="insegnamento-header" onclick="toggleInsegnamento(${idx})">
+                        <div class="insegnamento-info">
+                            <span class="insegnamento-arrow ${isExpanded ? 'expanded' : ''}" id="arrow-${idx}">▶</span>
+                            <span class="insegnamento-nome">${ins.nome}</span>
+                            <span class="insegnamento-ore">${seguitoIns}h / ${totaleIns}h</span>
+                        </div>
+                        <span class="insegnamento-percent ${colorClass}">${percIns}%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: ${percIns}%; background: ${progressColor};"></div></div>
+                    <div class="moduli-container ${isExpanded ? 'visible' : ''}" id="moduli-${idx}">`;
+
+                moduliData.forEach(mod => {
+                    const modColor = mod.percentuale >= 70 ? '#16a34a' : mod.percentuale >= 60 ? '#d97706' : '#dc2626';
+                    const modColorClass = mod.percentuale >= 70 ? 'percent-ok' : mod.percentuale >= 60 ? 'percent-warn' : 'percent-bad';
+
+                    html += `<div class="modulo">
+                        <div class="modulo-header">
+                            <span class="modulo-nome">${mod.nome}</span>
+                            <div class="modulo-stats"><span class="modulo-ore">${mod.seguite}h / ${mod.totale}h</span><span class="modulo-percent ${modColorClass}">${mod.percentuale}%</span></div>
+                        </div>
+                        <div class="modulo-progress"><div class="progress-fill" style="width: ${mod.percentuale}%; background: ${modColor};"></div></div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function toggleInsegnamento(idx) {
+            const m = document.getElementById(`moduli-${idx}`);
+            const a = document.getElementById(`arrow-${idx}`);
+            if (m && a) {
+                m.classList.toggle('visible');
+                a.classList.toggle('expanded');
+            }
+        }
+
+        function aggiornaInterfaccia(animationDirection = null) {
+            renderCalendario(animationDirection);
+            renderInsegnamenti();
+            updateControls();
+        }
+
+        // ============================================
+        // GESTIONE SELEZIONATORE INSEGNAMENTI & MODULI
+        // ============================================
+        function onInsegnamentoChange(moduloSelezionato = null) {
+            const insScelto = document.getElementById('editInsegnamento').value;
+            const groupModulo = document.getElementById('groupModuloSelect');
+            const groupLibero = document.getElementById('groupTitoloLibero');
+            const selectModulo = document.getElementById('editModulo');
+
+            if (insScelto === 'ALTRO') {
+                groupModulo.style.display = 'none';
+                groupLibero.style.display = 'block';
+            } else {
+                groupModulo.style.display = 'block';
+                groupLibero.style.display = 'none';
+                selectModulo.innerHTML = '';
+
+                const listaModuli = strutturaCorsi[insScelto] || [];
+                listaModuli.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.searchKey;
+                    opt.textContent = m.nome;
+                    selectModulo.appendChild(opt);
+                });
+
+                if (moduloSelezionato) {
+                    selectModulo.value = moduloSelezionato;
+                }
+            }
+        }
+
+        function compilaCampiTitolo(titoloCompleto) {
+            let trovato = false;
+
+            for (const [insNome, moduli] of Object.entries(strutturaCorsi)) {
+                if (titoloCompleto.includes(insNome)) {
+                    document.getElementById('editInsegnamento').value = insNome;
+                    onInsegnamentoChange();
+                    for (const m of moduli) {
+                        if (titoloCompleto.includes(m.searchKey)) {
+                            document.getElementById('editModulo').value = m.searchKey;
+                            trovato = true;
+                            break;
+                        }
+                    }
+                    if (trovato) break;
+                }
+            }
+
+            if (!trovato) {
+                document.getElementById('editInsegnamento').value = 'ALTRO';
+                onInsegnamentoChange();
+                document.getElementById('editTitoloLibero').value = titoloCompleto;
+            }
+        }
+
+        // ============================================
+        // CREAZIONE & MODIFICA EVENTI (CON AUTOSAVE)
+        // ============================================
+        let tipoSelezionato = 'normale';
+
+        function creaNuovoEvento(e, weekIdx, giorno) {
+            if (e.target.closest('.evento')) return;
+
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickY = e.clientY - rect.top;
+            
+            let oraInizio = 8 + (clickY / 64);
+            oraInizio = Math.floor(oraInizio * 2) / 2;
+            if (oraInizio < 8) oraInizio = 8;
+            if (oraInizio > 19) oraInizio = 19;
+            const oraFine = Math.min(oraInizio + 2, 20);
+
+            eventoSelezionatoRef = { weekIdx, giorno, eventIdx: -1, isNew: true };
+
+            document.getElementById('modalTitle').textContent = "Nuova Lezione";
+            document.getElementById('btnDeleteEvent').style.display = 'none';
+
+            document.getElementById('editGiorno').value = giorno;
+            document.getElementById('editInsegnamento').value = 'PATOLOGIA GENERALE';
+            onInsegnamentoChange();
+            document.getElementById('editTitoloLibero').value = '';
+            document.getElementById('editDocente').value = '';
+            document.getElementById('editLuogo').value = '';
+            document.getElementById('editOraInizio').value = formattaOra(oraInizio);
+            document.getElementById('editOraFine').value = formattaOra(oraFine);
+
+            impostaStato('normale');
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function apriModale(e, weekIdx, giorno, eventIdx) {
+            if (e) e.stopPropagation();
+
+            eventoSelezionatoRef = { weekIdx, giorno, eventIdx, isNew: false };
+            const ev = settimane[weekIdx].eventi[giorno][eventIdx];
+
+            document.getElementById('modalTitle').textContent = "Modifica Lezione";
+            document.getElementById('btnDeleteEvent').style.display = 'block';
+
+            document.getElementById('editGiorno').value = giorno;
+            compilaCampiTitolo(ev.titolo);
+            document.getElementById('editDocente').value = ev.docente || '';
+            document.getElementById('editLuogo').value = ev.luogo || '';
+            document.getElementById('editOraInizio').value = formattaOra(ev.oraInizio);
+            document.getElementById('editOraFine').value = formattaOra(ev.oraFine);
+
+            impostaStato(ev.tipo || 'normale');
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function chiudiModale() {
+            document.getElementById('editModal').classList.remove('active');
+            eventoSelezionatoRef = null;
+        }
+
+        function impostaStato(tipo) {
+            tipoSelezionato = tipo;
+            ['Normale', 'Obbligatorio', 'Saltata'].forEach(t => {
+                const b = document.getElementById(`btnStato${t}`);
+                b.className = 'btn-status-quick' + (tipo === t.toLowerCase() ? ` active-${tipo}` : '');
+            });
+        }
+
+        function salvaModificheEvento() {
+            if (!eventoSelezionatoRef) return;
+            const { weekIdx, giorno: vecchioGiorno, eventIdx, isNew } = eventoSelezionatoRef;
+            const nuovoGiorno = document.getElementById('editGiorno').value;
+            
+            const insScelto = document.getElementById('editInsegnamento').value;
+            let titoloFinale = '';
+
+            if (insScelto === 'ALTRO') {
+                titoloFinale = document.getElementById('editTitoloLibero').value.trim() || 'Attività Extra';
+            } else {
+                const moduloScelto = document.getElementById('editModulo').value;
+                titoloFinale = `${insScelto} - ${moduloScelto}`;
+            }
+
+            const docente = document.getElementById('editDocente').value.trim();
+            const luogo = document.getElementById('editLuogo').value.trim();
+            const oraInizio = timeStringToDecimal(document.getElementById('editOraInizio').value);
+            const oraFine = timeStringToDecimal(document.getElementById('editOraFine').value);
+
+            if (oraFine <= oraInizio) {
+                alert("L'ora di fine deve essere successiva all'ora di inizio.");
+                return;
+            }
+
+            const datiEvento = {
+                titolo: titoloFinale,
+                docente,
+                luogo,
+                oraInizio,
+                oraFine,
+                tipo: tipoSelezionato
+            };
+
+            if (!settimane[weekIdx].eventi) settimane[weekIdx].eventi = {};
+            if (!settimane[weekIdx].eventi[nuovoGiorno]) settimane[weekIdx].eventi[nuovoGiorno] = [];
+
+            if (isNew) {
+                settimane[weekIdx].eventi[nuovoGiorno].push(datiEvento);
+            } else {
+                if (vecchioGiorno === nuovoGiorno) {
+                    settimane[weekIdx].eventi[vecchioGiorno][eventIdx] = datiEvento;
+                } else {
+                    settimane[weekIdx].eventi[vecchioGiorno].splice(eventIdx, 1);
+                    settimane[weekIdx].eventi[nuovoGiorno].push(datiEvento);
+                }
+            }
+
+            chiudiModale();
+            aggiornaInterfaccia();
+            salvaSuCloudSilenzioso();
+        }
+
+        function eliminaEventoCorrente() {
+            if (!eventoSelezionatoRef || eventoSelezionatoRef.isNew) return;
+            if (!confirm("Vuoi eliminare questa lezione?")) return;
+            const { weekIdx, giorno, eventIdx } = eventoSelezionatoRef;
+            settimane[weekIdx].eventi[giorno].splice(eventIdx, 1);
+            chiudiModale();
+            aggiornaInterfaccia();
+            salvaSuCloudSilenzioso();
+        }
+
+        function ripristinaDati() {
+            if (confirm("Vuoi ripristinare il calendario predefinito sul Cloud?")) {
+                settimane = JSON.parse(JSON.stringify(defaultSettimane));
+                aggiornaInterfaccia();
+                salvaSuCloudSilenzioso();
+            }
+        }
+
+        function updateControls() {
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            const selector = document.getElementById('weekSelector');
+            if (btnPrev) btnPrev.disabled = settimanaCorrente === 0;
+            if (btnNext) btnNext.disabled = settimanaCorrente === settimane.length - 1;
+            if (selector) selector.value = settimanaCorrente;
+        }
+
+        function prevWeek() { 
+            if (settimanaCorrente > 0 && !isTransitioning) { 
+                settimanaCorrente--; 
+                aggiornaInterfaccia('prev'); 
+            } 
+        }
+
+        function nextWeek() { 
+            if (settimanaCorrente < settimane.length - 1 && !isTransitioning) { 
+                settimanaCorrente++; 
+                aggiornaInterfaccia('next'); 
+            } 
+        }
+
+        function changeWeek() { 
+            const newWeek = parseInt(document.getElementById('weekSelector').value);
+            const dir = newWeek > settimanaCorrente ? 'next' : 'prev';
+            settimanaCorrente = newWeek; 
+            aggiornaInterfaccia(dir); 
+        }
+
+        function exportICS() {
+            let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Fisioterapia UniTO//IT\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nX-WR-CALNAME:Fisioterapia 2025-2026\r\nX-WR-TIMEZONE:Europe/Rome\r\n';
+            settimane.forEach(s => {
+                const baseDate = new Date(dateMap[s.numero] || '2026-09-28');
+                giorni.forEach(g => {
+                    const evs = (s.eventi && s.eventi[g]) ? s.eventi[g] : [];
+                    const dEv = new Date(baseDate);
+                    dEv.setDate(baseDate.getDate() + (giornoOffset[g] || 0));
+                    evs.forEach(ev => {
+                        if (!appartieneAlGruppo(ev, gruppoSelezionato)) return;
+
+                        const hI = Math.floor(ev.oraInizio), mI = Math.round((ev.oraInizio - hI) * 60);
+                        const hF = Math.floor(ev.oraFine), mF = Math.round((ev.oraFine - hF) * 60);
+                        const dtS = new Date(dEv); dtS.setHours(hI, mI, 0);
+                        const dtE = new Date(dEv); dtE.setHours(hF, mF, 0);
+                        const fmt = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+                        let prefisso = ev.tipo === 'saltata' ? '❌ [SALTATA] ' : ev.tipo === 'obbligatorio' ? '⚠️ [OBBLIGATORIO] ' : '✅ ';
+                        ics += `BEGIN:VEVENT\r\nUID:${s.numero}-${g}-${ev.oraInizio}@fisioterapia\r\nDTSTART:${fmt(dtS)}\r\nDTEND:${fmt(dtE)}\r\nSUMMARY:${prefisso}${ev.titolo}\r\n`;
+                        if (ev.docente) ics += `DESCRIPTION:Docente: ${ev.docente}\r\n`;
+                        if (ev.luogo) ics += `LOCATION:${ev.luogo}\r\n`;
+                        ics += 'END:VEVENT\r\n';
+                    });
+                });
+            });
+            ics += 'END:VCALENDAR\r\n';
+            const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'calendario-fisioterapia.ics';
+            link.click();
+        }
+
+        function init() {
+            const select = document.getElementById('weekSelector');
+            select.innerHTML = '';
+            settimane.forEach((s, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = `W${s.numero} - ${s.periodo}`;
+                select.appendChild(opt);
+            });
+
+            document.getElementById('groupSelector').value = gruppoSelezionato;
+
+            initSwipeGestures();
+
+            setInterval(() => {
+                renderCalendario();
+            }, 60000);
+
+            if (currentUser) {
+                document.getElementById('usernameInput').value = currentUser;
+                caricaOCreaProfilo();
+            } else {
+                aggiornaInterfaccia();
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
