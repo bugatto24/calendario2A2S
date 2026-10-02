@@ -580,8 +580,24 @@ body {
 .form-group input, .form-group select { width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-family: inherit; }
 .form-group input:focus, .form-group select:focus { border-color: #7e22ce; outline: none; }
 .form-row { display: flex; gap: 10px; }
-.modal-footer { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f1f5f9; }
+
+/* Footer modale con pulsanti ordinati */
+.modal-footer { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    margin-top: 20px; 
+    padding-top: 15px; 
+    border-top: 1px solid #f1f5f9; 
+}
+.modal-footer-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 .btn-delete { background: #fee2e2; color: #dc2626; border: none; padding: 9px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.btn-cancel-modal { background: #f1f5f9; color: #475569; border: 1.5px solid #cbd5e1; padding: 9px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.btn-cancel-modal:hover { background: #e2e8f0; }
 .btn-save-modal { background: #7e22ce; color: white; border: none; padding: 9px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
 /* Modale Conflitti */
@@ -789,7 +805,7 @@ body {
             </div>
             <div class="quick-status-buttons">
                 <button type="button" class="btn-status-quick" id="btnStatoNormale" onclick="impostaStato('normale')">✅ Segui</button>
-                <button type="button" class="btn-status-quick" id="btnStatoObbligatorio" onclick="impostaStato('obbligatorio')">⚠️️ Obbligatoria</button>
+                <button type="button" class="btn-status-quick" id="btnStatoObbligatorio" onclick="impostaStato('obbligatorio')">⚠️ Obbligatoria</button>
                 <button type="button" class="btn-status-quick" id="btnStatoSaltata" onclick="impostaStato('saltata')">❌ Salta</button>
             </div>
             
@@ -815,7 +831,7 @@ body {
                 </select>
             </div>
 
-            <!-- Menu Modulo con etichetta pulita e valore con stringa esatta originale -->
+            <!-- Menu Modulo -->
             <div class="form-group" id="groupModuloSelect">
                 <label for="editModulo">Corso / Modulo</label>
                 <select id="editModulo"></select>
@@ -839,9 +855,14 @@ body {
                     <input type="time" id="editOraFine">
                 </div>
             </div>
+            
+            <!-- Footer con pulsante Elimina a sinistra, Annulla e Conferma a destra -->
             <div class="modal-footer">
                 <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente()">🗑 Elimina</button>
-                <button type="button" class="btn-save-modal" onclick="confermaESalvaModifiche()">Conferma</button>
+                <div class="modal-footer-right">
+                    <button type="button" class="btn-cancel-modal" onclick="chiudiModale()">Annulla</button>
+                    <button type="button" class="btn-save-modal" onclick="salvaModificheEvento()">Conferma</button>
+                </div>
             </div>
         </div>
     </div>
@@ -912,8 +933,8 @@ body {
 
         let currentUser = '';
         let gruppoSelezionato = 'ALL';
-        let moduliConvalidati = []; // Elenco searchKey dei moduli convalidati
-        let moduloInEvidenza = null; // searchKey del modulo correntemente evidenziato
+        let moduliConvalidati = [];
+        let moduloInEvidenza = null;
 
         try {
             currentUser = localStorage.getItem('currentUser_fisioterapia') || '';
@@ -1345,15 +1366,12 @@ body {
             return h + (m / 60);
         }
 
-        // Verifica se un evento appartiene a un modulo convalidato
         function isEventoConvalidato(titolo) {
             const t = (titolo || '').toUpperCase();
             return moduliConvalidati.some(key => t.includes(key));
         }
 
-        // Calcolo ore insegnamento: esclude categoricamente gli eventi di altri gruppi E quelli dei moduli convalidati
         function calcolaOreModulo(searchTerm) {
-            // Se il modulo è convalidato, azzera completamente dal calcolo delle ore
             if (moduliConvalidati.includes(searchTerm)) {
                 return { totale: 0, seguite: 0, percentuale: 0, convalidato: true };
             }
@@ -1619,7 +1637,6 @@ body {
             aggiornaInterfaccia();
         }
 
-        // Gestione pressione lunga (500ms) o click singolo per attivare/disattivare
         let pressTimer = null;
         let isLongPressTriggered = false;
 
@@ -1639,12 +1656,10 @@ body {
         }
 
         function handleModuloClick(searchKey, label) {
-            // Se il long-press è appena scattato, evita di interpretarlo come click immediato
             if (isLongPressTriggered) {
                 isLongPressTriggered = false;
                 return;
             }
-            // Se è già evidenziato, un click semplice lo deseleziona
             if (moduloInEvidenza === searchKey) {
                 disattivaEvidenziazione();
             }
@@ -1798,7 +1813,6 @@ body {
             insegnamenti.forEach((ins, idx) => {
                 const moduliData = ins.moduli.map(m => ({ ...m, ...calcolaOreModulo(m.searchKey) }));
                 
-                // Esclude dal conteggio totale e seguito i moduli convalidati
                 const moduliAttivi = moduliData.filter(m => !m.convalidato);
                 const totaleIns = moduliAttivi.reduce((acc, m) => acc + m.totale, 0);
                 const seguitoIns = moduliAttivi.reduce((acc, m) => acc + m.seguite, 0);
@@ -2001,14 +2015,7 @@ body {
             });
         }
 
-        // Pop-up di conferma prima del salvataggio
-        function confermaESalvaModifiche() {
-            if (!confirm("Vuoi salvare le modifiche apportate a questa lezione?")) {
-                return;
-            }
-            salvaModificheEvento();
-        }
-
+        // Salvataggio diretto senza popup intermedio
         function salvaModificheEvento() {
             if (!eventoSelezionatoRef) return;
             const { weekIdx, giorno: vecchioGiorno, eventIdx, isNew } = eventoSelezionatoRef;
@@ -2128,7 +2135,7 @@ body {
                         const dtE = new Date(dEv); dtE.setHours(hF, mF, 0);
                         const fmt = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
 
-                        let prefisso = ev.tipo === 'saltata' ? '❌ [SALTATA] ' : ev.tipo === 'obbligatorio' ? '⚠️️ [OBBLIGATORIO] ' : '✅ ';
+                        let prefisso = ev.tipo === 'saltata' ? '❌ [SALTATA] ' : ev.tipo === 'obbligatorio' ? '⚠️ [OBBLIGATORIO] ' : '✅ ';
                         ics += `BEGIN:VEVENT\r\nUID:${s.numero}-${g}-${ev.oraInizio}@fisioterapia\r\nDTSTART:${fmt(dtS)}\r\nDTEND:${fmt(dtE)}\r\nSUMMARY:${prefisso}${ev.titolo}\r\n`;
                         if (ev.docente) ics += `DESCRIPTION:Docente: ${ev.docente}\r\n`;
                         if (ev.luogo) ics += `LOCATION:${ev.luogo}\r\n`;
