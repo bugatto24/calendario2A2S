@@ -155,6 +155,30 @@ body {
 .btn-reset { background: #ffffff; color: #64748b; border: 1px solid #e2e8f0; }
 .btn-reset:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
 
+/* Banner modalità evidenziazione */
+.highlight-banner {
+    display: none;
+    background: #fdf4ff;
+    border-bottom: 1px solid #f0abfc;
+    padding: 8px 20px;
+    font-size: 12px;
+    color: #86198f;
+    font-weight: 600;
+    align-items: center;
+    justify-content: space-between;
+}
+.highlight-banner.active { display: flex; }
+.btn-clear-highlight {
+    background: #fae8ff;
+    color: #701a75;
+    border: 1px solid #f0abfc;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
 /* Legenda */
 .legend { 
     background: #f8fafc; 
@@ -194,7 +218,7 @@ body {
 .dot-altro { background: #64748b; }
 
 /* ========================================================
-   CALENDARIO & TRANSIZIONI RAPIDE
+   CALENDARIO & TRANSIZIONI
    ======================================================== */
 .calendar-container { 
     background: #ffffff; 
@@ -333,6 +357,7 @@ body {
     border-radius: 50%;
 }
 
+/* Eventi */
 .evento { 
     position: absolute; 
     padding: 6px 8px; 
@@ -363,7 +388,7 @@ body {
 }
 .evento-time { 
     font-size: 10px; 
-    font-weight: 500;
+    font-weight: 500; 
     opacity: 0.85; 
 }
 .evento-docente { 
@@ -397,7 +422,8 @@ body {
 .bordo-locomotore { border-left-color: #f97316 !important; }
 .bordo-altro { border-left-color: #64748b !important; }
 
-.evento-altrogruppo {
+/* Eventi Altro Gruppo o Modulo Convalidato: grafica trasparente */
+.evento-altrogruppo, .evento-convalidato {
     background: #ffffff !important;
     border: 1.5px dashed #94a3b8 !important;
     border-left: 4px dashed #94a3b8 !important;
@@ -405,9 +431,22 @@ body {
     opacity: 0.35 !important;
     box-shadow: none !important;
 }
-.evento-altrogruppo:hover {
+.evento-altrogruppo:hover, .evento-convalidato:hover {
     opacity: 0.75 !important;
     transform: translateY(-1px);
+}
+
+/* Modalità Evidenziazione Modulo (Focus) */
+.calendar.has-highlight .evento {
+    opacity: 0.25;
+    filter: grayscale(40%);
+}
+.calendar.has-highlight .evento.evento-in-focus {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: scale(1.02);
+    box-shadow: 0 0 0 2.5px #a855f7, 0 6px 15px rgba(168, 85, 247, 0.25) !important;
+    z-index: 28 !important;
 }
 
 /* Statistiche */
@@ -452,14 +491,55 @@ body {
 .progress-fill { height: 100%; transition: width 0.3s; }
 .moduli-container { padding: 14px 20px; background: #faf5ff; border-top: 1px solid #f1f5f9; display: none; }
 .moduli-container.visible { display: block; }
-.modulo { padding: 10px 0 10px 16px; border-bottom: 1px solid #f3e8ff; }
+
+/* Singolo modulo nelle statistiche */
+.modulo { 
+    padding: 10px 12px; 
+    border-bottom: 1px solid #f3e8ff; 
+    border-radius: 8px;
+    transition: all 0.2s;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.modulo:hover {
+    background: rgba(126, 34, 206, 0.04);
+}
+.modulo.modulo-selected {
+    background: #f3e8ff;
+    border: 1px solid #c084fc;
+}
 .modulo:last-child { border-bottom: none; }
 .modulo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.modulo-left { display: flex; align-items: center; gap: 8px; flex: 1; }
 .modulo-nome { font-size: 0.88rem; font-weight: 500; color: #334155; }
 .modulo-stats { display: flex; align-items: center; gap: 8px; }
 .modulo-ore { font-size: 0.8rem; color: #64748b; }
 .modulo-percent { font-size: 0.88rem; font-weight: 700; }
 .modulo-progress { width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+
+/* Checkbox Convalida */
+.convalida-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b21a8;
+    background: #f5f3ff;
+    padding: 2px 7px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid #ddd6fe;
+}
+.convalida-label input { cursor: pointer; }
+.badge-convalidato {
+    font-size: 10px;
+    background: #e9d5ff;
+    color: #6b21a8;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+}
 
 /* Modali */
 .modal-overlay { 
@@ -581,34 +661,13 @@ body {
         width: 100% !important;
         grid-template-columns: 36px repeat(5, 1fr) !important;
     }
-    .calendar-container.vista-compatta .time-column {
-        width: 36px !important;
-    }
-    .calendar-container.vista-compatta .time-header {
-        font-size: 9px;
-        padding: 10px 2px;
-    }
-    .calendar-container.vista-compatta .time-slot {
-        font-size: 9px;
-        padding-right: 3px;
-        justify-content: center;
-    }
+    .calendar-container.vista-compatta .time-column { width: 36px !important; }
+    .calendar-container.vista-compatta .time-header { font-size: 9px; padding: 10px 2px; }
+    .calendar-container.vista-compatta .time-slot { font-size: 9px; padding-right: 3px; justify-content: center; }
     .calendar-container.vista-compatta .day-name { font-size: 9px; }
     .calendar-container.vista-compatta .day-number { font-size: 12px; width: 22px; height: 22px; }
-    .calendar-container.vista-compatta .evento {
-        padding: 3px 2px;
-        border-left-width: 3px !important;
-        border-radius: 4px;
-    }
-    .calendar-container.vista-compatta .evento-title {
-        font-size: 9.5px;
-        line-height: 1.15;
-        white-space: normal;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
+    .calendar-container.vista-compatta .evento { padding: 3px 2px; border-left-width: 3px !important; border-radius: 4px; }
+    .calendar-container.vista-compatta .evento-title { font-size: 9.5px; line-height: 1.15; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .calendar-container.vista-compatta .evento-time { font-size: 8.5px; margin-top: 1px; }
     .calendar-container.vista-compatta .evento-docente { display: none; }
 
@@ -683,13 +742,19 @@ body {
             </div>
         </div>
 
-        <!-- Legenda Ordinata (Stati e Materie) -->
+        <!-- Banner Modalità Evidenziazione Modulo -->
+        <div class="highlight-banner" id="highlightBanner">
+            <span id="highlightBannerText">🔍 Evidenziazione attiva per: ...</span>
+            <button class="btn-clear-highlight" onclick="disattivaEvidenziazione()">Mostra tutto</button>
+        </div>
+
+        <!-- Legenda Ordinata -->
         <div class="legend">
             <div class="legend-group">
                 <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
                 <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
                 <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
-                <div class="legend-item"><div class="legend-box legend-altrogruppo"></div><span>👥 Altro Gruppo</span></div>
+                <div class="legend-item"><div class="legend-box legend-altrogruppo"></div><span>👥 Altro Gruppo / Convalidato</span></div>
             </div>
             <div class="legend-divider"></div>
             <div class="legend-group">
@@ -708,20 +773,23 @@ body {
         <!-- Statistiche / Progressi Insegnamenti -->
         <div class="stats-container">
             <h3 class="stats-title">📊 Piano Frequenza Personalizzato</h3>
+            <p style="font-size:12px; color:#64748b; margin-bottom:14px; text-align:center;">
+                💡 <em>Tieni premuto a lungo (long-press) su un modulo per evidenziarne tutte le lezioni a calendario. Clicca di nuovo per uscire.</em>
+            </p>
             <div class="insegnamenti-container" id="insegnamentiContainer"></div>
         </div>
     </div>
 
     <!-- Modale Modifica / Creazione Lezione -->
-    <div class="modal-overlay" id="editModal">
-        <div class="modal">
+    <div class="modal-overlay" id="editModal" onclick="gestisciClickOverlay(event)">
+        <div class="modal" id="editModalCard">
             <div class="modal-header">
                 <h3 id="modalTitle">Modifica Lezione</h3>
                 <button class="btn-close" onclick="chiudiModale()">&times;</button>
             </div>
             <div class="quick-status-buttons">
                 <button type="button" class="btn-status-quick" id="btnStatoNormale" onclick="impostaStato('normale')">✅ Segui</button>
-                <button type="button" class="btn-status-quick" id="btnStatoObbligatorio" onclick="impostaStato('obbligatorio')">⚠️ Obbligatoria</button>
+                <button type="button" class="btn-status-quick" id="btnStatoObbligatorio" onclick="impostaStato('obbligatorio')">⚠️️ Obbligatoria</button>
                 <button type="button" class="btn-status-quick" id="btnStatoSaltata" onclick="impostaStato('saltata')">❌ Salta</button>
             </div>
             
@@ -736,6 +804,7 @@ body {
                 </select>
             </div>
 
+            <!-- Menu Insegnamento -->
             <div class="form-group">
                 <label for="editInsegnamento">Insegnamento</label>
                 <select id="editInsegnamento" onchange="onInsegnamentoChange()">
@@ -746,6 +815,7 @@ body {
                 </select>
             </div>
 
+            <!-- Menu Modulo con etichetta pulita e valore con stringa esatta originale -->
             <div class="form-group" id="groupModuloSelect">
                 <label for="editModulo">Corso / Modulo</label>
                 <select id="editModulo"></select>
@@ -771,14 +841,14 @@ body {
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente()">🗑 Elimina</button>
-                <button type="button" class="btn-save-modal" onclick="salvaModificheEvento()">Conferma</button>
+                <button type="button" class="btn-save-modal" onclick="confermaESalvaModifiche()">Conferma</button>
             </div>
         </div>
     </div>
 
     <!-- Modale Conflitti Smart Merge -->
-    <div class="modal-overlay" id="conflictModal">
-        <div class="modal">
+    <div class="modal-overlay" id="conflictModal" onclick="gestisciClickOverlayConflitti(event)">
+        <div class="modal" id="conflictModalCard">
             <div class="modal-header">
                 <h3 style="color:#b91c1c;">⚠️ Rilevati Conflitti durante l'aggiornamento</h3>
                 <button class="btn-close" onclick="chiudiModalConflitti()">&times;</button>
@@ -842,9 +912,13 @@ body {
 
         let currentUser = '';
         let gruppoSelezionato = 'ALL';
+        let moduliConvalidati = []; // Elenco searchKey dei moduli convalidati
+        let moduloInEvidenza = null; // searchKey del modulo correntemente evidenziato
+
         try {
             currentUser = localStorage.getItem('currentUser_fisioterapia') || '';
             gruppoSelezionato = localStorage.getItem('currentGroup_fisioterapia') || 'ALL';
+            moduliConvalidati = JSON.parse(localStorage.getItem('convalidati_fisioterapia') || '[]');
         } catch(e) {}
 
         let settimanaCorrente = 0;
@@ -1213,6 +1287,10 @@ body {
                             document.getElementById('groupSelector').value = gruppoSelezionato;
                             try { localStorage.setItem('currentGroup_fisioterapia', gruppoSelezionato); } catch(e) {}
                         }
+                        if (data.convalidati) {
+                            moduliConvalidati = Array.isArray(data.convalidati) ? data.convalidati : [];
+                            try { localStorage.setItem('convalidati_fisioterapia', JSON.stringify(moduliConvalidati)); } catch(e) {}
+                        }
                     } else {
                         settimane = Array.isArray(data) ? data : Object.values(data);
                     }
@@ -1238,6 +1316,7 @@ body {
             const payload = {
                 settimane: settimane,
                 gruppo: gruppoSelezionato,
+                convalidati: moduliConvalidati,
                 lastUpdate: new Date().toISOString()
             };
 
@@ -1266,7 +1345,19 @@ body {
             return h + (m / 60);
         }
 
+        // Verifica se un evento appartiene a un modulo convalidato
+        function isEventoConvalidato(titolo) {
+            const t = (titolo || '').toUpperCase();
+            return moduliConvalidati.some(key => t.includes(key));
+        }
+
+        // Calcolo ore insegnamento: esclude categoricamente gli eventi di altri gruppi E quelli dei moduli convalidati
         function calcolaOreModulo(searchTerm) {
+            // Se il modulo è convalidato, azzera completamente dal calcolo delle ore
+            if (moduliConvalidati.includes(searchTerm)) {
+                return { totale: 0, seguite: 0, percentuale: 0, convalidato: true };
+            }
+
             let totale = 0, seguite = 0;
             settimane.forEach(s => {
                 if (!s || !s.eventi) return;
@@ -1281,7 +1372,7 @@ body {
                     });
                 });
             });
-            return { totale, seguite, percentuale: totale > 0 ? Math.round((seguite / totale) * 100) : 0 };
+            return { totale, seguite, percentuale: totale > 0 ? Math.round((seguite / totale) * 100) : 0, convalidato: false };
         }
 
         function getClasseInsegnamento(titolo) {
@@ -1392,7 +1483,6 @@ body {
         // ============================================
         let mergedSettimanePending = null;
 
-        // Estrae la chiave semantica del corso ignorando formattazioni diverse
         function getChiaveSemantica(titolo) {
             const t = (titolo || '').toUpperCase();
             for (const moduli of Object.values(corsiConfig)) {
@@ -1400,11 +1490,10 @@ body {
                     if (t.includes(m.searchKey)) return m.searchKey;
                 }
             }
-            return t; // Se non appartiene ai corsi ufficiali, ritorna il titolo grezzo
+            return t;
         }
 
         function sonoStessaLezioneUfficiale(ev1, ev2) {
-            // Se le ore sono coincidenti e appartengono allo stesso corso semantico
             const stessoOrario = Math.abs(ev1.oraInizio - ev2.oraInizio) < 0.25;
             const chiave1 = getChiaveSemantica(ev1.titolo);
             const chiave2 = getChiaveSemantica(ev2.titolo);
@@ -1424,37 +1513,32 @@ body {
                     const eventiUtente = utenteW.eventi[giorno] || [];
                     const eventiNuovi = nuovaW.eventi[giorno] || [];
 
-                    // 1. Preserva lo stato ('saltata', 'obbligatorio') se la lezione è la stessa
                     eventiNuovi.forEach(evNuovo => {
                         const matchUtente = eventiUtente.find(u => sonoStessaLezioneUfficiale(u, evNuovo));
                         if (matchUtente) {
-                            evNuovo.tipo = matchUtente.tipo; // Mantieni lo stato dell'utente
+                            evNuovo.tipo = matchUtente.tipo;
                         }
                     });
 
-                    // 2. Preserva tutti gli eventi custom 'ALTRO' dell'utente
                     eventiUtente.forEach(evU => {
                         const isCustom = evU.titolo && (evU.titolo.startsWith('ALTRO') || !Object.keys(corsiConfig).some(k => evU.titolo.includes(k)));
                         if (isCustom) {
-                            // Verifica se si sovrappone a una lezione ufficiale
                             const sovrapposto = eventiNuovi.find(n => n.oraInizio < evU.oraFine && n.oraFine > evU.oraInizio);
                             if (sovrapposto && evU.titolo !== sovrapposto.titolo) {
                                 conflitti.push(`W${wNumero} (${giorno}): L'evento "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) si sovrappone alla lezione ufficiale "${sovrapposto.titolo}".`);
                             }
-                            // Se non è già presente come evento identico, preservalo
                             if (!eventiNuovi.some(n => n.titolo === evU.titolo && Math.abs(n.oraInizio - evU.oraInizio) < 0.1)) {
                                 eventiNuovi.push(evU);
                             }
                         }
                     });
 
-                    // 3. Rileva solo le REALI lezioni ufficiali cancellate (es. Farmacologia giovedì 8/10)
                     eventiUtente.forEach(evU => {
                         const eraUfficiale = Object.keys(corsiConfig).some(k => (evU.titolo || '').includes(k));
                         if (eraUfficiale) {
                             const esisteAncora = eventiNuovi.some(n => sonoStessaLezioneUfficiale(n, evU));
                             if (!esisteAncora && evU.tipo !== 'normale') {
-                                conflitti.push(`W${wNumero} (${giorno}): La lezione "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) è stata cancellata dall'orario ufficiale, ma l'avevi contrassegnata come "${evU.tipo}". Verrà rimossa.`);
+                                conflitti.push(`W${wNumero} (${giorno}): La lezione "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) è stata cancellata dall'orario ufficiale, ma era segnata come "${evU.tipo}". Verrà rimossa.`);
                             }
                         }
                     });
@@ -1489,6 +1573,81 @@ body {
 
         function chiudiModalConflitti() {
             document.getElementById('conflictModal').classList.remove('active');
+        }
+
+        function gestisciClickOverlayConflitti(e) {
+            if (e.target === document.getElementById('conflictModal')) {
+                chiudiModalConflitti();
+            }
+        }
+
+        // ============================================
+        // GESTIONE CONVALIDA MODULI (CHECKBOX)
+        // ============================================
+        function toggleConvalidaModulo(searchKey, isChecked) {
+            if (isChecked) {
+                if (!moduliConvalidati.includes(searchKey)) {
+                    moduliConvalidati.push(searchKey);
+                }
+            } else {
+                moduliConvalidati = moduliConvalidati.filter(k => k !== searchKey);
+            }
+
+            try {
+                localStorage.setItem('convalidati_fisioterapia', JSON.stringify(moduliConvalidati));
+            } catch(e) {}
+
+            aggiornaInterfaccia();
+            salvaSuCloudSilenzioso();
+        }
+
+        // ============================================
+        // GESTIONE EVIDENZIAZIONE MODULO (LONG-PRESS & SINGLE-PRESS)
+        // ============================================
+        function attivaEvidenziazione(searchKey, label) {
+            moduloInEvidenza = searchKey;
+            const banner = document.getElementById('highlightBanner');
+            const bannerText = document.getElementById('highlightBannerText');
+            bannerText.textContent = `🔍 Evidenziazione attiva per: ${label}`;
+            banner.classList.add('active');
+            aggiornaInterfaccia();
+        }
+
+        function disattivaEvidenziazione() {
+            moduloInEvidenza = null;
+            document.getElementById('highlightBanner').classList.remove('active');
+            aggiornaInterfaccia();
+        }
+
+        // Gestione pressione lunga (500ms) o click singolo per attivare/disattivare
+        let pressTimer = null;
+        let isLongPressTriggered = false;
+
+        function startModuloPress(searchKey, label) {
+            isLongPressTriggered = false;
+            pressTimer = setTimeout(() => {
+                isLongPressTriggered = true;
+                attivaEvidenziazione(searchKey, label);
+            }, 500);
+        }
+
+        function cancelModuloPress() {
+            if (pressTimer) {
+                clearTimeout(pressTimer);
+                pressTimer = null;
+            }
+        }
+
+        function handleModuloClick(searchKey, label) {
+            // Se il long-press è appena scattato, evita di interpretarlo come click immediato
+            if (isLongPressTriggered) {
+                isLongPressTriggered = false;
+                return;
+            }
+            // Se è già evidenziato, un click semplice lo deseleziona
+            if (moduloInEvidenza === searchKey) {
+                disattivaEvidenziazione();
+            }
         }
 
         // ============================================
@@ -1532,6 +1691,12 @@ body {
                 const nowDate = now.getDate();
                 const nowDecimalHour = now.getHours() + (now.getMinutes() / 60);
 
+                if (moduloInEvidenza) {
+                    calElem.classList.add('has-highlight');
+                } else {
+                    calElem.classList.remove('has-highlight');
+                }
+
                 let html = '<div class="time-column"><div class="time-header">Ora</div>';
                 ore.forEach(ora => { 
                     html += `<div class="time-slot">${String(ora).padStart(2, '0')}:00</div>`; 
@@ -1569,6 +1734,8 @@ body {
 
                     eventiLayout.forEach(({ evento, eventIdx, colIndex, totalCols }) => {
                         const appartiene = appartieneAlGruppo(evento, gruppoSelezionato);
+                        const convalidato = isEventoConvalidato(evento.titolo);
+                        const inEvidenza = moduloInEvidenza && (evento.titolo || '').toUpperCase().includes(moduloInEvidenza);
 
                         const top = (evento.oraInizio - 8) * 64;
                         const height = Math.max((evento.oraFine - evento.oraInizio) * 64, 20);
@@ -1581,7 +1748,10 @@ body {
                         let classeBordo = getClasseInsegnamento(evento.titolo);
                         let emoji = '';
 
-                        if (!appartiene) {
+                        if (convalidato) {
+                            classeStato = 'evento-convalidato';
+                            emoji = '🎓';
+                        } else if (!appartiene) {
                             classeStato = 'evento-altrogruppo';
                             emoji = '👥';
                         } else {
@@ -1591,7 +1761,9 @@ body {
                                     evento.tipo === 'saltata' ? '❌' : '✅';
                         }
 
-                        html += `<div class="evento ${classeStato} ${classeBordo}" style="top: ${top}px; height: ${height}px; width: ${widthCalc}; left: ${leftCalc};" onclick="apriModale(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
+                        const focusClass = inEvidenza ? 'evento-in-focus' : '';
+
+                        html += `<div class="evento ${classeStato} ${classeBordo} ${focusClass}" style="top: ${top}px; height: ${height}px; width: ${widthCalc}; left: ${leftCalc};" onclick="apriModale(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
                         html += `<div class="evento-title">${emoji} ${evento.titolo}</div>`;
                         html += `<div class="evento-time">${formattaOra(evento.oraInizio)} - ${formattaOra(evento.oraFine)}</div>`;
                         if (evento.docente || evento.luogo) {
@@ -1610,41 +1782,26 @@ body {
             const insegnamenti = [
                 {
                     nome: 'PATOLOGIA GENERALE',
-                    moduli: [
-                        { nome: 'PATOLOGIA GENERALE', search: 'PATOLOGIA GENERALE LEZ' },
-                        { nome: 'FARMACOLOGIA', search: 'FARMACOLOGIA' },
-                        { nome: 'GASTROENTEROLOGIA', search: 'GASTROENTEROLOGIA' },
-                        { nome: 'NEFROLOGIA', search: 'NEFROLOGIA' },
-                        { nome: 'OTORINOLARINGOIATRIA', search: 'OTORINOLARINGOIATRIA' }
-                    ]
+                    moduli: corsiConfig['PATOLOGIA GENERALE']
                 },
                 {
                     nome: 'NEUROLESIONI',
-                    moduli: [
-                        { nome: 'NEUROLOGIA II NEUROFISIOLOGIA', search: 'NEUROLOGIA II' },
-                        { nome: 'NEUROCHIRURGIA', search: 'NEUROCHIRURGIA' },
-                        { nome: 'MEDICINA FISICA E RIABILITATIVA III', search: 'RIABILITATIVA III' },
-                        { nome: 'SCIENZE FISIOTERAPICHE 4', search: 'FISIOTERAPICHE 4' },
-                        { nome: 'SCIENZE FISIOTERAPICHE 5', search: 'FISIOTERAPICHE 5' }
-                    ]
+                    moduli: corsiConfig['NEUROLESIONI']
                 },
                 {
                     nome: 'MALATTIE APPARATO LOCOMOTORE',
-                    moduli: [
-                        { nome: 'MALATTIE APPARATO LOCOMOTORE', search: 'MALATTIE APPARATO LOCOMOTORE LEZ' },
-                        { nome: 'REUMATOLOGIA', search: 'REUMATOLOGIA' },
-                        { nome: 'MEDICINA FISICA E RIABILITATIVA IV', search: 'RIABILITATIVA IV' },
-                        { nome: 'SCIENZE FISIOTERAPICHE 6', search: 'FISIOTERAPICHE 6' },
-                        { nome: 'SCIENZE FISIOTERAPICHE 7', search: 'FISIOTERAPICHE 7' }
-                    ]
+                    moduli: corsiConfig['MALATTIE APPARATO LOCOMOTORE']
                 }
             ];
 
             let html = '';
             insegnamenti.forEach((ins, idx) => {
-                const moduliData = ins.moduli.map(m => ({ ...m, ...calcolaOreModulo(m.search) }));
-                const totaleIns = moduliData.reduce((acc, m) => acc + m.totale, 0);
-                const seguitoIns = moduliData.reduce((acc, m) => acc + m.seguite, 0);
+                const moduliData = ins.moduli.map(m => ({ ...m, ...calcolaOreModulo(m.searchKey) }));
+                
+                // Esclude dal conteggio totale e seguito i moduli convalidati
+                const moduliAttivi = moduliData.filter(m => !m.convalidato);
+                const totaleIns = moduliAttivi.reduce((acc, m) => acc + m.totale, 0);
+                const seguitoIns = moduliAttivi.reduce((acc, m) => acc + m.seguite, 0);
                 const percIns = totaleIns > 0 ? Math.round((seguitoIns / totaleIns) * 100) : 0;
                 const colorClass = percIns >= 70 ? 'percent-ok' : percIns >= 60 ? 'percent-warn' : 'percent-bad';
                 const progressColor = percIns >= 70 ? '#16a34a' : percIns >= 60 ? '#d97706' : '#dc2626';
@@ -1665,15 +1822,32 @@ body {
                     <div class="moduli-container ${isExpanded ? 'visible' : ''}" id="moduli-${idx}">`;
 
                 moduliData.forEach(mod => {
+                    const isConvalidato = mod.convalidato;
+                    const isSelected = moduloInEvidenza === mod.searchKey;
                     const modColor = mod.percentuale >= 70 ? '#16a34a' : mod.percentuale >= 60 ? '#d97706' : '#dc2626';
                     const modColorClass = mod.percentuale >= 70 ? 'percent-ok' : mod.percentuale >= 60 ? 'percent-warn' : 'percent-bad';
 
-                    html += `<div class="modulo">
+                    html += `<div class="modulo ${isSelected ? 'modulo-selected' : ''}" 
+                                  onmousedown="startModuloPress('${mod.searchKey}', '${mod.label}')"
+                                  onmouseup="cancelModuloPress()"
+                                  onmouseleave="cancelModuloPress()"
+                                  ontouchstart="startModuloPress('${mod.searchKey}', '${mod.label}')"
+                                  ontouchend="cancelModuloPress()"
+                                  onclick="handleModuloClick('${mod.searchKey}', '${mod.label}')">
                         <div class="modulo-header">
-                            <span class="modulo-nome">${mod.nome}</span>
-                            <div class="modulo-stats"><span class="modulo-ore">${mod.seguite}h / ${mod.totale}h</span><span class="modulo-percent ${modColorClass}">${mod.percentuale}%</span></div>
+                            <div class="modulo-left">
+                                <span class="modulo-nome">${mod.label}</span>
+                                ${isConvalidato ? '<span class="badge-convalidato">🎓 Convalidato</span>' : ''}
+                            </div>
+                            <div class="modulo-stats">
+                                <label class="convalida-label" onclick="event.stopPropagation();" title="Se convalidato, le sue lezioni diventano trasparenti e non contano nelle percentuali">
+                                    <input type="checkbox" ${isConvalidato ? 'checked' : ''} onchange="toggleConvalidaModulo('${mod.searchKey}', this.checked)">
+                                    Convalida
+                                </label>
+                                ${!isConvalidato ? `<span class="modulo-ore">${mod.seguite}h / ${mod.totale}h</span><span class="modulo-percent ${modColorClass}">${mod.percentuale}%</span>` : ''}
+                            </div>
                         </div>
-                        <div class="modulo-progress"><div class="progress-fill" style="width: ${mod.percentuale}%; background: ${modColor};"></div></div>
+                        ${!isConvalidato ? `<div class="modulo-progress"><div class="progress-fill" style="width: ${mod.percentuale}%; background: ${modColor};"></div></div>` : ''}
                     </div>`;
                 });
                 html += `</div></div>`;
@@ -1753,7 +1927,7 @@ body {
         }
 
         // ============================================
-        // CREAZIONE & MODIFICA EVENTI (CON AUTOSAVE)
+        // CREAZIONE & MODIFICA EVENTI
         // ============================================
         let tipoSelezionato = 'normale';
 
@@ -1812,12 +1986,27 @@ body {
             eventoSelezionatoRef = null;
         }
 
+        // Chiusura al click fuori dal riquadro bianco
+        function gestisciClickOverlay(e) {
+            if (e.target === document.getElementById('editModal')) {
+                chiudiModale();
+            }
+        }
+
         function impostaStato(tipo) {
             tipoSelezionato = tipo;
             ['Normale', 'Obbligatorio', 'Saltata'].forEach(t => {
                 const b = document.getElementById(`btnStato${t}`);
                 b.className = 'btn-status-quick' + (tipo === t.toLowerCase() ? ` active-${tipo}` : '');
             });
+        }
+
+        // Pop-up di conferma prima del salvataggio
+        function confermaESalvaModifiche() {
+            if (!confirm("Vuoi salvare le modifiche apportate a questa lezione?")) {
+                return;
+            }
+            salvaModificheEvento();
         }
 
         function salvaModificheEvento() {
@@ -1885,6 +2074,8 @@ body {
         function ripristinaDati() {
             if (confirm("ATTENZIONE: Il Reset Totale sovrascrive tutto il tuo calendario con l'orario iniziale, cancellando tutte le tue personalizzazioni e lezioni extra. Vuoi procedere?")) {
                 settimane = JSON.parse(JSON.stringify(defaultSettimane));
+                moduliConvalidati = [];
+                try { localStorage.removeItem('convalidati_fisioterapia'); } catch(e) {}
                 aggiornaInterfaccia();
                 salvaSuCloudSilenzioso();
             }
@@ -1929,7 +2120,7 @@ body {
                     const dEv = new Date(baseDate);
                     dEv.setDate(baseDate.getDate() + (giornoOffset[g] || 0));
                     evs.forEach(ev => {
-                        if (!appartieneAlGruppo(ev, gruppoSelezionato)) return;
+                        if (!appartieneAlGruppo(ev, gruppoSelezionato) || isEventoConvalidato(ev.titolo)) return;
 
                         const hI = Math.floor(ev.oraInizio), mI = Math.round((ev.oraInizio - hI) * 60);
                         const hF = Math.floor(ev.oraFine), mF = Math.round((ev.oraFine - hF) * 60);
@@ -1937,7 +2128,7 @@ body {
                         const dtE = new Date(dEv); dtE.setHours(hF, mF, 0);
                         const fmt = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
 
-                        let prefisso = ev.tipo === 'saltata' ? '❌ [SALTATA] ' : ev.tipo === 'obbligatorio' ? '⚠️ [OBBLIGATORIO] ' : '✅ ';
+                        let prefisso = ev.tipo === 'saltata' ? '❌ [SALTATA] ' : ev.tipo === 'obbligatorio' ? '⚠️️ [OBBLIGATORIO] ' : '✅ ';
                         ics += `BEGIN:VEVENT\r\nUID:${s.numero}-${g}-${ev.oraInizio}@fisioterapia\r\nDTSTART:${fmt(dtS)}\r\nDTEND:${fmt(dtE)}\r\nSUMMARY:${prefisso}${ev.titolo}\r\n`;
                         if (ev.docente) ics += `DESCRIPTION:Docente: ${ev.docente}\r\n`;
                         if (ev.luogo) ics += `LOCATION:${ev.luogo}\r\n`;
