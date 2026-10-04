@@ -423,7 +423,7 @@ body {
 .bordo-locomotore { border-left-color: #f97316 !important; }
 .bordo-altro { border-left-color: #64748b !important; }
 
-/* Eventi Altro Gruppo o Modulo Convalidato: grafica trasparente */
+/* Eventi Altro Gruppo o Modulo Convalidato */
 .evento-altrogruppo, .evento-convalidato {
     background: #ffffff !important;
     border: 1.5px dashed #94a3b8 !important;
@@ -791,7 +791,7 @@ body {
         <div class="stats-container">
             <h3 class="stats-title">📊 Piano Frequenza Personalizzato</h3>
             <p style="font-size:12px; color:#64748b; margin-bottom:14px; text-align:center;">
-                💡 <em>Tieni premuto a lungo (long-press) su un modulo o su una lezione per evidenziarne tutte le lezioni a calendario. Premi ESC da tastiera per uscire.</em>
+                💡 <em>Tieni premuto a lungo (long-press a schermo fermo) su una lezione o su un modulo per evidenziarne le lezioni. Un tocco singolo sul calendario o il tasto ESC disattivano subito l'evidenziazione.</em>
             </p>
             <div class="insegnamenti-container" id="insegnamentiContainer"></div>
         </div>
@@ -857,7 +857,6 @@ body {
                 </div>
             </div>
             
-            <!-- Footer con pulsante Elimina a sinistra, Annulla e Conferma a destra -->
             <div class="modal-footer">
                 <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente()">🗑 Elimina</button>
                 <div class="modal-footer-right">
@@ -1240,7 +1239,7 @@ body {
                 const diffX = touchEndX - touchStartX;
                 const diffY = touchEndY - touchStartY;
 
-                if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY)) {
+                if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY)) {
                     if (diffX < 0) {
                         nextWeek();
                     } else {
@@ -1621,7 +1620,7 @@ body {
         }
 
         // ============================================
-        // GESTIONE EVIDENZIAZIONE MODULO (LONG-PRESS & KEY ESC)
+        // GESTIONE EVIDENZIAZIONE MODULO & SCROLL-SAFE LONG PRESS
         // ============================================
         function attivaEvidenziazione(searchKey, label) {
             moduloInEvidenza = searchKey;
@@ -1638,7 +1637,6 @@ body {
             aggiornaInterfaccia();
         }
 
-        // Helper per ricavare la searchKey e label da qualsiasi titolo lezione
         function trovaDettagliModuloDaTitolo(titolo) {
             const t = (titolo || '').toUpperCase();
             for (const [insNome, moduli] of Object.entries(corsiConfig)) {
@@ -1653,16 +1651,32 @@ body {
 
         let pressTimer = null;
         let isLongPressTriggered = false;
+        let pressStartCoords = { x: 0, y: 0 };
+        const MOVE_THRESHOLD = 8; // pixel max consentiti: oltre questa soglia è uno scroll, non long-press
 
-        function startModuloPress(searchKey, label) {
+        function startModuloPress(e, searchKey, label) {
             isLongPressTriggered = false;
+            const touch = e.touches ? e.touches[0] : e;
+            pressStartCoords = { x: touch.clientX, y: touch.clientY };
+
+            if (pressTimer) clearTimeout(pressTimer);
             pressTimer = setTimeout(() => {
                 isLongPressTriggered = true;
                 attivaEvidenziazione(searchKey, label);
             }, 500);
         }
 
-        function cancelModuloPress() {
+        function checkMoveCancelPress(e) {
+            if (!pressTimer) return;
+            const touch = e.touches ? e.touches[0] : e;
+            const diffX = Math.abs(touch.clientX - pressStartCoords.x);
+            const diffY = Math.abs(touch.clientY - pressStartCoords.y);
+            if (diffX > MOVE_THRESHOLD || diffY > MOVE_THRESHOLD) {
+                cancelAnyPress();
+            }
+        }
+
+        function cancelAnyPress() {
             if (pressTimer) {
                 clearTimeout(pressTimer);
                 pressTimer = null;
@@ -1679,33 +1693,37 @@ body {
             }
         }
 
-        // Gestione Long-Press su evento nel calendario
-        function startEventoPress(titolo) {
+        function startEventoPress(e, titolo) {
             isLongPressTriggered = false;
+            const touch = e.touches ? e.touches[0] : e;
+            pressStartCoords = { x: touch.clientX, y: touch.clientY };
+
             const dett = trovaDettagliModuloDaTitolo(titolo);
+            if (pressTimer) clearTimeout(pressTimer);
             pressTimer = setTimeout(() => {
                 isLongPressTriggered = true;
                 attivaEvidenziazione(dett.searchKey, dett.label);
             }, 500);
         }
 
-        function cancelEventoPress() {
-            if (pressTimer) {
-                clearTimeout(pressTimer);
-                pressTimer = null;
-            }
-        }
-
         function handleEventoClick(e, weekIdx, giorno, eventIdx) {
             if (e) e.stopPropagation();
+            
+            // Se si trattava del rilascio dopo un long press a schermo fermo, non procedere
             if (isLongPressTriggered) {
                 isLongPressTriggered = false;
                 return;
             }
+
+            // REQUISITO: Se la modalità evidenziazione è attiva, QUALSIASI short-press nel calendario la disattiva subito
+            if (moduloInEvidenza) {
+                disattivaEvidenziazione();
+                return;
+            }
+
             apriModale(e, weekIdx, giorno, eventIdx);
         }
 
-        // Listener da tastiera per ESC (chiusura modali ed esc da evidenziazione)
         function initKeyboardShortcuts() {
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' || e.key === 'Esc') {
@@ -1722,7 +1740,6 @@ body {
                         modalClosed = true;
                     }
 
-                    // Se non ci sono modali aperti ma c'è l'evidenziazione attiva, ESC la disattiva
                     if (!modalClosed && moduloInEvidenza) {
                         disattivaEvidenziazione();
                     }
@@ -1798,7 +1815,7 @@ body {
                             <span class="day-name">${giornoBreve}</span>
                             <span class="day-number">${giornoNum}</span>
                         </div>
-                        <div class="day-grid" onclick="creaNuovoEvento(event, ${settimanaCorrente}, '${giorno}')">`;
+                        <div class="day-grid" onclick="gestisciClickDayGrid(event, ${settimanaCorrente}, '${giorno}')">`;
 
                     ore.forEach((ora, idx) => { 
                         html += `<div class="grid-line" style="top: ${idx * 64}px;"></div>`; 
@@ -1846,11 +1863,13 @@ body {
 
                         html += `<div class="evento ${classeStato} ${classeBordo} ${focusClass}" 
                                       style="top: ${top}px; height: ${height}px; width: ${widthCalc}; left: ${leftCalc};" 
-                                      onmousedown="startEventoPress('${safeTitle}')"
-                                      onmouseup="cancelEventoPress()"
-                                      onmouseleave="cancelEventoPress()"
-                                      ontouchstart="startEventoPress('${safeTitle}')"
-                                      ontouchend="cancelEventoPress()"
+                                      onmousedown="startEventoPress(event, '${safeTitle}')"
+                                      onmousemove="checkMoveCancelPress(event)"
+                                      onmouseup="cancelAnyPress()"
+                                      onmouseleave="cancelAnyPress()"
+                                      ontouchstart="startEventoPress(event, '${safeTitle}')"
+                                      ontouchmove="checkMoveCancelPress(event)"
+                                      ontouchend="cancelAnyPress()"
                                       onclick="handleEventoClick(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
                         html += `<div class="evento-title">${emoji} ${evento.titolo}</div>`;
                         html += `<div class="evento-time">${formattaOra(evento.oraInizio)} - ${formattaOra(evento.oraFine)}</div>`;
@@ -1863,6 +1882,18 @@ body {
                 });
                 calElem.innerHTML = html;
             }
+        }
+
+        function gestisciClickDayGrid(event, weekIdx, giorno) {
+            if (event.target.closest('.evento')) return;
+
+            // Se l'evidenziazione è attiva, qualsiasi tocco su sfondo vuoto esce dal focus
+            if (moduloInEvidenza) {
+                disattivaEvidenziazione();
+                return;
+            }
+
+            creaNuovoEvento(event, weekIdx, giorno);
         }
 
         function renderInsegnamenti() {
@@ -1915,11 +1946,13 @@ body {
                     const modColorClass = mod.percentuale >= 70 ? 'percent-ok' : mod.percentuale >= 60 ? 'percent-warn' : 'percent-bad';
 
                     html += `<div class="modulo ${isSelected ? 'modulo-selected' : ''}" 
-                                   onmousedown="startModuloPress('${mod.searchKey}', '${mod.label}')"
-                                   onmouseup="cancelModuloPress()"
-                                   onmouseleave="cancelModuloPress()"
-                                   ontouchstart="startModuloPress('${mod.searchKey}', '${mod.label}')"
-                                   ontouchend="cancelModuloPress()"
+                                   onmousedown="startModuloPress(event, '${mod.searchKey}', '${mod.label}')"
+                                   onmousemove="checkMoveCancelPress(event)"
+                                   onmouseup="cancelAnyPress()"
+                                   onmouseleave="cancelAnyPress()"
+                                   ontouchstart="startModuloPress(event, '${mod.searchKey}', '${mod.label}')"
+                                   ontouchmove="checkMoveCancelPress(event)"
+                                   ontouchend="cancelAnyPress()"
                                    onclick="handleModuloClick('${mod.searchKey}', '${mod.label}')">
                         <div class="modulo-header">
                             <div class="modulo-left">
@@ -2073,7 +2106,6 @@ body {
             eventoSelezionatoRef = null;
         }
 
-        // Chiusura al click fuori dal riquadro bianco
         function gestisciClickOverlay(e) {
             if (e.target === document.getElementById('editModal')) {
                 chiudiModale();
@@ -2088,7 +2120,6 @@ body {
             });
         }
 
-        // Salvataggio diretto senza popup intermedio
         function salvaModificheEvento() {
             if (!eventoSelezionatoRef) return;
             const { weekIdx, giorno: vecchioGiorno, eventIdx, isNew } = eventoSelezionatoRef;
