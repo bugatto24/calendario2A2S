@@ -40,13 +40,12 @@ body {
 .header { 
     background: #ffffff; 
     color: #1e293b; 
-    padding: 18px 24px; 
+    padding: 16px 24px; 
     border-bottom: 1px solid #e2e8f0; 
     display: flex; 
-    justify-content: space-between; 
+    justify-content: flex-start; 
     align-items: center; 
-    flex-wrap: wrap; 
-    gap: 12px; 
+    gap: 14px; 
 }
 .header-title-box { display: flex; align-items: center; gap: 14px; }
 .header-logo {
@@ -62,30 +61,33 @@ body {
 }
 .header h1 { font-size: 1.35rem; font-weight: 700; color: #0f172a; }
 
-/* Barra Utente e Gruppo (Desktop) */
+/* Barra Utente e Gruppo - Layout a 2 metà bilanciate su un'unica riga */
 .user-bar { 
     background: #f8fafc; 
-    padding: 12px 20px; 
+    padding: 10px 20px; 
     border-bottom: 1px solid #e2e8f0; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    flex-wrap: wrap; 
     gap: 12px; 
     font-size: 13px; 
 }
-.user-bar-left { 
-    display: flex; 
-    align-items: center; 
-    gap: 12px; 
-    flex-wrap: wrap; 
+.user-bar-half {
+    flex: 1 1 50%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
 }
-.user-bar-input-group { 
-    display: flex; 
-    align-items: center; 
-    gap: 6px; 
+.user-bar-left {
+    justify-content: flex-start;
 }
-.user-bar input, .user-bar select, .controls select, .form-group select { 
+.user-bar-right {
+    justify-content: flex-end;
+}
+.user-bar input { 
+    flex: 1;
+    min-width: 0;
     padding: 7px 11px; 
     border-radius: 8px; 
     border: 1.5px solid #cbd5e1; 
@@ -94,6 +96,20 @@ body {
     font-weight: 500; 
     background: #ffffff; 
     transition: all 0.2s; 
+}
+.user-bar select, .controls select, .form-group select { 
+    padding: 7px 11px; 
+    border-radius: 8px; 
+    border: 1.5px solid #cbd5e1; 
+    font-size: 13px; 
+    outline: none; 
+    font-weight: 500; 
+    background: #ffffff; 
+    transition: all 0.2s; 
+}
+.user-bar select {
+    flex: 1;
+    min-width: 0;
 }
 .user-bar input:focus, .user-bar select:focus, .controls select:focus, .form-group select:focus {
     border-color: #7e22ce;
@@ -124,7 +140,7 @@ body {
 .btn-sync-merge:hover { background: #0369a1; }
 .sync-badge { 
     font-size: 12px; 
-    padding: 5px 11px; 
+    padding: 6px 12px; 
     border-radius: 20px; 
     background: #ede9fe; 
     color: #6b21a8; 
@@ -133,6 +149,9 @@ body {
     display: inline-flex;
     align-items: center;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
 }
 
 /* Controlli Settimane e Azioni */
@@ -624,44 +643,37 @@ body {
         flex-direction: column;
     }
 
-    /* Ordine elementi mobile: pulsanti e legenda finiscono sotto al calendario! */
-    .header { order: 1; padding: 10px 12px; flex-direction: row; justify-content: space-between; align-items: center; gap: 8px; }
+    /* Header compatto */
+    .header { order: 1; padding: 10px 12px; }
     .header-title-box { gap: 8px; }
     .header-logo { width: 30px; height: 30px; border-radius: 7px; }
     .header-logo svg { width: 16px; height: 16px; }
     .header h1 { font-size: 1rem; }
 
-    /* Barra utente ultra-compatta su 2 linee */
+    /* Barra utente ultra-compatta su 1 sola riga divisa a metà */
     .user-bar { 
         order: 2; 
-        padding: 6px 10px; 
-        gap: 6px; 
+        padding: 8px 10px; 
+        gap: 8px; 
         background: #f8fafc;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        align-items: center;
     }
-    .user-bar-left {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-    /* Linea 1: input utente, pulsante Carica, e stato connessione inline */
-    .user-bar-input-group.user-input-row {
-        width: 100%;
+    .user-bar-half {
+        flex: 1 1 50%;
         display: flex;
         align-items: center;
         gap: 6px;
+        min-width: 0;
     }
     .user-bar input {
-        flex: 1;
-        min-width: 0;
         padding: 5px 8px;
-        font-size: 12px;
+        font-size: 11.5px;
         height: 32px;
     }
     .btn-user {
-        padding: 5px 10px;
+        padding: 5px 9px;
         font-size: 12px;
         height: 32px;
         white-space: nowrap;
@@ -670,27 +682,12 @@ body {
         font-size: 11px;
         padding: 4px 8px;
         height: 32px;
-        box-sizing: border-box;
         border-radius: 8px;
-    }
-
-    /* Linea 2: selettore gruppo inline compatto */
-    .user-bar-input-group.group-input-row {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .group-label {
-        font-size: 11px;
-        font-weight: 700;
-        color: #475569;
-        white-space: nowrap;
+        max-width: 110px;
     }
     .user-bar select {
-        flex: 1;
         padding: 5px 8px;
-        font-size: 12px;
+        font-size: 11.5px;
         height: 32px;
     }
 
@@ -780,7 +777,7 @@ body {
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
+        <!-- Header pulito senza duplicati di badge -->
         <div class="header">
             <div class="header-title-box">
                 <div class="header-logo">
@@ -795,31 +792,27 @@ body {
                     <h1>Calendario Fisioterapia 2025-2026</h1>
                 </div>
             </div>
-            <!-- Badge per Desktop (nascosto su mobile in favore della visualizzazione inline) -->
-            <div class="sync-badge desktop-only" id="syncStatusDesktop">Stato: Non connesso</div>
         </div>
 
-        <!-- Barra Profilo e Filtro Gruppo (Compattata per Mobile) -->
+        <!-- Barra Profilo e Filtro Gruppo: 1 RIGA / 2 METÀ (50% e 50%) -->
         <div class="user-bar">
-            <div class="user-bar-left">
-                <!-- RIGA 1: Input utente, pulsante Carica/Crea e Badge -->
-                <div class="user-bar-input-group user-input-row">
-                    <input type="text" id="usernameInput" placeholder="Nome utente (es. mario_rossi)">
-                    <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica o crea profilo">Carica</button>
-                    <div class="sync-badge" id="syncStatus">Non connesso</div>
-                </div>
-                
-                <!-- RIGA 2: Selezione Gruppo -->
-                <div class="user-bar-input-group group-input-row">
-                    <span class="group-label">Gruppo:</span>
-                    <select id="groupSelector" onchange="cambiaGruppo()">
-                        <option value="ALL">Tutti i Gruppi</option>
-                        <option value="A">Gruppo A</option>
-                        <option value="B">Gruppo B</option>
-                        <option value="C">Gruppo C</option>
-                        <option value="D">Gruppo D</option>
-                    </select>
-                </div>
+            <!-- Metà Sinistra: Input nome utente + pulsante Carica -->
+            <div class="user-bar-half user-bar-left">
+                <input type="text" id="usernameInput" placeholder="Nome utente (es. mario_rossi)">
+                <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica o crea profilo">Carica</button>
+            </div>
+            
+            <!-- Metà Destra: Pallino/Badge stato connessione + Solo menu a tendina gruppo -->
+            <div class="user-bar-half user-bar-right">
+                <div class="sync-badge" id="syncStatus">Non connesso</div>
+                <select id="groupSelector" onchange="cambiaGruppo()">
+                    <option value="ALL">Scegli Gruppo</option>
+                    <option value="ALL">Tutti i Gruppi</option>
+                    <option value="A">Gruppo A</option>
+                    <option value="B">Gruppo B</option>
+                    <option value="C">Gruppo C</option>
+                    <option value="D">Gruppo D</option>
+                </select>
             </div>
         </div>
 
@@ -1281,10 +1274,8 @@ body {
         const giornoOffset = { 'lunedì': 0, 'martedì': 1, 'mercoledì': 2, 'giovedì': 3, 'venerdì': 4 };
 
         function updateSyncBadges(text) {
-            const badgeMobile = document.getElementById('syncStatus');
-            const badgeDesktop = document.getElementById('syncStatusDesktop');
-            if (badgeMobile) badgeMobile.textContent = text;
-            if (badgeDesktop) badgeDesktop.textContent = text;
+            const badge = document.getElementById('syncStatus');
+            if (badge) badge.textContent = text;
         }
 
         function sanitizeUsername(name) {
