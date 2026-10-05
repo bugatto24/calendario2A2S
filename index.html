@@ -36,6 +36,15 @@ body {
     flex-direction: column;
 }
 
+/* Header pulito con h1 a sinistra e stato connessione in alto a destra */
+.header { 
+    background: #ffffff; 
+    color: #1e293b; 
+    padding: 16px 24px; 
+    border-bottom: 1px solid #e2e8f0; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
 /* Header pulito */
 .header { 
     background: #ffffff; 
@@ -43,7 +52,7 @@ body {
     padding: 16px 24px; 
     border-bottom: 1px solid #e2e8f0; 
     display: flex; 
-    justify-content: flex-start; 
+    justify-content: space-between; 
     align-items: center; 
     gap: 14px; 
 }
@@ -61,34 +70,30 @@ body {
 }
 .header h1 { font-size: 1.35rem; font-weight: 700; color: #0f172a; }
 
-/* Barra Utente e Gruppo - 1 sola riga (Metà Sinistra con Input + Carica + Dot Stato, Metà Destra con Menu Gruppo) */
+/* Barra Utente e Gruppo - Versione Desktop (Ripristinata con spaziatura standard) */
 .user-bar { 
     background: #f8fafc; 
-    padding: 10px 20px; 
+    padding: 12px 24px; 
     border-bottom: 1px solid #e2e8f0; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
-    gap: 12px; 
+    gap: 16px; 
     font-size: 13px; 
 }
-.user-bar-half {
-    flex: 1 1 50%;
+.user-bar-left {
     display: flex;
     align-items: center;
-    gap: 8px;
-    min-width: 0;
-}
-.user-bar-left {
-    justify-content: flex-start;
+    gap: 10px;
 }
 .user-bar-right {
-    justify-content: flex-end;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 .user-bar input { 
-    flex: 1;
-    min-width: 0;
-    padding: 7px 11px; 
+    width: 260px;
+    padding: 7px 12px; 
     border-radius: 8px; 
     border: 1.5px solid #cbd5e1; 
     font-size: 13px; 
@@ -98,7 +103,7 @@ body {
     transition: all 0.2s; 
 }
 .user-bar select, .controls select, .form-group select { 
-    padding: 7px 11px; 
+    padding: 7px 12px; 
     border-radius: 8px; 
     border: 1.5px solid #cbd5e1; 
     font-size: 13px; 
@@ -108,15 +113,14 @@ body {
     transition: all 0.2s; 
 }
 .user-bar select {
-    width: 100%;
-    min-width: 0;
+    min-width: 170px;
 }
 .user-bar input:focus, .user-bar select:focus, .controls select:focus, .form-group select:focus {
     border-color: #7e22ce;
     box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.12);
 }
 
-/* Indicatore di connessione ultra-sintetico */
+/* Indicatore di connessione ultra-sintetico (In alto a destra nell'header) */
 .status-indicator {
     display: inline-flex;
     align-items: center;
@@ -176,7 +180,12 @@ body {
     font-family: inherit; 
     flex-shrink: 0;
 }
-.btn-user { background: #7e22ce; color: white; }
+.btn-user { 
+    background: #7e22ce; 
+    color: white; 
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
 .btn-user:hover { background: #6b21a8; }
 .btn-today { background: #f8fafc; color: #1e293b; border: 1.5px solid #cbd5e1; font-weight: 600; }
 .btn-today:hover { background: #e2e8f0; border-color: #94a3b8; }
@@ -674,53 +683,60 @@ body {
         flex-direction: column;
     }
 
-    /* Header compatto */
-    .header { order: 1; padding: 10px 12px; }
+    /* Header compatto con titolo e status in linea a destra */
+    .header { 
+        order: 1; 
+        padding: 10px 12px; 
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
     .header-title-box { gap: 8px; }
     .header-logo { width: 30px; height: 30px; border-radius: 7px; }
     .header-logo svg { width: 16px; height: 16px; }
     .header h1 { font-size: 1rem; }
 
-    /* Barra utente su 1 sola riga (50% e 50%) */
+    /* Barra utente su mobile: unica riga con textbox flessibile, carica fisso e tendina a destra con spazio idoneo */
     .user-bar { 
         order: 2; 
         padding: 8px 10px; 
-        gap: 8px; 
+        gap: 6px; 
         background: #f8fafc;
         display: flex;
         flex-direction: row;
         align-items: center;
+        justify-content: space-between;
     }
-    .user-bar-half {
-        flex: 1 1 50%;
+    .user-bar-left {
+        flex: 1 1 auto;
         display: flex;
         align-items: center;
         gap: 6px;
         min-width: 0;
     }
     .user-bar input {
+        width: 100%;
+        min-width: 0;
         padding: 5px 8px;
         font-size: 11.5px;
         height: 32px;
     }
     .btn-user {
-        padding: 5px 8px;
+        flex-shrink: 0;
+        padding: 5px 10px;
         font-size: 11.5px;
         height: 32px;
         white-space: nowrap;
     }
-    .status-indicator {
-        gap: 3px;
-    }
-    .status-dot {
-        width: 8.5px;
-        height: 8.5px;
-    }
-    .status-text-off {
-        font-size: 9.5px;
+    .user-bar-right {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
     }
     .user-bar select {
-        padding: 5px 8px;
+        width: 132px;
+        min-width: 132px;
+        padding: 5px 6px;
         font-size: 11.5px;
         height: 32px;
     }
@@ -811,7 +827,7 @@ body {
 </head>
 <body>
     <div class="container">
-        <!-- Header pulito -->
+        <!-- Header pulito con titolo a sinistra e pallino a destra -->
         <div class="header">
             <div class="header-title-box">
                 <div class="header-logo">
@@ -823,25 +839,26 @@ body {
                     </svg>
                 </div>
                 <div>
-                    <h1>Calendario Fisioterapia 2025-2026</h1>
+                    <h1>Calendario Fisioterapia 2026-2027</h1>
                 </div>
+            </div>
+            <!-- Indicatore sintetico (🟢 oppure 🔴 off) in alto a destra nell'header -->
+            <div class="status-indicator" id="statusIndicator" title="Non connesso">
+                <span class="status-dot offline" id="statusDot"></span>
+                <span class="status-text-off" id="statusText">off</span>
             </div>
         </div>
 
-        <!-- Barra Profilo e Filtro Gruppo: 1 RIGA / 2 METÀ BILANCIATE (50% e 50%) -->
+        <!-- Barra Profilo e Filtro Gruppo: Layout desktop confortevole / mobile 1 riga bilanciata -->
         <div class="user-bar">
-            <!-- Metà Sinistra: Input nome utente + pulsante Carica + Indicatore sintetico (🟢 oppure 🔴 off) -->
-            <div class="user-bar-half user-bar-left">
+            <!-- Sinistra: Input nome utente + pulsante Carica a larghezza fissa -->
+            <div class="user-bar-left">
                 <input type="text" id="usernameInput" placeholder="Nome utente (es. mario_rossi)">
                 <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica o crea profilo">Carica</button>
-                <div class="status-indicator" id="statusIndicator" title="Non connesso">
-                    <span class="status-dot offline" id="statusDot"></span>
-                    <span class="status-text-off" id="statusText">off</span>
-                </div>
             </div>
             
-            <!-- Metà Destra: Solo menu a tendina scelta gruppo -->
-            <div class="user-bar-half user-bar-right">
+            <!-- Destra: Menu a tendina con larghezza idonea per 'Scegli Gruppo' -->
+            <div class="user-bar-right">
                 <select id="groupSelector" onchange="cambiaGruppo()">
                     <option value="ALL">Scegli Gruppo</option>
                     <option value="ALL">Tutti i Gruppi</option>
@@ -1310,11 +1327,12 @@ body {
         };
         const giornoOffset = { 'lunedì': 0, 'martedì': 1, 'mercoledì': 2, 'giovedì': 3, 'venerdì': 4 };
 
+
         /**
-         * Aggiorna l'indicatore di stato sintetico:
+         * Aggiorna l'indicatore di stato sintetico in alto a destra:
          * - 'online': Mostra SOLO il pallino verde (tooltip con nome utente).
          * - 'offline': Mostra pallino rosso + scritta 'off'.
-         * - 'pending': Mostra pallino arancione pulsante (caricamento/salvataggio in corso).
+         * - 'pending': Mostra pallino arancione pulsante.
          */
         function setConnectionStatus(state, infoTooltip = '') {
             const container = document.getElementById('statusIndicator');
@@ -1333,7 +1351,6 @@ body {
                 text.style.display = 'none';
                 container.title = infoTooltip || 'Sincronizzazione in corso...';
             } else {
-                // offline / non connesso / errore
                 dot.classList.add('offline');
                 text.style.display = 'inline';
                 text.textContent = 'off';
@@ -1346,11 +1363,9 @@ body {
         }
 
         /**
-         * Calcola l'indice della settimana da selezionare automaticamente all'apertura:
-         * - Se aperto da Lunedì a Sabato: appartiene alla settimana in corso (da Lunedì a Sabato).
-         * - Se aperto di Domenica: appartiene alla settimana che inizia il giorno dopo (Lunedì).
-         * - Se la data cade prima della prima settimana: seleziona l'indice 0.
-         * - Se successiva all'ultima settimana: seleziona l'ultima.
+         * Calcola l'indice della settimana da selezionare all'apertura:
+         * - Da Lunedì a Sabato: settimana in corso.
+         * - Domenica: settimana che inizia il giorno dopo (Lunedì).
          */
         function calcolaIndiceSettimanaCorrente() {
             const oggi = new Date();
@@ -1360,7 +1375,6 @@ body {
             targetDate.setHours(0, 0, 0, 0);
 
             if (giornoSettimana === 0) {
-                // Se è domenica, proietta a domani (lunedì della settimana entrante)
                 targetDate.setDate(targetDate.getDate() + 1);
             }
 
@@ -1394,9 +1408,7 @@ body {
             aggiornaInterfaccia(dir);
         }
 
-        // ============================================
-        // VISTA COMPATTA / ESPANSA (MOBILE)
-        // ============================================
+
         function toggleVistaMobile() {
             const container = document.getElementById('calendarContainer');
             const btn = document.getElementById('btnToggleView');
@@ -1411,9 +1423,6 @@ body {
             }
         }
 
-        // ============================================
-        // GESTIONE SWIPE RAPIDO DA MOBILE (SOLO COMPATTA)
-        // ============================================
         let touchStartX = 0;
         let touchStartY = 0;
 
@@ -1443,9 +1452,6 @@ body {
             }, { passive: true });
         }
 
-        // ============================================
-        // FILTRAGGIO GRUPPI (incluso A/B e C/D)
-        // ============================================
         function appartieneAlGruppo(evento, gruppoTarget) {
             if (gruppoTarget === 'ALL') return true;
             const text = ((evento.docente || '') + ' ' + (evento.titolo || '')).toUpperCase();
@@ -1468,14 +1474,10 @@ body {
             salvaSuCloudSilenzioso();
         }
 
-        // ============================================
-        // CLOUD PROFILE & SALVATAGGIO AUTOMATICO
-        // ============================================
         function caricaOCreaProfilo() {
             const inputVal = document.getElementById('usernameInput').value;
             const sanitized = sanitizeUsername(inputVal);
             if (!sanitized) {
-                alert("Inserisci un nome utente (es. mario_rossi).");
                 return;
             }
             currentUser = sanitized;
@@ -1659,9 +1661,7 @@ body {
             return risultati;
         }
 
-        // ============================================
-        // SMART MERGE INTELLIGENTE (FUZZY MATCHING)
-        // ============================================
+
         let mergedSettimanePending = null;
 
         function getChiaveSemantica(titolo) {
@@ -1739,7 +1739,6 @@ body {
                 document.getElementById('conflictModal').classList.add('active');
             } else {
                 applicaMergeConfermato();
-                alert("✅ Calendario sincronizzato con l'orario ufficiale! Tutte le tue preferenze sono state mantenute.");
             }
         }
 
@@ -1806,10 +1805,11 @@ body {
             return { searchKey: t, label: titolo || 'Attività' };
         }
 
+
         let pressTimer = null;
         let isLongPressTriggered = false;
         let pressStartCoords = { x: 0, y: 0 };
-        const MOVE_THRESHOLD = 8; // Pixel di tolleranza anti-scroll
+        const MOVE_THRESHOLD = 8; // Tolleranza pixel anti-scroll
 
         function startModuloPress(e, searchKey, label) {
             isLongPressTriggered = false;
@@ -1903,6 +1903,7 @@ body {
         }
 
         let isTransitioning = false;
+
 
         function renderCalendario(animationDirection = null) {
             const calElem = document.getElementById('calendar');
@@ -2046,6 +2047,7 @@ body {
 
             creaNuovoEvento(event, weekIdx, giorno);
         }
+
 
         function renderInsegnamenti() {
             const container = document.getElementById('insegnamentiContainer');
@@ -2194,6 +2196,7 @@ body {
             }
         }
 
+
         let tipoSelezionato = 'normale';
 
         function creaNuovoEvento(e, weekIdx, giorno) {
@@ -2285,7 +2288,6 @@ body {
             const oraFine = timeStringToDecimal(document.getElementById('editOraFine').value);
 
             if (oraFine <= oraInizio) {
-                alert("L'ora di fine deve essere successiva all'ora di inizio.");
                 return;
             }
 
@@ -2319,7 +2321,6 @@ body {
 
         function eliminaEventoCorrente() {
             if (!eventoSelezionatoRef || eventoSelezionatoRef.isNew) return;
-            if (!confirm("Vuoi eliminare questa lezione?")) return;
             const { weekIdx, giorno, eventIdx } = eventoSelezionatoRef;
             settimane[weekIdx].eventi[giorno].splice(eventIdx, 1);
             chiudiModale();
@@ -2328,13 +2329,11 @@ body {
         }
 
         function ripristinaDati() {
-            if (confirm("ATTENZIONE: Il Reset Totale sovrascrive tutto il tuo calendario con l'orario iniziale, cancellando tutte le tue personalizzazioni e lezioni extra. Vuoi procedere?")) {
-                settimane = JSON.parse(JSON.stringify(defaultSettimane));
-                moduliConvalidati = [];
-                try { localStorage.removeItem('convalidati_fisioterapia'); } catch(e) {}
-                aggiornaInterfaccia();
-                salvaSuCloudSilenzioso();
-            }
+            settimane = JSON.parse(JSON.stringify(defaultSettimane));
+            moduliConvalidati = [];
+            try { localStorage.removeItem('convalidati_fisioterapia'); } catch(e) {}
+            aggiornaInterfaccia();
+            salvaSuCloudSilenzioso();
         }
 
         function updateControls() {
@@ -2367,8 +2366,9 @@ body {
             aggiornaInterfaccia(dir); 
         }
 
+
         function exportICS() {
-            let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Fisioterapia UniTO//IT\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nX-WR-CALNAME:Fisioterapia 2025-2026\r\nX-WR-TIMEZONE:Europe/Rome\r\n';
+            let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Fisioterapia UniTO//IT\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nX-WR-CALNAME:Fisioterapia 2026-2027\r\nX-WR-TIMEZONE:Europe/Rome\r\n';
             settimane.forEach(s => {
                 const baseDate = new Date(dateMap[s.numero] || '2026-09-28');
                 giorni.forEach(g => {
@@ -2399,6 +2399,7 @@ body {
             link.download = 'calendario-fisioterapia.ics';
             link.click();
         }
+
 
         function init() {
             const select = document.getElementById('weekSelector');
