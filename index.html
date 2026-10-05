@@ -68,7 +68,7 @@
             justify-content: center;
             font-size: 13px;
             font-weight: 700;
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 20px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -89,7 +89,7 @@
         /* Barra Utente e Gruppo (Desktop Base) */
         .user-bar { 
             background: #f8fafc; 
-            padding: 12px 20px; 
+            padding: 12px 24px; 
             border-bottom: 1px solid #e2e8f0; 
             display: flex; 
             justify-content: space-between; 
@@ -101,7 +101,6 @@
             display: flex; 
             align-items: center; 
             gap: 10px; 
-            flex: 1;
         }
         .user-bar-input-group { 
             display: flex; 
@@ -111,7 +110,11 @@
         .user-bar-right {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+        }
+        .user-bar-right label {
+            font-weight: 600;
+            color: #475569;
         }
         .user-bar input, .user-bar select, .controls select, .form-group select { 
             padding: 8px 12px; 
@@ -154,10 +157,10 @@
         .btn-sync-merge { background: #0284c7; color: white; font-weight: 600; }
         .btn-sync-merge:hover { background: #0369a1; }
 
-        /* Controlli Settimane e Azioni */
+        /* Controlli Settimane e Azioni (In Alto su Desktop) */
         .controls { 
             background: #ffffff; 
-            padding: 12px 20px; 
+            padding: 12px 24px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
@@ -184,7 +187,7 @@
             display: none;
             background: #fdf4ff;
             border-bottom: 1px solid #f0abfc;
-            padding: 8px 20px;
+            padding: 8px 24px;
             font-size: 12px;
             color: #86198f;
             font-weight: 600;
@@ -206,7 +209,7 @@
         /* Legenda */
         .legend { 
             background: #f8fafc; 
-            padding: 10px 20px; 
+            padding: 10px 24px; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
@@ -587,6 +590,50 @@
         .conflict-list li:last-child { margin-bottom: 0; }
 
         /* ========================================================
+           DISTRIBUZIONE DESKTOP SPECIFICA (≥ 769px)
+           ======================================================== */
+        @media (min-width: 769px) {
+            /* Ordine desktop: header -> user-bar -> controls -> legend -> highlight-banner -> calendar -> stats */
+            .header { order: 1; }
+            .user-bar { order: 2; }
+            .controls { order: 3; }
+            .legend { order: 4; }
+            .highlight-banner { order: 5; }
+            .calendar-container { order: 6; }
+            .stats-container { order: 7; }
+
+            .user-bar {
+                padding: 14px 24px;
+            }
+            .user-bar-left {
+                gap: 12px;
+            }
+            #usernameInput {
+                width: 250px;
+            }
+            .user-bar-right select {
+                min-width: 170px;
+            }
+
+            /* Su desktop i pulsanti d'azione si affiancano ai selettori settimana */
+            .controls {
+                padding: 14px 24px;
+            }
+            .action-buttons-mobile-box {
+                display: contents; /* integra direttamente i pulsanti nella riga controls */
+            }
+            .action-buttons {
+                display: flex;
+                gap: 8px;
+            }
+
+            .legend {
+                padding: 10px 24px;
+                gap: 20px;
+            }
+        }
+
+        /* ========================================================
            RESPONSIVE MOBILE SPECIFICO (≤ 768px)
            ======================================================== */
         @media (max-width: 768px) {
@@ -634,6 +681,9 @@
             .user-bar-right {
                 flex-shrink: 0;
             }
+            .user-bar-right label {
+                display: none;
+            }
             .user-bar-right select {
                 width: 126px;
                 padding: 7px 6px;
@@ -664,11 +714,12 @@
             .nav-buttons select { width: 100%; min-width: 0; padding: 7px; font-size: 12px; }
             .btn-today, .btn-nav { padding: 7px 10px; font-size: 12px; }
 
-            /* Box azioni spostato sotto */
+            /* Box azioni spostato sotto su mobile */
             .action-buttons-mobile-box {
                 background: #ffffff;
                 padding: 10px;
                 border-bottom: 1px solid #e2e8f0;
+                display: block;
             }
             .action-buttons { 
                 width: 100%; 
@@ -744,6 +795,7 @@
                 </div>
             </div>
             <div class="user-bar-right">
+                <label for="groupSelector">Gruppo:</label>
                 <select id="groupSelector" onchange="cambiaGruppo()">
                     <option value="ALL">Scegli Gruppo</option>
                     <option value="ALL">Tutti i Gruppi</option>
@@ -755,13 +807,40 @@
             </div>
         </div>
 
-        <!-- Controlli Settimane -->
+        <!-- Controlli Settimane & Azioni (Sopra al calendario su Desktop) -->
         <div class="controls">
             <div class="nav-buttons">
                 <button class="btn btn-today" onclick="vaiAOggi()" title="Vai alla settimana con il giorno odierno">Oggi</button>
                 <button class="btn btn-nav" id="btnPrev" onclick="prevWeek()">◀</button>
                 <select id="weekSelector" onchange="changeWeek()"></select>
                 <button class="btn btn-nav" id="btnNext" onclick="nextWeek()">▶</button>
+            </div>
+
+            <!-- Blocco Azioni: affiancato su desktop, reindirizzato sotto via CSS su mobile -->
+            <div class="action-buttons-mobile-box">
+                <div class="action-buttons">
+                    <button class="btn btn-sync-merge" onclick="avviaSmartMerge()" title="Confronta e aggiorna il calendario preservando le tue personalizzazioni">🔄 Sincronizza Orario</button>
+                    <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleVistaMobile()">📐 Espandi</button>
+                    <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
+                    <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset Totale</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legenda (Prima del calendario su Desktop, dopo il calendario su Mobile) -->
+        <div class="legend">
+            <div class="legend-group">
+                <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
+                <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
+                <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
+                <div class="legend-item"><div class="legend-box legend-altrogruppo"></div><span>👥 Altro Gruppo / Convalidato</span></div>
+            </div>
+            <div class="legend-divider"></div>
+            <div class="legend-group">
+                <div class="legend-item"><span class="legend-dot dot-patologia"></span><span>Patologia Gen.</span></div>
+                <div class="legend-item"><span class="legend-dot dot-neuro"></span><span>Neurolesioni</span></div>
+                <div class="legend-item"><span class="legend-dot dot-locomotore"></span><span>App. Locomotore</span></div>
+                <div class="legend-item"><span class="legend-dot dot-altro"></span><span>Altro</span></div>
             </div>
         </div>
 
@@ -774,33 +853,6 @@
         <!-- Vista Calendario -->
         <div class="calendar-container vista-compatta" id="calendarContainer">
             <div class="calendar" id="calendar"></div>
-        </div>
-
-        <!-- Blocco Azioni (Sotto al calendario su mobile) -->
-        <div class="action-buttons-mobile-box">
-            <div class="action-buttons">
-                <button class="btn btn-sync-merge" onclick="avviaSmartMerge()" title="Confronta e aggiorna il calendario preservando le tue personalizzazioni">🔄 Sincronizza Orario</button>
-                <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleVistaMobile()">📐 Espandi</button>
-                <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
-                <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset Totale</button>
-            </div>
-        </div>
-
-        <!-- Legenda (Sotto ai pulsanti su mobile) -->
-        <div class="legend">
-            <div class="legend-group">
-                <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
-                <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️️ Obbligatoria</span></div>
-                <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
-                <div class="legend-item"><div class="legend-box legend-altrogruppo"></div><span>👥 Altro Gruppo / Convalidato</span></div>
-            </div>
-            <div class="legend-divider"></div>
-            <div class="legend-group">
-                <div class="legend-item"><span class="legend-dot dot-patologia"></span><span>Patologia Gen.</span></div>
-                <div class="legend-item"><span class="legend-dot dot-neuro"></span><span>Neurolesioni</span></div>
-                <div class="legend-item"><span class="legend-dot dot-locomotore"></span><span>App. Locomotore</span></div>
-                <div class="legend-item"><span class="legend-dot dot-altro"></span><span>Altro</span></div>
-            </div>
         </div>
 
         <!-- Statistiche / Progressi -->
@@ -1255,7 +1307,6 @@
                 }
             }
 
-            // Fallback: se precedente alla prima settimana -> 0; se successiva -> ultima
             const primaData = new Date(dateMap[settimane[0].numero]);
             if (targetDate < primaData) return 0;
             return settimane.length - 1;
@@ -1529,14 +1580,12 @@
             salvaSuCloudSilenzioso();
         }
 
-        // ============================================
-        // GESTIONE FOCUS MODULO & LONG-PRESS ANTI-SCROLL
-        // ============================================
+        // Focus Modulo & Long-Press Anti-Scroll
         let pressTimer = null;
         let isLongPressTriggered = false;
         let pressOriginX = 0;
         let pressOriginY = 0;
-        const MOVE_THRESHOLD = 8; // tolleranza massima di 8px per non scambiare lo scroll con un long press
+        const MOVE_THRESHOLD = 8;
 
         function estraiModuloSearchKey(titolo) {
             const t = (titolo || '').toUpperCase();
@@ -1895,7 +1944,6 @@
         function creaNuovoEvento(e, weekIdx, giorno) {
             if (e.target.closest('.evento')) return;
 
-            // Se l'evidenziazione era attiva, un tocco sul calendario la disattiva
             if (moduloInEvidenza) {
                 disattivaEvidenziazione();
                 return;
@@ -1936,7 +1984,6 @@
                 return;
             }
 
-            // Se è attiva l'evidenziazione, qualsiasi tocco breve la annulla
             if (moduloInEvidenza) {
                 disattivaEvidenziazione();
                 return;
@@ -2231,7 +2278,6 @@
 
             document.getElementById('groupSelector').value = gruppoSelezionato;
 
-            // Selezione diretta della settimana corrente senza animazione iniziale
             settimanaCorrente = calcolaIndiceSettimanaCorrente();
 
             initSwipeGestures();
