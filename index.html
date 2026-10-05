@@ -32,13 +32,15 @@ body {
     box-shadow: 0 4px 20px rgba(0,0,0,0.06); 
     overflow: hidden; 
     border: 1px solid #e2e8f0; 
+    display: flex;
+    flex-direction: column;
 }
 
 /* Header stile Workspace */
 .header { 
     background: #ffffff; 
     color: #1e293b; 
-    padding: 20px 24px; 
+    padding: 18px 24px; 
     border-bottom: 1px solid #e2e8f0; 
     display: flex; 
     justify-content: space-between; 
@@ -48,8 +50,8 @@ body {
 }
 .header-title-box { display: flex; align-items: center; gap: 14px; }
 .header-logo {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     background: #7e22ce;
     color: white;
     border-radius: 10px;
@@ -58,12 +60,12 @@ body {
     justify-content: center;
     box-shadow: 0 2px 8px rgba(126, 34, 206, 0.3);
 }
-.header h1 { font-size: 1.4rem; font-weight: 700; color: #0f172a; }
+.header h1 { font-size: 1.35rem; font-weight: 700; color: #0f172a; }
 
-/* Barra Utente e Gruppo */
+/* Barra Utente e Gruppo (Desktop) */
 .user-bar { 
     background: #f8fafc; 
-    padding: 14px 20px; 
+    padding: 12px 20px; 
     border-bottom: 1px solid #e2e8f0; 
     display: flex; 
     justify-content: space-between; 
@@ -75,7 +77,7 @@ body {
 .user-bar-left { 
     display: flex; 
     align-items: center; 
-    gap: 10px; 
+    gap: 12px; 
     flex-wrap: wrap; 
 }
 .user-bar-input-group { 
@@ -84,7 +86,7 @@ body {
     gap: 6px; 
 }
 .user-bar input, .user-bar select, .controls select, .form-group select { 
-    padding: 8px 12px; 
+    padding: 7px 11px; 
     border-radius: 8px; 
     border: 1.5px solid #cbd5e1; 
     font-size: 13px; 
@@ -122,18 +124,21 @@ body {
 .btn-sync-merge:hover { background: #0369a1; }
 .sync-badge { 
     font-size: 12px; 
-    padding: 6px 12px; 
+    padding: 5px 11px; 
     border-radius: 20px; 
     background: #ede9fe; 
     color: #6b21a8; 
     font-weight: 600; 
     transition: all 0.2s ease; 
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
 }
 
 /* Controlli Settimane e Azioni */
 .controls { 
     background: #ffffff; 
-    padding: 14px 20px; 
+    padding: 12px 20px; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
@@ -182,7 +187,7 @@ body {
 /* Legenda */
 .legend { 
     background: #f8fafc; 
-    padding: 12px 20px; 
+    padding: 10px 20px; 
     display: flex; 
     justify-content: center; 
     align-items: center; 
@@ -493,7 +498,6 @@ body {
 .moduli-container { padding: 14px 20px; background: #faf5ff; border-top: 1px solid #f1f5f9; display: none; }
 .moduli-container.visible { display: block; }
 
-/* Singolo modulo nelle statistiche */
 .modulo { 
     padding: 10px 12px; 
     border-bottom: 1px solid #f3e8ff; 
@@ -502,13 +506,8 @@ body {
     user-select: none; 
     -webkit-user-select: none; 
 }
-.modulo:hover {
-    background: rgba(126, 34, 206, 0.04);
-}
-.modulo.modulo-selected {
-    background: #f3e8ff;
-    border: 1px solid #c084fc;
-}
+.modulo:hover { background: rgba(126, 34, 206, 0.04); }
+.modulo.modulo-selected { background: #f3e8ff; border: 1px solid #c084fc; }
 .modulo:last-child { border-bottom: none; }
 .modulo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .modulo-left { display: flex; align-items: center; gap: 8px; flex: 1; }
@@ -582,7 +581,6 @@ body {
 .form-group input:focus, .form-group select:focus { border-color: #7e22ce; outline: none; }
 .form-row { display: flex; gap: 10px; }
 
-/* Footer modale con pulsanti ordinati */
 .modal-footer { 
     display: flex; 
     justify-content: space-between; 
@@ -613,46 +611,94 @@ body {
     font-size: 12px;
     color: #991b1b;
 }
-.conflict-list li {
-    margin-bottom: 8px;
-    line-height: 1.35;
-    margin-left: 18px;
-}
+.conflict-list li { margin-bottom: 8px; line-height: 1.35; margin-left: 18px; }
 .conflict-list li:last-child { margin-bottom: 0; }
 
-/* Responsive Mobile */
+/* ========================================================
+   RESPONSIVE MOBILE (< 768px): MASSIMA COMPATTEZZA E REORDER
+   ======================================================== */
 @media (max-width: 768px) {
     body { padding: 4px; }
-    .header { padding: 12px 14px; flex-direction: column; align-items: flex-start; }
-    .header h1 { font-size: 1.15rem; }
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
 
+    /* Ordine elementi mobile: pulsanti e legenda finiscono sotto al calendario! */
+    .header { order: 1; padding: 10px 12px; flex-direction: row; justify-content: space-between; align-items: center; gap: 8px; }
+    .header-title-box { gap: 8px; }
+    .header-logo { width: 30px; height: 30px; border-radius: 7px; }
+    .header-logo svg { width: 16px; height: 16px; }
+    .header h1 { font-size: 1rem; }
+
+    /* Barra utente ultra-compatta su 2 linee */
     .user-bar { 
-        padding: 10px 12px; 
-        flex-direction: column; 
-        align-items: stretch; 
-        gap: 8px; 
-    }
-    .user-bar-left { 
-        flex-direction: column; 
-        align-items: stretch; 
-        gap: 8px; 
-        width: 100%; 
-    }
-    .user-bar-input-group { 
-        width: 100%; 
-        display: grid; 
-        grid-template-columns: 1fr auto; 
+        order: 2; 
+        padding: 6px 10px; 
         gap: 6px; 
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
     }
-    .user-bar-input-group label { display: none; }
-    .user-bar input { width: 100%; font-size: 13px; }
-    .sync-badge { text-align: center; }
+    .user-bar-left {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    /* Linea 1: input utente, pulsante Carica, e stato connessione inline */
+    .user-bar-input-group.user-input-row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .user-bar input {
+        flex: 1;
+        min-width: 0;
+        padding: 5px 8px;
+        font-size: 12px;
+        height: 32px;
+    }
+    .btn-user {
+        padding: 5px 10px;
+        font-size: 12px;
+        height: 32px;
+        white-space: nowrap;
+    }
+    .sync-badge {
+        font-size: 11px;
+        padding: 4px 8px;
+        height: 32px;
+        box-sizing: border-box;
+        border-radius: 8px;
+    }
 
+    /* Linea 2: selettore gruppo inline compatto */
+    .user-bar-input-group.group-input-row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .group-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #475569;
+        white-space: nowrap;
+    }
+    .user-bar select {
+        flex: 1;
+        padding: 5px 8px;
+        font-size: 12px;
+        height: 32px;
+    }
+
+    /* Navigazione settimane subito sotto la barra utente */
     .controls { 
-        padding: 10px 12px; 
-        flex-direction: column; 
-        align-items: stretch; 
-        gap: 8px; 
+        order: 3; 
+        padding: 6px 10px; 
+        border-bottom: 1px solid #e2e8f0;
     }
     .nav-buttons { 
         width: 100%; 
@@ -660,28 +706,60 @@ body {
         grid-template-columns: auto auto 1fr auto; 
         gap: 6px; 
     }
-    .nav-buttons select { width: 100%; min-width: 0; }
-    
+    .nav-buttons .btn { height: 32px; padding: 4px 8px; font-size: 12px; }
+    .nav-buttons select { height: 32px; padding: 4px 8px; font-size: 12px; width: 100%; min-width: 0; }
+
+    /* Banner evidenziazione */
+    .highlight-banner { order: 4; }
+
+    /* Calendario principale */
+    .calendar-container { order: 5; }
+
+    /* Pulsanti azione (Spostati SOTTO il calendario) */
+    .action-buttons-wrapper {
+        order: 6;
+        padding: 10px 10px 6px 10px;
+        background: #ffffff;
+        border-top: 1px solid #e2e8f0;
+    }
     .action-buttons { 
         width: 100%; 
         display: grid; 
         grid-template-columns: 1fr 1fr; 
         gap: 6px; 
     }
-    .action-buttons .btn { justify-content: center; width: 100%; padding: 8px 6px; font-size: 11px; }
+    .action-buttons .btn { 
+        justify-content: center; 
+        width: 100%; 
+        padding: 8px 6px; 
+        font-size: 11px; 
+    }
 
-    .legend { gap: 10px; justify-content: flex-start; padding: 8px 12px; font-size: 11px; }
+    /* Legenda (Spostata SOTTO i pulsanti di azione) */
+    .legend { 
+        order: 7; 
+        gap: 8px; 
+        justify-content: flex-start; 
+        padding: 10px; 
+        font-size: 11px; 
+        border-top: 1px solid #f1f5f9;
+        border-bottom: 1px solid #e2e8f0;
+    }
     .legend-divider { display: none; }
 
+    /* Statistiche in fondo */
+    .stats-container { order: 8; padding: 16px 12px; }
+
+    /* Vista compatta del calendario su mobile */
     .calendar-container.vista-compatta .calendar {
         min-width: 100% !important;
         width: 100% !important;
-        grid-template-columns: 36px repeat(5, 1fr) !important;
+        grid-template-columns: 34px repeat(5, 1fr) !important;
     }
-    .calendar-container.vista-compatta .time-column { width: 36px !important; }
-    .calendar-container.vista-compatta .time-header { font-size: 9px; padding: 10px 2px; }
-    .calendar-container.vista-compatta .time-slot { font-size: 9px; padding-right: 3px; justify-content: center; }
-    .calendar-container.vista-compatta .day-name { font-size: 9px; }
+    .calendar-container.vista-compatta .time-column { width: 34px !important; }
+    .calendar-container.vista-compatta .time-header { font-size: 9px; padding: 10px 1px; }
+    .calendar-container.vista-compatta .time-slot { font-size: 8.5px; padding-right: 2px; justify-content: center; }
+    .calendar-container.vista-compatta .day-name { font-size: 8.5px; }
     .calendar-container.vista-compatta .day-number { font-size: 12px; width: 22px; height: 22px; }
     .calendar-container.vista-compatta .evento { padding: 3px 2px; border-left-width: 3px !important; border-radius: 4px; }
     .calendar-container.vista-compatta .evento-title { font-size: 9.5px; line-height: 1.15; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -696,7 +774,6 @@ body {
     .calendar-container.vista-espansa .time-slot { font-size: 10px; padding-right: 4px; }
     .calendar-container.vista-espansa .evento { font-size: 10px; padding: 5px; }
 
-    .stats-container { padding: 16px; }
     .insegnamento-header { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
     </style>
@@ -707,7 +784,7 @@ body {
         <div class="header">
             <div class="header-title-box">
                 <div class="header-logo">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
                         <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -718,19 +795,23 @@ body {
                     <h1>Calendario Fisioterapia 2025-2026</h1>
                 </div>
             </div>
-            <div class="sync-badge" id="syncStatus">Stato: Non connesso</div>
+            <!-- Badge per Desktop (nascosto su mobile in favore della visualizzazione inline) -->
+            <div class="sync-badge desktop-only" id="syncStatusDesktop">Stato: Non connesso</div>
         </div>
 
-        <!-- Barra Profilo e Filtro Gruppo -->
+        <!-- Barra Profilo e Filtro Gruppo (Compattata per Mobile) -->
         <div class="user-bar">
             <div class="user-bar-left">
-                <div class="user-bar-input-group">
+                <!-- RIGA 1: Input utente, pulsante Carica/Crea e Badge -->
+                <div class="user-bar-input-group user-input-row">
                     <input type="text" id="usernameInput" placeholder="Nome utente (es. mario_rossi)">
-                    <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica o crea profilo">Carica/Crea</button>
+                    <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica o crea profilo">Carica</button>
+                    <div class="sync-badge" id="syncStatus">Non connesso</div>
                 </div>
                 
-                <div class="user-bar-input-group" style="grid-template-columns: auto 1fr;">
-                    <span style="font-weight: 600; color: #475569;">Gruppo:</span>
+                <!-- RIGA 2: Selezione Gruppo -->
+                <div class="user-bar-input-group group-input-row">
+                    <span class="group-label">Gruppo:</span>
                     <select id="groupSelector" onchange="cambiaGruppo()">
                         <option value="ALL">Tutti i Gruppi</option>
                         <option value="A">Gruppo A</option>
@@ -742,20 +823,13 @@ body {
             </div>
         </div>
 
-        <!-- Controlli Settimane e Azioni -->
+        <!-- Controlli Settimana (Desktop include anche le azioni; in mobile le azioni vanno sotto) -->
         <div class="controls">
             <div class="nav-buttons">
                 <button class="btn btn-today" onclick="vaiAOggi()" title="Vai alla settimana con il giorno odierno">Oggi</button>
                 <button class="btn btn-nav" id="btnPrev" onclick="prevWeek()">◀</button>
                 <select id="weekSelector" onchange="changeWeek()"></select>
                 <button class="btn btn-nav" id="btnNext" onclick="nextWeek()">▶</button>
-            </div>
-            
-            <div class="action-buttons">
-                <button class="btn btn-sync-merge" onclick="avviaSmartMerge()" title="Confronta e aggiorna il calendario preservando le tue personalizzazioni">🔄 Sincronizza Orario</button>
-                <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleVistaMobile()">📐 Espandi</button>
-                <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
-                <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset Totale</button>
             </div>
         </div>
 
@@ -765,7 +839,22 @@ body {
             <button class="btn-clear-highlight" onclick="disattivaEvidenziazione()">Mostra tutto</button>
         </div>
 
-        <!-- Legenda Ordinata -->
+        <!-- Vista Calendario -->
+        <div class="calendar-container vista-compatta" id="calendarContainer">
+            <div class="calendar" id="calendar"></div>
+        </div>
+
+        <!-- Pulsanti Azione (Su mobile posizionati sotto il calendario) -->
+        <div class="action-buttons-wrapper">
+            <div class="action-buttons">
+                <button class="btn btn-sync-merge" onclick="avviaSmartMerge()" title="Confronta e aggiorna il calendario preservando le tue personalizzazioni">🔄 Sincronizza Orario</button>
+                <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleVistaMobile()">📐 Espandi</button>
+                <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
+                <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset Totale</button>
+            </div>
+        </div>
+
+        <!-- Legenda (Su mobile posizionata sotto i pulsanti di azione) -->
         <div class="legend">
             <div class="legend-group">
                 <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
@@ -780,11 +869,6 @@ body {
                 <div class="legend-item"><span class="legend-dot dot-locomotore"></span><span>App. Locomotore</span></div>
                 <div class="legend-item"><span class="legend-dot dot-altro"></span><span>Altro</span></div>
             </div>
-        </div>
-
-        <!-- Vista Calendario -->
-        <div class="calendar-container vista-compatta" id="calendarContainer">
-            <div class="calendar" id="calendar"></div>
         </div>
 
         <!-- Statistiche / Progressi Insegnamenti -->
@@ -1196,8 +1280,67 @@ body {
         };
         const giornoOffset = { 'lunedì': 0, 'martedì': 1, 'mercoledì': 2, 'giovedì': 3, 'venerdì': 4 };
 
+        function updateSyncBadges(text) {
+            const badgeMobile = document.getElementById('syncStatus');
+            const badgeDesktop = document.getElementById('syncStatusDesktop');
+            if (badgeMobile) badgeMobile.textContent = text;
+            if (badgeDesktop) badgeDesktop.textContent = text;
+        }
+
         function sanitizeUsername(name) {
             return name.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+        }
+
+        /**
+         * Calcola l'indice della settimana da selezionare automaticamente all'apertura:
+         * - Se aperto da Lunedì a Sabato: appartiene alla settimana in corso (da Lunedì a Sabato).
+         * - Se aperto di Domenica: appartiene alla settimana che inizia il giorno dopo (Lunedì).
+         * - Se la data cade prima della prima settimana: seleziona l'indice 0.
+         * - Se successiva all'ultima settimana: seleziona l'ultima.
+         */
+        function calcolaIndiceSettimanaCorrente() {
+            const oggi = new Date();
+            const giornoSettimana = oggi.getDay(); // 0 = Domenica, 1 = Lun, ..., 6 = Sab
+
+            // Riferimento effettivo per la determinazione della settimana
+            const targetDate = new Date(oggi);
+            targetDate.setHours(0, 0, 0, 0);
+
+            if (giornoSettimana === 0) {
+                // Se è domenica, proietta a domani (lunedì della settimana entrante)
+                targetDate.setDate(targetDate.getDate() + 1);
+            }
+
+            // Ricerca tra le settimane definite
+            for (let i = 0; i < settimane.length; i++) {
+                const baseStr = dateMap[settimane[i].numero];
+                if (!baseStr) continue;
+
+                const lunediSettimana = new Date(baseStr);
+                lunediSettimana.setHours(0, 0, 0, 0);
+
+                const domenicaSettimana = new Date(lunediSettimana);
+                domenicaSettimana.setDate(lunediSettimana.getDate() + 6);
+                domenicaSettimana.setHours(23, 59, 59, 999);
+
+                if (targetDate >= lunediSettimana && targetDate <= domenicaSettimana) {
+                    return i;
+                }
+            }
+
+            // Fallback se fuori orizzonte temporale
+            const primoLunedi = new Date(dateMap[settimane[0].numero]);
+            if (targetDate < primoLunedi) {
+                return 0;
+            }
+            return settimane.length - 1;
+        }
+
+        function vaiAOggi() {
+            const targetIndex = calcolaIndiceSettimanaCorrente();
+            const dir = targetIndex > settimanaCorrente ? 'next' : targetIndex < settimanaCorrente ? 'prev' : null;
+            settimanaCorrente = targetIndex;
+            aggiornaInterfaccia(dir);
         }
 
         // ============================================
@@ -1290,11 +1433,10 @@ body {
             } catch(e) {}
             document.getElementById('usernameInput').value = currentUser;
 
-            const statusBadge = document.getElementById('syncStatus');
-            statusBadge.textContent = "Connessione...";
+            updateSyncBadges("Connessione...");
 
             if (!db) {
-                statusBadge.textContent = "🔴 Errore DB";
+                updateSyncBadges("🔴 Errore DB");
                 return;
             }
 
@@ -1315,24 +1457,25 @@ body {
                     } else {
                         settimane = Array.isArray(data) ? data : Object.values(data);
                     }
-                    statusBadge.textContent = `🟢 Connesso: ${currentUser}`;
+                    updateSyncBadges(`🟢 ${currentUser}`);
                 } else {
                     settimane = JSON.parse(JSON.stringify(defaultSettimane));
                     salvaSuCloudSilenzioso();
-                    statusBadge.textContent = `🟢 Creato: ${currentUser}`;
+                    updateSyncBadges(`🟢 Creato: ${currentUser}`);
                 }
-                aggiornaInterfaccia();
+                // Posizionamento esatto sulla settimana corrente senza transizioni
+                settimanaCorrente = calcolaIndiceSettimanaCorrente();
+                aggiornaInterfaccia(null);
             }).catch(err => {
                 console.error("Errore fetch Firebase:", err);
-                statusBadge.textContent = "🔴 Errore caricamento";
+                updateSyncBadges("🔴 Errore");
             });
         }
 
         function salvaSuCloudSilenzioso() {
             if (!currentUser || !db) return;
 
-            const statusBadge = document.getElementById('syncStatus');
-            statusBadge.textContent = "Salvataggio...";
+            updateSyncBadges("Salvataggio...");
 
             const payload = {
                 settimane: settimane,
@@ -1343,17 +1486,14 @@ body {
 
             db.ref('utenti/' + currentUser).set(payload)
               .then(() => {
-                  statusBadge.textContent = `🟢 Sincronizzato`;
+                  updateSyncBadges(`🟢 Sincronizzato`);
               })
               .catch(err => {
                   console.error("Errore autosave:", err);
-                  statusBadge.textContent = "🔴 Non salvato";
+                  updateSyncBadges("🔴 Non salvato");
               });
         }
 
-        // ============================================
-        // CONVERSIONI ORARI
-        // ============================================
         function formattaOra(decimalHour) {
             const h = Math.floor(decimalHour);
             const m = Math.round((decimalHour - h) * 60);
@@ -1399,33 +1539,6 @@ body {
             if (t.includes('NEUROLESIONI')) return 'bordo-neuro';
             if (t.includes('MALATTIE APPARATO LOCOMOTORE')) return 'bordo-locomotore';
             return 'bordo-altro';
-        }
-
-        function vaiAOggi() {
-            const oggi = new Date();
-            let trovata = false;
-
-            for (let i = 0; i < settimane.length; i++) {
-                const baseStr = dateMap[settimane[i].numero];
-                if (!baseStr) continue;
-                const lunediSettimana = new Date(baseStr);
-                const domenicaSettimana = new Date(baseStr);
-                domenicaSettimana.setDate(lunediSettimana.getDate() + 6);
-
-                if (oggi >= lunediSettimana && oggi <= domenicaSettimana) {
-                    const dir = i > settimanaCorrente ? 'next' : 'prev';
-                    settimanaCorrente = i;
-                    aggiornaInterfaccia(dir);
-                    trovata = true;
-                    break;
-                }
-            }
-
-            if (!trovata) {
-                const dir = 0 < settimanaCorrente ? 'prev' : null;
-                settimanaCorrente = 0;
-                aggiornaInterfaccia(dir);
-            }
         }
 
         function calcolaLayoutEventi(eventiGiorno) {
@@ -1599,9 +1712,6 @@ body {
             }
         }
 
-        // ============================================
-        // GESTIONE CONVALIDA MODULI (CHECKBOX)
-        // ============================================
         function toggleConvalidaModulo(searchKey, isChecked) {
             if (isChecked) {
                 if (!moduliConvalidati.includes(searchKey)) {
@@ -1619,9 +1729,6 @@ body {
             salvaSuCloudSilenzioso();
         }
 
-        // ============================================
-        // GESTIONE EVIDENZIAZIONE MODULO & SCROLL-SAFE LONG PRESS
-        // ============================================
         function attivaEvidenziazione(searchKey, label) {
             moduloInEvidenza = searchKey;
             const banner = document.getElementById('highlightBanner');
@@ -1652,7 +1759,7 @@ body {
         let pressTimer = null;
         let isLongPressTriggered = false;
         let pressStartCoords = { x: 0, y: 0 };
-        const MOVE_THRESHOLD = 8; // pixel max consentiti: oltre questa soglia è uno scroll, non long-press
+        const MOVE_THRESHOLD = 8; // Pixel di tolleranza: oltre questa soglia viene annullato per evitare conflitti con lo scroll
 
         function startModuloPress(e, searchKey, label) {
             isLongPressTriggered = false;
@@ -1709,13 +1816,12 @@ body {
         function handleEventoClick(e, weekIdx, giorno, eventIdx) {
             if (e) e.stopPropagation();
             
-            // Se si trattava del rilascio dopo un long press a schermo fermo, non procedere
             if (isLongPressTriggered) {
                 isLongPressTriggered = false;
                 return;
             }
 
-            // REQUISITO: Se la modalità evidenziazione è attiva, QUALSIASI short-press nel calendario la disattiva subito
+            // Qualsiasi short press con evidenziazione attiva disattiva il focus immediatamente
             if (moduloInEvidenza) {
                 disattivaEvidenziazione();
                 return;
@@ -1747,9 +1853,6 @@ body {
             });
         }
 
-        // ============================================
-        // RENDER GRAFICO CON TRANSIZIONE VELOCE (120ms)
-        // ============================================
         let isTransitioning = false;
 
         function renderCalendario(animationDirection = null) {
@@ -1887,7 +1990,7 @@ body {
         function gestisciClickDayGrid(event, weekIdx, giorno) {
             if (event.target.closest('.evento')) return;
 
-            // Se l'evidenziazione è attiva, qualsiasi tocco su sfondo vuoto esce dal focus
+            // Se l'evidenziazione è attiva, qualsiasi click su spazio vuoto esce dal focus
             if (moduloInEvidenza) {
                 disattivaEvidenziazione();
                 return;
@@ -1990,9 +2093,6 @@ body {
             updateControls();
         }
 
-        // ============================================
-        // GESTIONE SELEZIONATORE INSEGNAMENTI & MODULI
-        // ============================================
         function onInsegnamentoChange(valoreEsattoPredefinito = null) {
             const insScelto = document.getElementById('editInsegnamento').value;
             const groupModulo = document.getElementById('groupModuloSelect');
@@ -2046,9 +2146,6 @@ body {
             }
         }
 
-        // ============================================
-        // CREAZIONE & MODIFICA EVENTI
-        // ============================================
         let tipoSelezionato = 'normale';
 
         function creaNuovoEvento(e, weekIdx, giorno) {
@@ -2255,9 +2352,6 @@ body {
             link.click();
         }
 
-        // ============================================
-        // INIZIALIZZAZIONE DELL'APPLICAZIONE
-        // ============================================
         function init() {
             const select = document.getElementById('weekSelector');
             select.innerHTML = '';
@@ -2273,6 +2367,9 @@ body {
             initSwipeGestures();
             initKeyboardShortcuts();
 
+            // Calcolo iniziale immediato della settimana corretta
+            settimanaCorrente = calcolaIndiceSettimanaCorrente();
+
             setInterval(() => {
                 renderCalendario();
             }, 60000);
@@ -2281,7 +2378,7 @@ body {
                 document.getElementById('usernameInput').value = currentUser;
                 caricaOCreaProfilo();
             } else {
-                aggiornaInterfaccia();
+                aggiornaInterfaccia(null);
             }
         }
 
