@@ -32,11 +32,11 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.06); 
             overflow: hidden; 
             border: 1px solid #e2e8f0; 
-            display: flex;
-            flex-direction: column;
         }
 
-        /* Header */
+        /* ========================================================
+           HEADER (Comune)
+           ======================================================== */
         .header { 
             background: #ffffff; 
             color: #1e293b; 
@@ -68,7 +68,7 @@
             justify-content: center;
             font-size: 13px;
             font-weight: 700;
-            padding: 4px 8px;
+            padding: 4px 10px;
             border-radius: 20px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -76,60 +76,12 @@
             user-select: none;
             white-space: nowrap;
         }
-        .header-status-indicator.is-offline {
-            color: #dc2626;
-            background: #fef2f2;
-            border-color: #fecaca;
-        }
-        .header-status-indicator.is-online {
-            background: #ecfdf5;
-            border-color: #a7f3d0;
-        }
+        .header-status-indicator.is-offline { color: #dc2626; background: #fef2f2; border-color: #fecaca; }
+        .header-status-indicator.is-online { background: #ecfdf5; border-color: #a7f3d0; }
 
-        /* Barra Utente e Gruppo (Desktop Base) */
-        .user-bar { 
-            background: #f8fafc; 
-            padding: 12px 20px; 
-            border-bottom: 1px solid #e2e8f0; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            gap: 16px; 
-            font-size: 13px; 
-        }
-        .user-bar-left { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            flex: 1;
-        }
-        .user-bar-input-group { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-        }
-        .user-bar-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .user-bar input, .user-bar select, .controls select, .form-group select { 
-            padding: 8px 12px; 
-            border-radius: 8px; 
-            border: 1.5px solid #cbd5e1; 
-            font-size: 13px; 
-            outline: none; 
-            font-weight: 500; 
-            background: #ffffff; 
-            transition: all 0.2s; 
-            font-family: inherit;
-        }
-        .user-bar input:focus, .user-bar select:focus, .controls select:focus, .form-group select:focus {
-            border-color: #7e22ce;
-            box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.12);
-        }
-
-        /* Pulsanti */
+        /* ========================================================
+           PULSANTI E INPUT (Stili condivisi)
+           ======================================================== */
         .btn { 
             padding: 8px 14px; 
             border: none; 
@@ -153,38 +105,36 @@
         .btn-toggle-view:hover { background: #c7d2fe; }
         .btn-sync-merge { background: #0284c7; color: white; font-weight: 600; }
         .btn-sync-merge:hover { background: #0369a1; }
-
-        /* Controlli Settimane e Azioni */
-        .controls { 
-            background: #ffffff; 
-            padding: 12px 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 1px solid #e2e8f0; 
-            flex-wrap: wrap; 
-            gap: 12px; 
-        }
-        .nav-buttons, .action-buttons { 
-            display: flex; 
-            gap: 8px; 
-            align-items: center; 
-            flex-wrap: wrap; 
-        }
-        .btn-nav { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 8px 12px; }
-        .btn-nav:hover:not(:disabled) { background: #e2e8f0; }
-        .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
         .btn-export { background: #10b981; color: white; }
         .btn-export:hover { background: #059669; }
         .btn-reset { background: #ffffff; color: #64748b; border: 1px solid #e2e8f0; }
         .btn-reset:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+        .btn-nav { background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 8px 12px; }
+        .btn-nav:hover:not(:disabled) { background: #e2e8f0; }
+        .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        input[type="text"], select { 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            border: 1.5px solid #cbd5e1; 
+            font-size: 13px; 
+            outline: none; 
+            font-weight: 500; 
+            background: #ffffff; 
+            transition: all 0.2s; 
+            font-family: inherit;
+        }
+        input[type="text"]:focus, select:focus {
+            border-color: #7e22ce;
+            box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.12);
+        }
 
         /* Banner Focus Modulo */
         .highlight-banner {
             display: none;
             background: #fdf4ff;
             border-bottom: 1px solid #f0abfc;
-            padding: 8px 20px;
+            padding: 8px 24px;
             font-size: 12px;
             color: #86198f;
             font-weight: 600;
@@ -203,45 +153,199 @@
             font-weight: 600;
         }
 
-        /* Legenda */
-        .legend { 
-            background: #f8fafc; 
-            padding: 10px 20px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 16px; 
-            flex-wrap: wrap; 
-            border-bottom: 1px solid #e2e8f0; 
-            font-size: 12px; 
-            font-weight: 500; 
-        }
-        .legend-group {
+        /* Stili Legenda */
+        .legend-content {
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
             flex-wrap: wrap;
+            font-size: 12px;
+            font-weight: 500;
         }
-        .legend-divider {
-            width: 1px;
-            height: 16px;
-            background: #cbd5e1;
-        }
+        .legend-group { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .legend-divider { width: 1px; height: 16px; background: #cbd5e1; }
         .legend-item { display: flex; align-items: center; gap: 6px; }
         .legend-box { width: 14px; height: 14px; border-radius: 4px; }
-
         .legend-verde { background: #ecfdf5; border: 1.5px solid #10b981; }
         .legend-giallo { background: #fffbeb; border: 1.5px solid #f59e0b; }
         .legend-grigio { background: #f8fafc; border: 1.5px solid #94a3b8; }
         .legend-altrogruppo { background: #ffffff; border: 1.5px dashed #94a3b8; opacity: 0.6; }
-
         .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
         .dot-patologia { background: #a855f7; }
         .dot-neuro { background: #0284c7; }
         .dot-locomotore { background: #f97316; }
         .dot-altro { background: #64748b; }
 
-        /* Calendario Griglia */
+        /* ========================================================
+           SEZIONE DESKTOP SPECIFICA (≥ 769px)
+           Tutto si trova SOPRA al calendario
+           ======================================================== */
+        @media (min-width: 769px) {
+            .mobile-only-block { display: none !important; }
+            .desktop-only-block { display: block; }
+
+            .user-bar-desktop {
+                background: #f8fafc;
+                padding: 14px 24px;
+                border-bottom: 1px solid #e2e8f0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 16px;
+            }
+            .user-bar-desktop-left { display: flex; align-items: center; gap: 10px; }
+            .user-bar-desktop-left input { width: 260px; }
+            .user-bar-desktop-right { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #475569; }
+            .user-bar-desktop-right select { min-width: 170px; }
+
+            .controls-desktop {
+                background: #ffffff;
+                padding: 14px 24px;
+                border-bottom: 1px solid #e2e8f0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 12px;
+            }
+            .controls-desktop .nav-buttons, .controls-desktop .action-buttons {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .legend-desktop {
+                background: #f8fafc;
+                padding: 10px 24px;
+                border-bottom: 1px solid #e2e8f0;
+            }
+        }
+
+        /* ========================================================
+           SEZIONE MOBILE SPECIFICA (≤ 768px)
+           Barra compatta su 1 riga, pulsanti e legenda SOTTO
+           ======================================================== */
+        @media (max-width: 768px) {
+            .desktop-only-block { display: none !important; }
+            .mobile-only-block { display: block; }
+
+            body { padding: 4px; }
+            .header { padding: 12px 14px; }
+            .header h1 { font-size: 1.05rem; }
+            .header-logo { width: 34px; height: 34px; }
+
+            /* Barra Utente Mobile: 1 riga esatta */
+            .user-bar-mobile {
+                background: #f8fafc;
+                padding: 8px 10px;
+                border-bottom: 1px solid #e2e8f0;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 6px;
+                flex-wrap: nowrap;
+            }
+            .user-bar-mobile-left {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                flex: 1;
+                min-width: 0;
+            }
+            .user-bar-mobile-left input {
+                flex: 1;
+                min-width: 0;
+                padding: 7px 8px;
+                font-size: 12px;
+            }
+            .user-bar-mobile-left .btn-user {
+                padding: 7px 10px;
+                font-size: 12px;
+                flex-shrink: 0;
+            }
+            .user-bar-mobile-right {
+                flex-shrink: 0;
+            }
+            .user-bar-mobile-right select {
+                width: 128px;
+                padding: 7px 6px;
+                font-size: 12px;
+            }
+
+            /* Navigazione settimane mobile sopra il calendario */
+            .nav-mobile-bar {
+                background: #ffffff;
+                padding: 8px 10px;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            .nav-buttons-mobile {
+                width: 100%;
+                display: grid;
+                grid-template-columns: auto auto 1fr auto;
+                gap: 5px;
+            }
+            .nav-buttons-mobile select { width: 100%; min-width: 0; padding: 7px; font-size: 12px; }
+            .nav-buttons-mobile .btn { padding: 7px 10px; font-size: 12px; }
+
+            /* Pulsanti d'azione mobile SOTTO il calendario */
+            .action-buttons-mobile {
+                background: #ffffff;
+                padding: 10px;
+                border-bottom: 1px solid #e2e8f0;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            .action-buttons-mobile .btn {
+                justify-content: center;
+                width: 100%;
+                padding: 8px 4px;
+                font-size: 11.5px;
+            }
+
+            /* Legenda mobile SOTTO i pulsanti */
+            .legend-mobile {
+                background: #f8fafc;
+                padding: 8px 10px;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            .legend-mobile .legend-content {
+                gap: 8px;
+                justify-content: flex-start;
+                font-size: 11px;
+            }
+            .legend-mobile .legend-divider { display: none; }
+
+            .stats-container { padding: 14px; }
+            .insegnamento-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+            .calendar-container.vista-compatta .calendar { 
+                min-width: 100% !important; 
+                width: 100% !important; 
+                grid-template-columns: 36px repeat(5, 1fr) !important; 
+            }
+            .calendar-container.vista-compatta .time-column { width: 36px !important; }
+            .calendar-container.vista-compatta .time-header { font-size: 9px; padding: 10px 2px; }
+            .calendar-container.vista-compatta .time-slot { font-size: 9px; padding-right: 3px; justify-content: center; }
+            .calendar-container.vista-compatta .day-name { font-size: 9px; }
+            .calendar-container.vista-compatta .day-number { font-size: 12px; width: 22px; height: 22px; }
+            .calendar-container.vista-compatta .evento { padding: 3px 2px; border-left-width: 3px !important; border-radius: 4px; }
+            .calendar-container.vista-compatta .evento-title { font-size: 9.5px; line-height: 1.15; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+            .calendar-container.vista-compatta .evento-time { font-size: 8.5px; margin-top: 1px; }
+            .calendar-container.vista-compatta .evento-docente { display: none; }
+
+            .calendar-container.vista-espansa .calendar { 
+                min-width: 900px !important; 
+                width: 900px !important; 
+                grid-template-columns: 55px repeat(5, minmax(165px, 1fr)) !important; 
+            }
+            .calendar-container.vista-espansa .time-slot { font-size: 10px; padding-right: 4px; }
+            .calendar-container.vista-espansa .evento { font-size: 10px; padding: 5px; }
+        }
+
+        /* ========================================================
+           CALENDARIO & GRIGLIA
+           ======================================================== */
         .calendar-container { 
             background: #ffffff; 
             overflow-x: auto; 
@@ -428,7 +532,6 @@
         }
         .evento-altrogruppo:hover, .evento-convalidato:hover { opacity: 0.75 !important; }
 
-        /* Focus Modulo */
         .calendar.has-highlight .evento { opacity: 0.22; filter: grayscale(40%); }
         .calendar.has-highlight .evento.evento-in-focus {
             opacity: 1 !important;
@@ -439,28 +542,10 @@
         }
 
         /* Statistiche */
-        .stats-container { 
-            background: #ffffff; 
-            padding: 24px; 
-            border-top: 1px solid #e2e8f0; 
-        }
+        .stats-container { background: #ffffff; padding: 24px; border-top: 1px solid #e2e8f0; }
         .stats-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
-        .insegnamento { 
-            border: 1px solid #e2e8f0; 
-            border-radius: 12px; 
-            margin-bottom: 12px; 
-            overflow: hidden; 
-            background: #ffffff; 
-        }
-        .insegnamento-header { 
-            background: #ffffff; 
-            padding: 14px 18px; 
-            cursor: pointer; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            transition: background 0.15s; 
-        }
+        .insegnamento { border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; overflow: hidden; background: #ffffff; }
+        .insegnamento-header { background: #ffffff; padding: 14px 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; }
         .insegnamento-header:hover { background: #f8fafc; }
         .insegnamento-info { display: flex; align-items: center; gap: 12px; }
         .insegnamento-arrow { font-size: 14px; transition: transform 0.2s; color: #94a3b8; }
@@ -476,14 +561,7 @@
         .moduli-container { padding: 14px 20px; background: #faf5ff; border-top: 1px solid #f1f5f9; display: none; }
         .moduli-container.visible { display: block; }
 
-        .modulo { 
-            padding: 10px 12px; 
-            border-bottom: 1px solid #f3e8ff; 
-            border-radius: 8px; 
-            transition: all 0.2s; 
-            user-select: none; 
-            -webkit-user-select: none; 
-        }
+        .modulo { padding: 10px 12px; border-bottom: 1px solid #f3e8ff; border-radius: 8px; transition: all 0.2s; user-select: none; -webkit-user-select: none; }
         .modulo:hover { background: rgba(126, 34, 206, 0.04); }
         .modulo.modulo-selected { background: #f3e8ff; border: 1px solid #c084fc; }
         .modulo:last-child { border-bottom: none; }
@@ -509,14 +587,7 @@
             border: 1px solid #ddd6fe;
         }
         .convalida-label input { cursor: pointer; }
-        .badge-convalidato {
-            font-size: 10px;
-            background: #e9d5ff;
-            color: #6b21a8;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 700;
-        }
+        .badge-convalidato { font-size: 10px; background: #e9d5ff; color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
 
         /* Modali */
         .modal-overlay { 
@@ -558,14 +629,7 @@
         .form-group input:focus, .form-group select:focus { border-color: #7e22ce; outline: none; }
         .form-row { display: flex; gap: 10px; }
 
-        .modal-footer { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-top: 20px; 
-            padding-top: 15px; 
-            border-top: 1px solid #f1f5f9; 
-        }
+        .modal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f1f5f9; }
         .modal-footer-right { display: flex; align-items: center; gap: 8px; }
         .btn-delete { background: #fee2e2; color: #dc2626; border: none; padding: 9px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
         .btn-cancel-modal { background: #f1f5f9; color: #475569; border: 1.5px solid #cbd5e1; padding: 9px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
@@ -585,138 +649,11 @@
         }
         .conflict-list li { margin-bottom: 8px; line-height: 1.35; margin-left: 18px; }
         .conflict-list li:last-child { margin-bottom: 0; }
-
-        /* ========================================================
-           RESPONSIVE MOBILE SPECIFICO (≤ 768px)
-           ======================================================== */
-        @media (max-width: 768px) {
-            body { padding: 4px; }
-            .header { padding: 12px 14px; }
-            .header h1 { font-size: 1.05rem; }
-            .header-logo { width: 34px; height: 34px; }
-
-            /* Barra Utente Mobile: 1 sola riga (textbox + carica + gruppo a dx) */
-            .user-bar { 
-                padding: 8px 10px;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 6px;
-                flex-wrap: nowrap;
-            }
-            .user-bar-left {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 6px;
-                flex: 1;
-                min-width: 0;
-            }
-            .user-bar-input-group {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 6px;
-                flex: 1;
-                min-width: 0;
-            }
-            #usernameInput {
-                flex: 1;
-                min-width: 0;
-                padding: 7px 8px;
-                font-size: 12px;
-            }
-            .btn-user {
-                padding: 7px 10px;
-                font-size: 12px;
-                flex-shrink: 0;
-            }
-            .user-bar-right {
-                flex-shrink: 0;
-            }
-            .user-bar-right select {
-                width: 126px;
-                padding: 7px 6px;
-                font-size: 12px;
-            }
-
-            /* Ordinamento Flex: Spostamento pulsanti orario e legenda sotto al calendario */
-            .header { order: 1; }
-            .user-bar { order: 2; }
-            .controls { order: 3; }
-            .highlight-banner { order: 4; }
-            .calendar-container { order: 5; }
-            .action-buttons-mobile-box { order: 6; }
-            .legend { order: 7; }
-            .stats-container { order: 8; }
-
-            .controls { 
-                padding: 8px 10px; 
-                flex-direction: column; 
-                gap: 6px; 
-            }
-            .nav-buttons { 
-                width: 100%; 
-                display: grid; 
-                grid-template-columns: auto auto 1fr auto; 
-                gap: 5px; 
-            }
-            .nav-buttons select { width: 100%; min-width: 0; padding: 7px; font-size: 12px; }
-            .btn-today, .btn-nav { padding: 7px 10px; font-size: 12px; }
-
-            /* Box azioni spostato sotto */
-            .action-buttons-mobile-box {
-                background: #ffffff;
-                padding: 10px;
-                border-bottom: 1px solid #e2e8f0;
-            }
-            .action-buttons { 
-                width: 100%; 
-                display: grid; 
-                grid-template-columns: 1fr 1fr; 
-                gap: 6px; 
-            }
-            .action-buttons .btn { 
-                justify-content: center; 
-                width: 100%; 
-                padding: 8px 4px; 
-                font-size: 11.5px; 
-            }
-
-            .legend { gap: 8px; justify-content: flex-start; padding: 8px 10px; font-size: 11px; }
-            .legend-divider { display: none; }
-
-            .calendar-container.vista-compatta .calendar { 
-                min-width: 100% !important; 
-                width: 100% !important; 
-                grid-template-columns: 36px repeat(5, 1fr) !important; 
-            }
-            .calendar-container.vista-compatta .time-column { width: 36px !important; }
-            .calendar-container.vista-compatta .time-header { font-size: 9px; padding: 10px 2px; }
-            .calendar-container.vista-compatta .time-slot { font-size: 9px; padding-right: 3px; justify-content: center; }
-            .calendar-container.vista-compatta .day-name { font-size: 9px; }
-            .calendar-container.vista-compatta .day-number { font-size: 12px; width: 22px; height: 22px; }
-            .calendar-container.vista-compatta .evento { padding: 3px 2px; border-left-width: 3px !important; border-radius: 4px; }
-            .calendar-container.vista-compatta .evento-title { font-size: 9.5px; line-height: 1.15; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-            .calendar-container.vista-compatta .evento-time { font-size: 8.5px; margin-top: 1px; }
-            .calendar-container.vista-compatta .evento-docente { display: none; }
-
-            .calendar-container.vista-espansa .calendar { 
-                min-width: 900px !important; 
-                width: 900px !important; 
-                grid-template-columns: 55px repeat(5, minmax(165px, 1fr)) !important; 
-            }
-            .calendar-container.vista-espansa .time-slot { font-size: 10px; padding-right: 4px; }
-            .calendar-container.vista-espansa .evento { font-size: 10px; padding: 5px; }
-
-            .stats-container { padding: 14px; }
-            .insegnamento-header { flex-direction: column; align-items: flex-start; gap: 8px; }
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
+        <!-- Header Comune -->
         <div class="header">
             <div class="header-title-box">
                 <div class="header-logo">
@@ -729,81 +666,146 @@
                 </div>
                 <h1>Calendario Fisioterapia 2026-2027</h1>
             </div>
-            <!-- Pallino indicatore in alto a destra -->
             <div class="header-status-indicator is-offline" id="headerStatusDot" title="Non connesso">
                 🔴 off
             </div>
         </div>
 
-        <!-- Barra Profilo e Filtro Gruppo -->
-        <div class="user-bar">
-            <div class="user-bar-left">
-                <div class="user-bar-input-group">
-                    <input type="text" id="usernameInput" placeholder="Nome utente (es. mario_rossi)">
+        <!-- ========================================================
+             1. BLOCCO DESKTOP (Mostrato solo su Desktop ≥ 769px)
+             Tutto prima del calendario: Barra utente, Controlli + Azioni, Legenda
+             ======================================================== -->
+        <div class="desktop-only-block">
+            <!-- Barra Utente Desktop -->
+            <div class="user-bar-desktop">
+                <div class="user-bar-desktop-left">
+                    <input type="text" class="input-username" placeholder="Nome utente (es. mario_rossi)">
                     <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica o crea profilo">Carica</button>
                 </div>
+                <div class="user-bar-desktop-right">
+                    <span>Gruppo:</span>
+                    <select class="select-group" onchange="cambiaGruppo(this.value)">
+                        <option value="ALL">Scegli Gruppo</option>
+                        <option value="ALL">Tutti i Gruppi</option>
+                        <option value="A">Gruppo A</option>
+                        <option value="B">Gruppo B</option>
+                        <option value="C">Gruppo C</option>
+                        <option value="D">Gruppo D</option>
+                    </select>
+                </div>
             </div>
-            <div class="user-bar-right">
-                <select id="groupSelector" onchange="cambiaGruppo()">
-                    <option value="ALL">Scegli Gruppo</option>
-                    <option value="ALL">Tutti i Gruppi</option>
-                    <option value="A">Gruppo A</option>
-                    <option value="B">Gruppo B</option>
-                    <option value="C">Gruppo C</option>
-                    <option value="D">Gruppo D</option>
-                </select>
+
+            <!-- Controlli Settimane e Azioni Desktop -->
+            <div class="controls-desktop">
+                <div class="nav-buttons">
+                    <button class="btn btn-today" onclick="vaiAOggi()" title="Vai alla settimana odierna">Oggi</button>
+                    <button class="btn btn-nav btn-prev-week" onclick="prevWeek()">◀</button>
+                    <select class="week-selector-input" onchange="changeWeek(this.value)"></select>
+                    <button class="btn btn-nav btn-next-week" onclick="nextWeek()">▶</button>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-sync-merge" onclick="avviaSmartMerge()">🔄 Sincronizza Orario</button>
+                    <button class="btn btn-toggle-view" onclick="toggleVistaMobile()">📐 Espandi</button>
+                    <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
+                    <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset Totale</button>
+                </div>
+            </div>
+
+            <!-- Legenda Desktop -->
+            <div class="legend-desktop">
+                <div class="legend-content">
+                    <div class="legend-group">
+                        <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
+                        <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
+                        <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
+                        <div class="legend-item"><div class="legend-box legend-altrogruppo"></div><span>👥 Altro Gruppo / Convalidato</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <div class="legend-item"><span class="legend-dot dot-patologia"></span><span>Patologia Gen.</span></div>
+                        <div class="legend-item"><span class="legend-dot dot-neuro"></span><span>Neurolesioni</span></div>
+                        <div class="legend-item"><span class="legend-dot dot-locomotore"></span><span>App. Locomotore</span></div>
+                        <div class="legend-item"><span class="legend-dot dot-altro"></span><span>Altro</span></div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Controlli Settimane -->
-        <div class="controls">
-            <div class="nav-buttons">
-                <button class="btn btn-today" onclick="vaiAOggi()" title="Vai alla settimana con il giorno odierno">Oggi</button>
-                <button class="btn btn-nav" id="btnPrev" onclick="prevWeek()">◀</button>
-                <select id="weekSelector" onchange="changeWeek()"></select>
-                <button class="btn btn-nav" id="btnNext" onclick="nextWeek()">▶</button>
+        <!-- ========================================================
+             2. BLOCCO MOBILE SUPERIORE (Mostrato solo su Mobile ≤ 768px)
+             Barra compattissima a 1 riga + nav settimane
+             ======================================================== -->
+        <div class="mobile-only-block">
+            <div class="user-bar-mobile">
+                <div class="user-bar-mobile-left">
+                    <input type="text" class="input-username" placeholder="Nome utente">
+                    <button class="btn btn-user" onclick="caricaOCreaProfilo()">Carica</button>
+                </div>
+                <div class="user-bar-mobile-right">
+                    <select class="select-group" onchange="cambiaGruppo(this.value)">
+                        <option value="ALL">Scegli Gruppo</option>
+                        <option value="ALL">Tutti i Gruppi</option>
+                        <option value="A">Gruppo A</option>
+                        <option value="B">Gruppo B</option>
+                        <option value="C">Gruppo C</option>
+                        <option value="D">Gruppo D</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="nav-mobile-bar">
+                <div class="nav-buttons-mobile">
+                    <button class="btn btn-today" onclick="vaiAOggi()">Oggi</button>
+                    <button class="btn btn-nav btn-prev-week" onclick="prevWeek()">◀</button>
+                    <select class="week-selector-input" onchange="changeWeek(this.value)"></select>
+                    <button class="btn btn-nav btn-next-week" onclick="nextWeek()">▶</button>
+                </div>
             </div>
         </div>
 
-        <!-- Banner Focus Modulo -->
+        <!-- Banner Focus Modulo (Comune) -->
         <div class="highlight-banner" id="highlightBanner">
             <span id="highlightBannerText">🔍 Evidenziazione attiva per: ...</span>
             <button class="btn-clear-highlight" onclick="disattivaEvidenziazione()">Mostra tutto</button>
         </div>
 
-        <!-- Vista Calendario -->
+        <!-- Vista Calendario (Comune) -->
         <div class="calendar-container vista-compatta" id="calendarContainer">
             <div class="calendar" id="calendar"></div>
         </div>
 
-        <!-- Blocco Azioni (Sotto al calendario su mobile) -->
-        <div class="action-buttons-mobile-box">
-            <div class="action-buttons">
-                <button class="btn btn-sync-merge" onclick="avviaSmartMerge()" title="Confronta e aggiorna il calendario preservando le tue personalizzazioni">🔄 Sincronizza Orario</button>
-                <button class="btn btn-toggle-view" id="btnToggleView" onclick="toggleVistaMobile()">📐 Espandi</button>
+        <!-- ========================================================
+             3. BLOCCO MOBILE INFERIORE (Mostrato solo su Mobile ≤ 768px)
+             I 4 pulsanti e la legenda posizionati SOTTO al calendario
+             ======================================================== -->
+        <div class="mobile-only-block">
+            <div class="action-buttons-mobile">
+                <button class="btn btn-sync-merge" onclick="avviaSmartMerge()">🔄 Sincronizza Orario</button>
+                <button class="btn btn-toggle-view" onclick="toggleVistaMobile()">📐 Espandi</button>
                 <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
                 <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset Totale</button>
             </div>
+
+            <div class="legend-mobile">
+                <div class="legend-content">
+                    <div class="legend-group">
+                        <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
+                        <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
+                        <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
+                        <div class="legend-item"><div class="legend-box legend-altrogruppo"></div><span>👥 Altro Gruppo / Convalidato</span></div>
+                    </div>
+                    <div class="legend-divider"></div>
+                    <div class="legend-group">
+                        <div class="legend-item"><span class="legend-dot dot-patologia"></span><span>Patologia Gen.</span></div>
+                        <div class="legend-item"><span class="legend-dot dot-neuro"></span><span>Neurolesioni</span></div>
+                        <div class="legend-item"><span class="legend-dot dot-locomotore"></span><span>App. Locomotore</span></div>
+                        <div class="legend-item"><span class="legend-dot dot-altro"></span><span>Altro</span></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Legenda (Sotto ai pulsanti su mobile) -->
-        <div class="legend">
-            <div class="legend-group">
-                <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
-                <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️️ Obbligatoria</span></div>
-                <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
-                <div class="legend-item"><div class="legend-box legend-altrogruppo"></div><span>👥 Altro Gruppo / Convalidato</span></div>
-            </div>
-            <div class="legend-divider"></div>
-            <div class="legend-group">
-                <div class="legend-item"><span class="legend-dot dot-patologia"></span><span>Patologia Gen.</span></div>
-                <div class="legend-item"><span class="legend-dot dot-neuro"></span><span>Neurolesioni</span></div>
-                <div class="legend-item"><span class="legend-dot dot-locomotore"></span><span>App. Locomotore</span></div>
-                <div class="legend-item"><span class="legend-dot dot-altro"></span><span>Altro</span></div>
-            </div>
-        </div>
-
-        <!-- Statistiche / Progressi -->
+        <!-- Statistiche / Progressi (Comune) -->
         <div class="stats-container">
             <h3 class="stats-title">📊 Piano Frequenza Personalizzato</h3>
             <p style="font-size:12px; color:#64748b; margin-bottom:14px; text-align:center;">
@@ -893,7 +895,7 @@
             </p>
             <ul class="conflict-list" id="conflictList"></ul>
             <p style="font-size:12px; color:#64748b;">
-                Scegliendo "Aggiorna comunque", le lezioni ufficiali verranno allineate al nuovo orario, mantenendo comunque le lezioni extra inserite da te e le tue preferenze di frequenza dove possibile.
+                Scegliendo "Aggiorna comunque", le lezioni ufficiali verranno allineate al nuovo orario, mantenendo comunque le tue preferenze dove possibile.
             </p>
             <div class="modal-footer">
                 <button type="button" class="btn btn-reset" onclick="chiudiModalConflitti()">Annulla</button>
@@ -1232,14 +1234,22 @@
             }
         }
 
-        // Calcolo settimana corrente all'avvio
+        // Sincronizza i campi input tra desktop e mobile
+        function syncInputsToUI() {
+            document.querySelectorAll('.input-username').forEach(el => el.value = currentUser);
+            document.querySelectorAll('.select-group').forEach(el => el.value = gruppoSelezionato);
+            document.querySelectorAll('.week-selector-input').forEach(el => el.value = settimanaCorrente);
+            document.querySelectorAll('.btn-prev-week').forEach(el => el.disabled = (settimanaCorrente === 0));
+            document.querySelectorAll('.btn-next-week').forEach(el => el.disabled = (settimanaCorrente === settimane.length - 1));
+        }
+
         function calcolaIndiceSettimanaCorrente() {
             const adesso = new Date();
-            const giornoSettimana = adesso.getDay(); // 0 = domenica, 1 = lunedì, ..., 6 = sabato
+            const giornoSettimana = adesso.getDay(); // 0 = dom, 1 = lun, ..., 6 = sab
 
             let targetDate = new Date(adesso);
             if (giornoSettimana === 0) {
-                targetDate.setDate(targetDate.getDate() + 1); // se domenica, salta alla settimana che inizia domani
+                targetDate.setDate(targetDate.getDate() + 1);
             }
 
             for (let i = 0; i < settimane.length; i++) {
@@ -1255,7 +1265,6 @@
                 }
             }
 
-            // Fallback: se precedente alla prima settimana -> 0; se successiva -> ultima
             const primaData = new Date(dateMap[settimane[0].numero]);
             if (targetDate < primaData) return 0;
             return settimane.length - 1;
@@ -1263,25 +1272,23 @@
 
         function toggleVistaMobile() {
             const container = document.getElementById('calendarContainer');
-            const btn = document.getElementById('btnToggleView');
+            const btns = document.querySelectorAll('.btn-toggle-view');
             if (container.classList.contains('vista-compatta')) {
                 container.classList.remove('vista-compatta');
                 container.classList.add('vista-espansa');
-                btn.textContent = '📐 Compatta';
+                btns.forEach(b => b.textContent = '📐 Compatta');
             } else {
                 container.classList.remove('vista-espansa');
                 container.classList.add('vista-compatta');
-                btn.textContent = '📐 Espandi';
+                btns.forEach(b => b.textContent = '📐 Espandi');
             }
         }
 
-        // Swipe rapido tra settimane su mobile
         let touchStartX = 0;
         let touchStartY = 0;
 
         function initSwipeGestures() {
             const container = document.getElementById('calendarContainer');
-            
             container.addEventListener('touchstart', (e) => {
                 touchStartX = e.changedTouches[0].screenX;
                 touchStartY = e.changedTouches[0].screenY;
@@ -1289,12 +1296,8 @@
 
             container.addEventListener('touchend', (e) => {
                 if (!container.classList.contains('vista-compatta')) return;
-
-                const touchEndX = e.changedTouches[0].screenX;
-                const touchEndY = e.changedTouches[0].screenY;
-                const diffX = touchEndX - touchStartX;
-                const diffY = touchEndY - touchStartY;
-
+                const diffX = e.changedTouches[0].screenX - touchStartX;
+                const diffY = e.changedTouches[0].screenY - touchStartY;
                 if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY)) {
                     if (diffX < 0) nextWeek();
                     else prevWeek();
@@ -1302,11 +1305,9 @@
             }, { passive: true });
         }
 
-        // Filtro gruppi
         function appartieneAlGruppo(evento, gruppoTarget) {
             if (gruppoTarget === 'ALL') return true;
             const text = ((evento.docente || '') + ' ' + (evento.titolo || '')).toUpperCase();
-            
             if (!text.includes('GRUPPO') && !text.includes('GRUPPI')) return true;
 
             if (gruppoTarget === 'A') return text.includes('GRUPPO A') || text.includes('GRUPPI A') || text.includes('A/B');
@@ -1316,16 +1317,20 @@
             return true;
         }
 
-        function cambiaGruppo() {
-            gruppoSelezionato = document.getElementById('groupSelector').value;
+        function cambiaGruppo(valore) {
+            gruppoSelezionato = valore || 'ALL';
             try { localStorage.setItem('currentGroup_fisioterapia', gruppoSelezionato); } catch(e) {}
+            syncInputsToUI();
             aggiornaInterfaccia();
             salvaSuCloudSilenzioso();
         }
 
-        // Cloud Firebase
         function caricaOCreaProfilo() {
-            const inputVal = document.getElementById('usernameInput').value;
+            let inputVal = '';
+            document.querySelectorAll('.input-username').forEach(el => {
+                if (el.value.trim()) inputVal = el.value.trim();
+            });
+
             const sanitized = sanitizeUsername(inputVal);
             if (!sanitized) {
                 alert("Inserisci un nome utente valido.");
@@ -1333,10 +1338,9 @@
             }
             currentUser = sanitized;
             try { localStorage.setItem('currentUser_fisioterapia', currentUser); } catch(e) {}
-            document.getElementById('usernameInput').value = currentUser;
+            syncInputsToUI();
 
             updateHeaderDot('syncing', 'Connessione al profilo...');
-
             if (!db) {
                 updateHeaderDot('offline', 'Database non connesso');
                 return;
@@ -1349,7 +1353,6 @@
                         settimane = Array.isArray(data.settimane) ? data.settimane : Object.values(data.settimane);
                         if (data.gruppo) {
                             gruppoSelezionato = data.gruppo;
-                            document.getElementById('groupSelector').value = gruppoSelezionato;
                             try { localStorage.setItem('currentGroup_fisioterapia', gruppoSelezionato); } catch(e) {}
                         }
                         if (data.convalidati) {
@@ -1365,6 +1368,7 @@
                     salvaSuCloudSilenzioso();
                     updateHeaderDot('online', `Nuovo profilo creato: ${currentUser}`);
                 }
+                syncInputsToUI();
                 aggiornaInterfaccia();
             }).catch(err => {
                 console.error("Errore Firebase:", err);
@@ -1374,7 +1378,6 @@
 
         function salvaSuCloudSilenzioso() {
             if (!currentUser || !db) return;
-
             updateHeaderDot('syncing', 'Salvataggio in corso...');
 
             const payload = {
@@ -1454,10 +1457,7 @@
             if (!eventiGiorno || eventiGiorno.length === 0) return [];
 
             const items = eventiGiorno.map((ev, originalIndex) => ({
-                ev,
-                originalIndex,
-                start: ev.oraInizio,
-                end: ev.oraFine
+                ev, originalIndex, start: ev.oraInizio, end: ev.oraFine
             }));
 
             items.sort((a, b) => (a.start - b.start) || ((b.end - b.start) - (a.end - a.start)));
@@ -1523,20 +1523,17 @@
             } else {
                 moduliConvalidati = moduliConvalidati.filter(k => k !== searchKey);
             }
-
             try { localStorage.setItem('convalidati_fisioterapia', JSON.stringify(moduliConvalidati)); } catch(e) {}
             aggiornaInterfaccia();
             salvaSuCloudSilenzioso();
         }
 
-        // ============================================
-        // GESTIONE FOCUS MODULO & LONG-PRESS ANTI-SCROLL
-        // ============================================
+        // Focus Modulo & Long-Press Anti-Scroll
         let pressTimer = null;
         let isLongPressTriggered = false;
         let pressOriginX = 0;
         let pressOriginY = 0;
-        const MOVE_THRESHOLD = 8; // tolleranza massima di 8px per non scambiare lo scroll con un long press
+        const MOVE_THRESHOLD = 8;
 
         function estraiModuloSearchKey(titolo) {
             const t = (titolo || '').toUpperCase();
@@ -1592,10 +1589,7 @@
                 curY = e.clientY;
             }
 
-            const dx = Math.abs(curX - pressOriginX);
-            const dy = Math.abs(curY - pressOriginY);
-
-            if (dx > MOVE_THRESHOLD || dy > MOVE_THRESHOLD) {
+            if (Math.abs(curX - pressOriginX) > MOVE_THRESHOLD || Math.abs(curY - pressOriginY) > MOVE_THRESHOLD) {
                 cancelAntiScrollPress();
             }
         }
@@ -1617,7 +1611,6 @@
             }
         }
 
-        // Render Calendario
         let isTransitioning = false;
 
         function renderCalendario(animationDirection = null) {
@@ -1807,7 +1800,7 @@
                                 ${isConvalidato ? '<span class="badge-convalidato">🎓 Convalidato</span>' : ''}
                             </div>
                             <div class="modulo-stats">
-                                <label class="convalida-label" onclick="event.stopPropagation();" title="Se convalidato, le lezioni diventano trasparenti e non contano">
+                                <label class="convalida-label" onclick="event.stopPropagation();" title="Se convalidato, le lezioni non contano">
                                     <input type="checkbox" ${isConvalidato ? 'checked' : ''} onchange="toggleConvalidaModulo('${mod.searchKey}', this.checked)">
                                     Convalida
                                 </label>
@@ -1834,7 +1827,7 @@
         function aggiornaInterfaccia(animationDirection = null) {
             renderCalendario(animationDirection);
             renderInsegnamenti();
-            updateControls();
+            syncInputsToUI();
         }
 
         function onInsegnamentoChange(valoreEsattoPredefinito = null) {
@@ -1889,13 +1882,11 @@
             }
         }
 
-        // Creazione ed Editing Lezioni
         let tipoSelezionato = 'normale';
 
         function creaNuovoEvento(e, weekIdx, giorno) {
             if (e.target.closest('.evento')) return;
 
-            // Se l'evidenziazione era attiva, un tocco sul calendario la disattiva
             if (moduloInEvidenza) {
                 disattivaEvidenziazione();
                 return;
@@ -1936,7 +1927,6 @@
                 return;
             }
 
-            // Se è attiva l'evidenziazione, qualsiasi tocco breve la annulla
             if (moduloInEvidenza) {
                 disattivaEvidenziazione();
                 return;
@@ -1965,9 +1955,7 @@
         }
 
         function gestisciClickOverlay(e) {
-            if (e.target === document.getElementById('editModal')) {
-                chiudiModale();
-            }
+            if (e.target === document.getElementById('editModal')) chiudiModale();
         }
 
         function impostaStato(tipo) {
@@ -2045,15 +2033,6 @@
             }
         }
 
-        function updateControls() {
-            const btnPrev = document.getElementById('btnPrev');
-            const btnNext = document.getElementById('btnNext');
-            const selector = document.getElementById('weekSelector');
-            if (btnPrev) btnPrev.disabled = settimanaCorrente === 0;
-            if (btnNext) btnNext.disabled = settimanaCorrente === settimane.length - 1;
-            if (selector) selector.value = settimanaCorrente;
-        }
-
         function prevWeek() { 
             if (settimanaCorrente > 0 && !isTransitioning) { 
                 settimanaCorrente--; 
@@ -2068,8 +2047,8 @@
             } 
         }
 
-        function changeWeek() { 
-            const newWeek = parseInt(document.getElementById('weekSelector').value);
+        function changeWeek(val) { 
+            const newWeek = parseInt(val);
             const dir = newWeek > settimanaCorrente ? 'next' : 'prev';
             settimanaCorrente = newWeek; 
             aggiornaInterfaccia(dir); 
@@ -2218,22 +2197,23 @@
             }
         });
 
+        function popolaSelectSettimane() {
+            document.querySelectorAll('.week-selector-input').forEach(select => {
+                select.innerHTML = '';
+                settimane.forEach((s, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.textContent = `W${s.numero} - ${s.periodo}`;
+                    select.appendChild(opt);
+                });
+            });
+        }
+
         // Inizializzazione
         function init() {
-            const select = document.getElementById('weekSelector');
-            select.innerHTML = '';
-            settimane.forEach((s, idx) => {
-                const opt = document.createElement('option');
-                opt.value = idx;
-                opt.textContent = `W${s.numero} - ${s.periodo}`;
-                select.appendChild(opt);
-            });
-
-            document.getElementById('groupSelector').value = gruppoSelezionato;
-
-            // Selezione diretta della settimana corrente senza animazione iniziale
+            popolaSelectSettimane();
             settimanaCorrente = calcolaIndiceSettimanaCorrente();
-
+            syncInputsToUI();
             initSwipeGestures();
 
             setInterval(() => {
@@ -2241,7 +2221,6 @@
             }, 60000);
 
             if (currentUser) {
-                document.getElementById('usernameInput').value = currentUser;
                 caricaOCreaProfilo();
             } else {
                 updateHeaderDot('offline', 'Non connesso');
