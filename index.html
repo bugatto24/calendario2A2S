@@ -830,9 +830,9 @@
         </div>
 
         <!-- Vista Calendario con ID Anchor -->
-       <div class="calendar-container vista-compatta" id="calendarioTarget">
-    <div class="calendar" id="calendar"></div>
-</div>
+        <div class="calendar-container vista-compatta" id="calendarContainer">
+            <div class="calendar" id="calendar"></div>
+        </div>
 
         <!-- Statistiche / Progressi -->
         <div class="stats-container">
@@ -2558,27 +2558,16 @@
         }
 
         // Autoscroll da Mobile sul Calendario
-       function checkMobileAutoScroll() {
-    const isMobile = window.innerWidth <= 768;
-
-    if (isMobile) {
-        if (!window.location.hash) {
-            history.replaceState(null, null, '#calendarioTarget');
-        }
-
-        setTimeout(() => {
-            const cal = document.getElementById('calendar');
-            if (cal) {
-                // Calcola l'offset esatto dell'inizio della barra dei giorni
-                const targetY = cal.getBoundingClientRect().top + window.pageYOffset;
-                window.scrollTo({
-                    top: targetY,
-                    behavior: 'instant'
-                });
+        function checkMobileAutoScroll() {
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    const calElem = document.getElementById('calendarContainer');
+                    if (calElem) {
+                        calElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 150);
             }
-        }, 150);
-    }
-}
+        }
 
         // Inizializzazione
         function init() {
