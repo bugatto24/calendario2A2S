@@ -618,6 +618,11 @@
             width: 100%;
             background: #ffffff;
         }
+        .prof-name-input:disabled {
+            background: transparent;
+            border-color: transparent;
+            padding-left: 0;
+        }
         .prof-genere-select {
             font-size: 11px;
             padding: 3px 6px;
@@ -647,6 +652,12 @@
             border-radius: 6px;
             padding: 6px 8px;
             font-family: inherit;
+        }
+        .prof-edit-input:disabled, .prof-edit-textarea:disabled {
+            background: #f8fafc;
+            color: #334155;
+            border-color: #e2e8f0;
+            cursor: default;
         }
         .prof-edit-textarea {
             width: 100%;
@@ -919,7 +930,7 @@
         </div>
     </div>
 
-    <!-- Modale Scheda Dettagli Docente Condivisa (Editabile in tempo reale) -->
+    <!-- Modale Scheda Dettagli Docente Condivisa (Visualizzazione di default e Modifica con pulsante) -->
     <div class="modal-overlay" id="profModal" onclick="gestisciClickOverlayProf(event)">
         <div class="modal" id="profModalCard">
             <div class="modal-header">
@@ -938,8 +949,8 @@
                     <div class="prof-avatar" id="profAvatar" title="Icona Prof">👨‍🏫</div>
                     <div class="prof-title-info">
                         <div class="prof-modulo-title" id="profModuloTitle">MODULO</div>
-                        <input type="text" class="prof-name-input" id="profNameInput" placeholder="Nome Prof" onchange="aggiornaDatiProfCorrente('nome', this.value)">
-                        <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
+                        <input type="text" class="prof-name-input" id="profNameInput" placeholder="Nome Prof" disabled onchange="aggiornaDatiProfCorrente('nome', this.value)">
+                        <div id="profGenereWrapper" style="display:none; align-items:center; gap:6px; margin-top:4px;">
                             <span style="font-size:11px; color:#64748b; font-weight:600;">Genere:</span>
                             <select class="prof-genere-select" id="profGenereSelect" onchange="aggiornaGenereProfCorrente(this.value)">
                                 <option value="M">Maschio (👨‍🏫)</option>
@@ -951,23 +962,24 @@
 
                 <div class="prof-detail-row">
                     <div class="prof-detail-label">📋 Modalità d'Esame:</div>
-                    <input type="text" class="prof-edit-input" id="profEsameInput" placeholder="Descrivi l'esame..." onchange="aggiornaDatiProfCorrente('esame', this.value)">
+                    <input type="text" class="prof-edit-input" id="profEsameInput" placeholder="Descrivi l'esame..." disabled onchange="aggiornaDatiProfCorrente('esame', this.value)">
                 </div>
 
                 <div class="prof-detail-row">
                     <div class="prof-detail-label">📍 Presenze:</div>
-                    <input type="text" class="prof-edit-input" id="profPresenzeInput" placeholder="Descrivi come prende le presenze..." onchange="aggiornaDatiProfCorrente('presenze', this.value)">
+                    <input type="text" class="prof-edit-input" id="profPresenzeInput" placeholder="Descrivi come prende le presenze..." disabled onchange="aggiornaDatiProfCorrente('presenze', this.value)">
                 </div>
 
                 <div class="prof-detail-row">
                     <div class="prof-detail-label">📝 Note Aggiuntive:</div>
-                    <textarea class="prof-edit-textarea" id="profNotesInput" placeholder="Aggiungi eventuali note..." onchange="aggiornaDatiProfCorrente('note', this.value)"></textarea>
+                    <textarea class="prof-edit-textarea" id="profNotesInput" placeholder="Aggiungi eventuali note..." disabled onchange="aggiornaDatiProfCorrente('note', this.value)"></textarea>
                 </div>
 
                 <div class="prof-page-indicator" id="profPageIndicator">1 di 1</div>
             </div>
 
-            <div class="modal-footer" style="justify-content: flex-end;">
+            <div class="modal-footer" style="justify-content: flex-end; gap: 8px;">
+                <button type="button" class="btn" id="btnToggleEditProf" style="background:#7e22ce; color:white; font-weight:600;" onclick="toggleModificaProf()">✏️ Modifica</button>
                 <button type="button" class="btn-cancel-modal" onclick="chiudiModalProf()">Chiudi</button>
             </div>
         </div>
@@ -992,7 +1004,6 @@
     </div>
 
     <script>
-        // Database Predefinito Informazioni Docenti (Sintassi verificata)
         const defaultProfDatabase = {
             'NEUROLOGIA II': [
                 { nome: 'Bozzali', genere: 'M', esame: '2 domande (scritte risposta aperta?)', presenze: 'Codice', note: 'Domande d’esame: 1 Semeiologia, 2 Patologia' }
@@ -1140,7 +1151,7 @@
                         { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
                     ]
                 }
-            },
+            ],
             {
                 numero: 3, periodo: "12-16 ottobre 2026",
                 eventi: {
@@ -1173,7 +1184,7 @@
                         { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
                     ]
                 }
-            },
+            ],
             {
                 numero: 4, periodo: "19-23 ottobre 2026",
                 eventi: {
@@ -1885,13 +1896,30 @@
             return profs[0].genere === 'F' ? '👩‍🏫' : '👨‍🏫';
         }
 
-        function getProfNamesLowercaseForSearchKey(searchKey) {
-            const profs = getProfListSafe(searchKey);
-            if (!profs || profs.length === 0) return '';
-            const names = profs.map(p => (p.nome || '').trim().toLowerCase()).filter(Boolean);
-            if (names.length === 0) return '';
-            return `(${names.join(', ')})`;
+        // Estrae il docente dichiarato negli eventi del calendario per il modulo
+        function getProfNameFromCalendarForSearchKey(searchKey) {
+    if (!settimane || !Array.isArray(settimane)) return '';
+    try {
+        for (const s of settimane) {
+            if (!s || !s.eventi) continue;
+            for (const g of giorni) {
+                const evs = s.eventi[g] || [];
+                for (const ev of evs) {
+                    if (ev && typeof ev.titolo === 'string' && ev.titolo.toUpperCase().includes(searchKey) && ev.docente) {
+                        let docClean = ev.docente.replace(/^(PROF\.|PROF\b|DOTT\.|DOTT\b|[A-Z]\.\s*)/gi, '').trim();
+                        docClean = docClean.split('(')[0].trim();
+                        if (docClean) {
+                            return `(${docClean.toLowerCase()})`;
+                        }
+                    }
+                }
+            }
         }
+    } catch(e) {
+        console.error("Errore estrazione docente da calendario:", e);
+    }
+    return '';
+}
 
         function renderInsegnamenti() {
             const container = document.getElementById('insegnamentiContainer');
@@ -1932,7 +1960,9 @@
                     const modColor = mod.percentuale >= 70 ? '#16a34a' : mod.percentuale >= 60 ? '#d97706' : '#dc2626';
                     const modColorClass = mod.percentuale >= 70 ? 'percent-ok' : mod.percentuale >= 60 ? 'percent-warn' : 'percent-bad';
                     const iconaProf = getProfIconForSearchKey(mod.searchKey);
-                    const profNamesLower = getProfNamesLowercaseForSearchKey(mod.searchKey);
+                    
+                    // Mostra il docente dichiarato a calendario
+                    const profCalendarName = getProfNameFromCalendarForSearchKey(mod.searchKey);
 
                     html += `<div class="modulo ${isSelected ? 'modulo-selected' : ''}" 
                                   onmousedown="startAntiScrollPress(event, '${mod.searchKey}', '${mod.label}')"
@@ -1948,7 +1978,7 @@
                                 <button type="button" class="btn-prof-icon" onclick="apriProfDaChart(event, '${mod.searchKey}', '${mod.label}')" title="Dettagli e Modifica Prof">${iconaProf}</button>
                                 <div class="modulo-nome-box">
                                     <span class="modulo-nome">${mod.label}</span>
-                                    ${profNamesLower ? `<span class="modulo-prof-name">${profNamesLower}</span>` : ''}
+                                    ${profCalendarName ? `<span class="modulo-prof-name">${profCalendarName}</span>` : ''}
                                 </div>
                                 ${isConvalidato ? '<span class="badge-convalidato">🎓 Convalidato</span>' : ''}
                             </div>
@@ -2234,6 +2264,7 @@
         let currentProfLabel = '';
         let currentProfList = [];
         let currentProfPageIndex = 0;
+        let isProfEditingMode = false;
 
         function initSharedProfSync() {
             if (!db) return;
@@ -2263,6 +2294,7 @@
             currentProfLabel = label;
             currentProfList = getProfListSafe(searchKey);
             currentProfPageIndex = 0;
+            isProfEditingMode = false;
 
             if (currentProfList.length === 0) {
                 currentProfList = [{
@@ -2284,11 +2316,36 @@
 
             document.getElementById('profAvatar').textContent = icon;
             document.getElementById('profModuloTitle').textContent = currentProfLabel || currentProfSearchKey;
-            document.getElementById('profNameInput').value = prof.nome || '';
+            
+            const nameInput = document.getElementById('profNameInput');
+            const esameInput = document.getElementById('profEsameInput');
+            const presenzeInput = document.getElementById('profPresenzeInput');
+            const notesInput = document.getElementById('profNotesInput');
+            const genereWrap = document.getElementById('profGenereWrapper');
+            const btnEdit = document.getElementById('btnToggleEditProf');
+
+            nameInput.value = prof.nome || '';
             document.getElementById('profGenereSelect').value = prof.genere || 'M';
-            document.getElementById('profEsameInput').value = prof.esame || '';
-            document.getElementById('profPresenzeInput').value = prof.presenze || '';
-            document.getElementById('profNotesInput').value = prof.note || '';
+            esameInput.value = prof.esame || '';
+            presenzeInput.value = prof.presenze || '';
+            notesInput.value = prof.note || '';
+
+            // Stato di abilitazione in base a isProfEditingMode
+            nameInput.disabled = !isProfEditingMode;
+            esameInput.disabled = !isProfEditingMode;
+            presenzeInput.disabled = !isProfEditingMode;
+            notesInput.disabled = !isProfEditingMode;
+
+            // Il genere compare solo se in modalità modifica
+            genereWrap.style.display = isProfEditingMode ? 'flex' : 'none';
+
+            if (isProfEditingMode) {
+                btnEdit.textContent = '💾 Fatto';
+                btnEdit.style.background = '#10b981';
+            } else {
+                btnEdit.textContent = '✏️️ Modifica';
+                btnEdit.style.background = '#7e22ce';
+            }
 
             const total = currentProfList.length;
             document.getElementById('btnProfPrev').disabled = (currentProfPageIndex === 0);
@@ -2297,6 +2354,11 @@
             document.getElementById('btnProfPrev').style.display = total > 1 ? 'flex' : 'none';
             document.getElementById('btnProfNext').style.display = total > 1 ? 'flex' : 'none';
             document.getElementById('profPageIndicator').textContent = total > 1 ? `Prof ${currentProfPageIndex + 1} di ${total}` : '';
+        }
+
+        function toggleModificaProf() {
+            isProfEditingMode = !isProfEditingMode;
+            renderProfPage();
         }
 
         function aggiornaDatiProfCorrente(campo, valore) {
@@ -2351,6 +2413,7 @@
         }
 
         function chiudiModalProf() {
+            isProfEditingMode = false;
             document.getElementById('profModal').classList.remove('active');
         }
 
@@ -2557,17 +2620,17 @@
             });
         }
 
-        // Autoscroll da Mobile sul Calendario
+        // Autoscroll preciso su Mobile all'inizio del calendario (linee rosse)
         function checkMobileAutoScroll() {
-            if (window.innerWidth <= 768) {
-                setTimeout(() => {
-                    const calElem = document.getElementById('calendarContainer');
-                    if (calElem) {
-                        calElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }, 150);
+    if (window.innerWidth <= 768) {
+        setTimeout(() => {
+            const calElem = document.getElementById('calendarContainer');
+            if (calElem) {
+                calElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
-        }
+        }, 300);
+    }
+}
 
         // Inizializzazione
         function init() {
