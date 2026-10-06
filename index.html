@@ -438,7 +438,7 @@
         .modulo-left { display: flex; align-items: center; gap: 8px; flex: 1; }
         .modulo-nome-box { display: inline-flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
         .modulo-nome { font-size: 0.88rem; font-weight: 700; color: #334155; text-transform: uppercase; }
-        .modulo-prof-name { font-size: 0.83rem; font-weight: 500; color: #6b21a8; text-transform: lowercase; }
+        .modulo-prof-name { font-size: 0.83rem; font-weight: 500; color: #6b21a8; text-transform: capitalize; }
         .modulo-stats { display: flex; align-items: center; gap: 8px; }
         .modulo-ore { font-size: 0.8rem; color: #64748b; }
         .modulo-percent { font-size: 0.88rem; font-weight: 700; }
@@ -1909,7 +1909,8 @@
                         let docClean = ev.docente.replace(/^(PROF\.|PROF\b|DOTT\.|DOTT\b|[A-Z]\.\s*)/gi, '').trim();
                         docClean = docClean.split('(')[0].trim();
                         if (docClean) {
-                            return `(${docClean.toLowerCase()})`;
+                            const formatted = docClean.charAt(0).toUpperCase() + docClean.slice(1).toLowerCase();
+                            return `(${formatted})`;
                         }
                     }
                 }
