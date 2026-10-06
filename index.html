@@ -37,9 +37,7 @@
             border: 1px solid #e2e8f0; 
         }
 
-        /* ========================================================
-           HEADER (Comune)
-           ======================================================== */
+        /* HEADER */
         .header { 
             background: #ffffff; 
             color: #1e293b; 
@@ -82,9 +80,7 @@
         .header-status-indicator.is-offline { color: #dc2626; background: #fef2f2; border-color: #fecaca; }
         .header-status-indicator.is-online { background: #ecfdf5; border-color: #a7f3d0; }
 
-        /* ========================================================
-           PULSANTI E INPUT (Stili condivisi)
-           ======================================================== */
+        /* PULSANTI E INPUT */
         .btn { 
             padding: 8px 14px; 
             border: none; 
@@ -116,7 +112,7 @@
         .btn-nav:hover:not(:disabled) { background: #e2e8f0; }
         .btn-nav:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        input[type="text"], select { 
+        input[type="text"], select, textarea { 
             padding: 8px 12px; 
             border-radius: 8px; 
             border: 1.5px solid #cbd5e1; 
@@ -127,9 +123,41 @@
             transition: all 0.2s; 
             font-family: inherit;
         }
-        input[type="text"]:focus, select:focus {
+        input[type="text"]:focus, select:focus, textarea:focus {
             border-color: #7e22ce;
             box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.12);
+        }
+
+        /* BARRE SUPERIORI UNIFICATE */
+        .user-bar {
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .user-bar-left { display: flex; align-items: center; gap: 8px; flex: 1; max-width: 420px; }
+        .user-bar-left input { flex: 1; min-width: 140px; }
+        .user-bar-right { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #475569; }
+
+        .controls-top {
+            background: #ffffff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .controls-top .nav-buttons, .controls-top .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         /* Banner Focus Modulo */
@@ -156,7 +184,12 @@
             font-weight: 600;
         }
 
-        /* Stili Legenda */
+        /* Legenda */
+        .legend-bar {
+            background: #f8fafc;
+            padding: 10px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
         .legend-content {
             display: flex;
             justify-content: center;
@@ -180,180 +213,13 @@
         .dot-locomotore { background: #f97316; }
         .dot-altro { background: #64748b; }
 
-        /* ========================================================
-           SEZIONE DESKTOP SPECIFICA (≥ 769px)
-           Tutto si trova SOPRA al calendario
-           ======================================================== */
-        @media (min-width: 769px) {
-            .mobile-only-block { display: none !important; }
-            .desktop-only-block { display: block; }
-
-            .user-bar-desktop {
-                background: #f8fafc;
-                padding: 14px 24px;
-                border-bottom: 1px solid #e2e8f0;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 16px;
-            }
-            .user-bar-desktop-left { display: flex; align-items: center; gap: 10px; }
-            .user-bar-desktop-left input { width: 260px; }
-            .user-bar-desktop-right { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: #475569; }
-            .user-bar-desktop-right select { min-width: 170px; }
-
-            .controls-desktop {
-                background: #ffffff;
-                padding: 14px 24px;
-                border-bottom: 1px solid #e2e8f0;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 12px;
-            }
-            .controls-desktop .nav-buttons, .controls-desktop .action-buttons {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .legend-desktop {
-                background: #f8fafc;
-                padding: 10px 24px;
-                border-bottom: 1px solid #e2e8f0;
-            }
-        }
-
-        /* ========================================================
-           SEZIONE MOBILE SPECIFICA (≤ 768px)
-           Barra compatta su 1 riga, pulsanti e legenda SOTTO
-           ======================================================== */
-        @media (max-width: 768px) {
-            .desktop-only-block { display: none !important; }
-            .mobile-only-block { display: block; }
-
-            body { padding: 4px; }
-            .header { padding: 12px 14px; }
-            .header h1 { font-size: 1.05rem; }
-            .header-logo { width: 34px; height: 34px; }
-
-            /* Barra Utente Mobile: 1 riga esatta */
-            .user-bar-mobile {
-                background: #f8fafc;
-                padding: 8px 10px;
-                border-bottom: 1px solid #e2e8f0;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 6px;
-                flex-wrap: nowrap;
-            }
-            .user-bar-mobile-left {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                flex: 1;
-                min-width: 0;
-            }
-            .user-bar-mobile-left input {
-                flex: 1;
-                min-width: 0;
-                padding: 7px 8px;
-                font-size: 12px;
-            }
-            .user-bar-mobile-left .btn-user {
-                padding: 7px 10px;
-                font-size: 12px;
-                flex-shrink: 0;
-            }
-            .user-bar-mobile-right {
-                flex-shrink: 0;
-            }
-            .user-bar-mobile-right select {
-                width: 128px;
-                padding: 7px 6px;
-                font-size: 12px;
-            }
-
-            /* Navigazione settimane mobile sopra il calendario */
-            .nav-mobile-bar {
-                background: #ffffff;
-                padding: 8px 10px;
-                border-bottom: 1px solid #e2e8f0;
-            }
-            .nav-buttons-mobile {
-                width: 100%;
-                display: grid;
-                grid-template-columns: auto auto 1fr auto;
-                gap: 5px;
-            }
-            .nav-buttons-mobile select { width: 100%; min-width: 0; padding: 7px; font-size: 12px; }
-            .nav-buttons-mobile .btn { padding: 7px 10px; font-size: 12px; }
-
-            /* Pulsanti d'azione mobile SOTTO il calendario */
-            .action-buttons-mobile {
-                background: #ffffff;
-                padding: 10px;
-                border-bottom: 1px solid #e2e8f0;
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 6px;
-            }
-            .action-buttons-mobile .btn {
-                justify-content: center;
-                width: 100%;
-                padding: 8px 4px;
-                font-size: 11.5px;
-            }
-
-            /* Legenda mobile SOTTO i pulsanti */
-            .legend-mobile {
-                background: #f8fafc;
-                padding: 8px 10px;
-                border-bottom: 1px solid #e2e8f0;
-            }
-            .legend-mobile .legend-content {
-                gap: 8px;
-                justify-content: flex-start;
-                font-size: 11px;
-            }
-            .legend-mobile .legend-divider { display: none; }
-
-            .stats-container { padding: 14px; }
-            .insegnamento-header { flex-direction: column; align-items: flex-start; gap: 8px; }
-
-            .calendar-container.vista-compatta .calendar { 
-                min-width: 100% !important; 
-                width: 100% !important; 
-                grid-template-columns: 36px repeat(5, 1fr) !important; 
-            }
-            .calendar-container.vista-compatta .time-column { width: 36px !important; }
-            .calendar-container.vista-compatta .time-header { font-size: 9px; padding: 10px 2px; }
-            .calendar-container.vista-compatta .time-slot { font-size: 9px; padding-right: 3px; justify-content: center; }
-            .calendar-container.vista-compatta .day-name { font-size: 9px; }
-            .calendar-container.vista-compatta .day-number { font-size: 12px; width: 22px; height: 22px; }
-            .calendar-container.vista-compatta .evento { padding: 3px 2px; border-left-width: 3px !important; border-radius: 4px; }
-            .calendar-container.vista-compatta .evento-title { font-size: 9.5px; line-height: 1.15; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-            .calendar-container.vista-compatta .evento-time { font-size: 8.5px; margin-top: 1px; }
-            .calendar-container.vista-compatta .evento-docente { display: none; }
-
-            .calendar-container.vista-espansa .calendar { 
-                min-width: 900px !important; 
-                width: 900px !important; 
-                grid-template-columns: 55px repeat(5, minmax(165px, 1fr)) !important; 
-            }
-            .calendar-container.vista-espansa .time-slot { font-size: 10px; padding-right: 4px; }
-            .calendar-container.vista-espansa .evento { font-size: 10px; padding: 5px; }
-        }
-
-        /* ========================================================
-           CALENDARIO & GRIGLIA
-           ======================================================== */
+        /* CALENDARIO & GRIGLIA */
         .calendar-container { 
             background: #ffffff; 
             overflow-x: auto; 
             position: relative; 
             -webkit-overflow-scrolling: touch; 
+            scroll-margin-top: 0px;
         }
         .calendar-container.vista-compatta { touch-action: pan-y; }
         .calendar-container.vista-espansa { touch-action: auto !important; overflow-x: scroll !important; }
@@ -492,7 +358,7 @@
             border: 1px solid #e2e8f0; 
             border-left-width: 5px !important; 
             user-select: none;
-            -webkit-user-select: none;
+            -webkit-user-select: none; 
         }
         .evento:hover { 
             transform: translateY(-1px); 
@@ -570,7 +436,9 @@
         .modulo:last-child { border-bottom: none; }
         .modulo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
         .modulo-left { display: flex; align-items: center; gap: 8px; flex: 1; }
-        .modulo-nome { font-size: 0.88rem; font-weight: 500; color: #334155; }
+        .modulo-nome-box { display: inline-flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+        .modulo-nome { font-size: 0.88rem; font-weight: 700; color: #334155; text-transform: uppercase; }
+        .modulo-prof-name { font-size: 0.83rem; font-weight: 500; color: #6b21a8; text-transform: lowercase; }
         .modulo-stats { display: flex; align-items: center; gap: 8px; }
         .modulo-ore { font-size: 0.8rem; color: #64748b; }
         .modulo-percent { font-size: 0.88rem; font-weight: 700; }
@@ -592,7 +460,37 @@
         .convalida-label input { cursor: pointer; }
         .badge-convalidato { font-size: 10px; background: #e9d5ff; color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
 
-        /* Modali */
+        /* BOTTONE DOCENTE */
+        .btn-prof-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 2px 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+            line-height: 1;
+            user-select: none;
+        }
+        .btn-prof-icon:hover {
+            background: #f5f3ff;
+            border-color: #a855f7;
+            transform: scale(1.08);
+        }
+
+        .docente-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .docente-input-row input {
+            flex: 1;
+        }
+
+        /* MODALI */
         .modal-overlay { 
             position: fixed; 
             top: 0; 
@@ -616,20 +514,24 @@
             max-width: 480px; 
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); 
             animation: popModal 0.15s ease-out; 
+            position: relative;
         }
         @keyframes popModal { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .modal-header h3 { font-size: 1.15rem; color: #0f172a; font-weight: 700; }
         .btn-close { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #94a3b8; }
+        
         .quick-status-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
         .btn-status-quick { padding: 9px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid transparent; background: #f8fafc; font-family: inherit; }
         .btn-status-quick.active-normale { border-color: #10b981; background: #ecfdf5; color: #065f46; }
         .btn-status-quick.active-obbligatorio { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
         .btn-status-quick.active-saltata { border-color: #94a3b8; background: #f1f5f9; color: #475569; }
+        
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #475569; }
-        .form-group input, .form-group select { width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-family: inherit; }
-        .form-group input:focus, .form-group select:focus { border-color: #7e22ce; outline: none; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13px; font-family: inherit; }
+        .form-group textarea { resize: vertical; min-height: 56px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #7e22ce; outline: none; }
         .form-row { display: flex; gap: 10px; }
 
         .modal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f1f5f9; }
@@ -639,24 +541,217 @@
         .btn-cancel-modal:hover { background: #e2e8f0; }
         .btn-save-modal { background: #7e22ce; color: white; border: none; padding: 9px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
-        .conflict-list {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            border-radius: 8px;
-            padding: 12px 14px;
-            margin: 14px 0;
-            max-height: 240px;
-            overflow-y: auto;
-            font-size: 12px;
-            color: #991b1b;
+        /* SCHEDA DETTAGLI DOCENTE (EDITABILE) */
+        .prof-card-container {
+            position: relative;
+            background: #faf5ff;
+            border: 1px solid #e9d5ff;
+            border-radius: 12px;
+            padding: 16px;
+            min-height: 310px;
+            touch-action: pan-y;
         }
-        .conflict-list li { margin-bottom: 8px; line-height: 1.35; margin-left: 18px; }
-        .conflict-list li:last-child { margin-bottom: 0; }
+        .prof-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ffffff;
+            border: 1.5px solid #c084fc;
+            color: #7e22ce;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 10;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .prof-nav-prev { left: -14px; }
+        .prof-nav-next { right: -14px; }
+        .prof-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: #cbd5e1;
+            color: #94a3b8;
+        }
+        .prof-header-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9d5ff;
+        }
+        .prof-avatar {
+            font-size: 32px;
+            background: #ffffff;
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            border: 1.5px solid #d8b4fe;
+            flex-shrink: 0;
+        }
+        .prof-title-info {
+            flex: 1;
+        }
+        .prof-modulo-title {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        .prof-name-input {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #581c87;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1.5px solid #cbd5e1;
+            width: 100%;
+            background: #ffffff;
+        }
+        .prof-genere-select {
+            font-size: 11px;
+            padding: 3px 6px;
+            border-radius: 6px;
+            margin-top: 4px;
+        }
+        .prof-detail-row {
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.35;
+        }
+        .prof-detail-label {
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
+        .prof-edit-input {
+            width: 100%;
+            font-size: 12.5px;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-family: inherit;
+        }
+        .prof-edit-textarea {
+            width: 100%;
+            font-size: 12.5px;
+            min-height: 48px;
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .prof-page-indicator {
+            text-align: center;
+            font-size: 11px;
+            color: #7e22ce;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .prof-shared-badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        /* RESPONSIVE MOBILE (≤ 768px) */
+        @media (max-width: 768px) {
+            body { padding: 4px; }
+            .header { padding: 12px 14px; }
+            .header h1 { font-size: 1.05rem; }
+            .header-logo { width: 34px; height: 34px; }
+
+            .user-bar {
+                padding: 8px 10px;
+                gap: 6px;
+            }
+            .user-bar-left { max-width: 100%; width: 100%; }
+            .user-bar-left input { font-size: 12px; padding: 6px 8px; }
+            .user-bar-right { width: 100%; justify-content: space-between; }
+            .user-bar-right select { flex: 1; font-size: 12px; padding: 6px 8px; }
+
+            .controls-top {
+                padding: 8px 10px;
+                gap: 8px;
+            }
+            .controls-top .nav-buttons {
+                width: 100%;
+                display: grid;
+                grid-template-columns: auto auto 1fr auto;
+                gap: 4px;
+            }
+            .controls-top .nav-buttons select { width: 100%; font-size: 12px; padding: 6px 4px; }
+            .controls-top .nav-buttons .btn { padding: 6px 8px; font-size: 12px; }
+
+            .controls-top .action-buttons {
+                width: 100%;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 5px;
+            }
+            .controls-top .action-buttons .btn {
+                width: 100%;
+                justify-content: center;
+                padding: 7px 4px;
+                font-size: 11px;
+            }
+
+            .legend-bar { padding: 8px 10px; }
+            .legend-content { gap: 8px; font-size: 11px; justify-content: flex-start; }
+            .legend-divider { display: none; }
+
+            .stats-container { padding: 14px; }
+            .insegnamento-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+            .calendar-container.vista-compatta .calendar { 
+                min-width: 100% !important; 
+                width: 100% !important; 
+                grid-template-columns: 36px repeat(5, 1fr) !important; 
+            }
+            .calendar-container.vista-compatta .time-column { width: 36px !important; }
+            .calendar-container.vista-compatta .time-header { font-size: 9px; padding: 10px 2px; }
+            .calendar-container.vista-compatta .time-slot { font-size: 9px; padding-right: 3px; justify-content: center; }
+            .calendar-container.vista-compatta .day-name { font-size: 9px; }
+            .calendar-container.vista-compatta .day-number { font-size: 12px; width: 22px; height: 22px; }
+            .calendar-container.vista-compatta .evento { padding: 3px 2px; border-left-width: 3px !important; border-radius: 4px; }
+            .calendar-container.vista-compatta .evento-title { font-size: 9.5px; line-height: 1.15; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+            .calendar-container.vista-compatta .evento-time { font-size: 8.5px; margin-top: 1px; }
+            .calendar-container.vista-compatta .evento-docente { display: none; }
+
+            .calendar-container.vista-espansa .calendar { 
+                min-width: 900px !important; 
+                width: 900px !important; 
+                grid-template-columns: 55px repeat(5, minmax(165px, 1fr)) !important; 
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Header Comune -->
+        <!-- Header -->
         <div class="header">
             <div class="header-title-box">
                 <div class="header-logo">
@@ -674,145 +769,76 @@
             </div>
         </div>
 
-        <!-- ========================================================
-             1. BLOCCO DESKTOP (Mostrato solo su Desktop ≥ 769px)
-             Tutto prima del calendario: Barra utente, Controlli + Azioni, Legenda
-             ======================================================== -->
-        <div class="desktop-only-block">
-            <!-- Barra Utente Desktop -->
-            <div class="user-bar-desktop">
-                <div class="user-bar-desktop-left">
-                    <input type="text" class="input-username" placeholder="Nome utente (es. mario_rossi)">
-                    <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica o crea profilo">Carica</button>
-                </div>
-                <div class="user-bar-desktop-right">
-                    <span>Gruppo:</span>
-                    <select class="select-group" onchange="cambiaGruppo(this.value)">
-                        <option value="ALL">Scegli Gruppo</option>
-                        <option value="ALL">Tutti i Gruppi</option>
-                        <option value="A">Gruppo A</option>
-                        <option value="B">Gruppo B</option>
-                        <option value="C">Gruppo C</option>
-                        <option value="D">Gruppo D</option>
-                    </select>
-                </div>
+        <!-- Barra Utente Unificata in alto -->
+        <div class="user-bar">
+            <div class="user-bar-left">
+                <input type="text" class="input-username" placeholder="Nome utente (es. mario_rossi)">
+                <button class="btn btn-user" onclick="caricaOCreaProfilo()" title="Carica o crea profilo">Carica</button>
             </div>
-
-            <!-- Controlli Settimane e Azioni Desktop -->
-            <div class="controls-desktop">
-                <div class="nav-buttons">
-                    <button class="btn btn-today" onclick="vaiAOggi()" title="Vai alla settimana odierna">Oggi</button>
-                    <button class="btn btn-nav btn-prev-week" onclick="prevWeek()">◀</button>
-                    <select class="week-selector-input" onchange="changeWeek(this.value)"></select>
-                    <button class="btn btn-nav btn-next-week" onclick="nextWeek()">▶</button>
-                </div>
-                <div class="action-buttons">
-                    <button class="btn btn-sync-merge" onclick="avviaSmartMerge()">🔄 Sincronizza Orario</button>
-                    <button class="btn btn-toggle-view" onclick="toggleVistaMobile()">📐 Espandi</button>
-                    <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
-                    <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset Totale</button>
-                </div>
-            </div>
-
-            <!-- Legenda Desktop -->
-            <div class="legend-desktop">
-                <div class="legend-content">
-                    <div class="legend-group">
-                        <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
-                        <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
-                        <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
-                        <div class="legend-item"><div class="legend-box legend-altrogruppo"></div><span>👥 Altro Gruppo / Convalidato</span></div>
-                    </div>
-                    <div class="legend-divider"></div>
-                    <div class="legend-group">
-                        <div class="legend-item"><span class="legend-dot dot-patologia"></span><span>Patologia Gen.</span></div>
-                        <div class="legend-item"><span class="legend-dot dot-neuro"></span><span>Neurolesioni</span></div>
-                        <div class="legend-item"><span class="legend-dot dot-locomotore"></span><span>App. Locomotore</span></div>
-                        <div class="legend-item"><span class="legend-dot dot-altro"></span><span>Altro</span></div>
-                    </div>
-                </div>
+            <div class="user-bar-right">
+                <span>Gruppo:</span>
+                <select class="select-group" onchange="cambiaGruppo(this.value)">
+                    <option value="ALL">Scegli Gruppo</option>
+                    <option value="ALL">Tutti i Gruppi</option>
+                    <option value="A">Gruppo A</option>
+                    <option value="B">Gruppo B</option>
+                    <option value="C">Gruppo C</option>
+                    <option value="D">Gruppo D</option>
+                </select>
             </div>
         </div>
 
-        <!-- ========================================================
-             2. BLOCCO MOBILE SUPERIORE (Mostrato solo su Mobile ≤ 768px)
-             Barra compattissima a 1 riga + nav settimane
-             ======================================================== -->
-        <div class="mobile-only-block">
-            <div class="user-bar-mobile">
-                <div class="user-bar-mobile-left">
-                    <input type="text" class="input-username" placeholder="Nome utente">
-                    <button class="btn btn-user" onclick="caricaOCreaProfilo()">Carica</button>
-                </div>
-                <div class="user-bar-mobile-right">
-                    <select class="select-group" onchange="cambiaGruppo(this.value)">
-                        <option value="ALL">Scegli Gruppo</option>
-                        <option value="ALL">Tutti i Gruppi</option>
-                        <option value="A">Gruppo A</option>
-                        <option value="B">Gruppo B</option>
-                        <option value="C">Gruppo C</option>
-                        <option value="D">Gruppo D</option>
-                    </select>
-                </div>
+        <!-- Barra Controlli & Navigazione Unificata in alto -->
+        <div class="controls-top">
+            <div class="nav-buttons">
+                <button class="btn btn-today" onclick="vaiAOggi()" title="Vai alla settimana odierna">Oggi</button>
+                <button class="btn btn-nav btn-prev-week" onclick="prevWeek()">◀</button>
+                <select class="week-selector-input" onchange="changeWeek(this.value)"></select>
+                <button class="btn btn-nav btn-next-week" onclick="nextWeek()">▶</button>
             </div>
-
-            <div class="nav-mobile-bar">
-                <div class="nav-buttons-mobile">
-                    <button class="btn btn-today" onclick="vaiAOggi()">Oggi</button>
-                    <button class="btn btn-nav btn-prev-week" onclick="prevWeek()">◀</button>
-                    <select class="week-selector-input" onchange="changeWeek(this.value)"></select>
-                    <button class="btn btn-nav btn-next-week" onclick="nextWeek()">▶</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Banner Focus Modulo (Comune) -->
-        <div class="highlight-banner" id="highlightBanner">
-            <span id="highlightBannerText">🔍 Evidenziazione attiva per: ...</span>
-            <button class="btn-clear-highlight" onclick="disattivaEvidenziazione()">Mostra tutto</button>
-        </div>
-
-        <!-- Vista Calendario (Comune) -->
-        <div class="calendar-container vista-compatta" id="calendarContainer">
-            <div class="calendar" id="calendar"></div>
-        </div>
-
-        <!-- ========================================================
-             3. BLOCCO MOBILE INFERIORE (Mostrato solo su Mobile ≤ 768px)
-             I 4 pulsanti e la legenda posizionati SOTTO al calendario
-             ======================================================== -->
-        <div class="mobile-only-block">
-            <div class="action-buttons-mobile">
+            <div class="action-buttons">
                 <button class="btn btn-sync-merge" onclick="avviaSmartMerge()">🔄 Sincronizza Orario</button>
                 <button class="btn btn-toggle-view" onclick="toggleVistaMobile()">📐 Espandi</button>
                 <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
                 <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset Totale</button>
             </div>
+        </div>
 
-            <div class="legend-mobile">
-                <div class="legend-content">
-                    <div class="legend-group">
-                        <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
-                        <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
-                        <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
-                        <div class="legend-item"><div class="legend-box legend-altrogruppo"></div><span>👥 Altro Gruppo / Convalidato</span></div>
-                    </div>
-                    <div class="legend-divider"></div>
-                    <div class="legend-group">
-                        <div class="legend-item"><span class="legend-dot dot-patologia"></span><span>Patologia Gen.</span></div>
-                        <div class="legend-item"><span class="legend-dot dot-neuro"></span><span>Neurolesioni</span></div>
-                        <div class="legend-item"><span class="legend-dot dot-locomotore"></span><span>App. Locomotore</span></div>
-                        <div class="legend-item"><span class="legend-dot dot-altro"></span><span>Altro</span></div>
-                    </div>
+        <!-- Legenda -->
+        <div class="legend-bar">
+            <div class="legend-content">
+                <div class="legend-group">
+                    <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
+                    <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
+                    <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
+                    <div class="legend-item"><div class="legend-box legend-altrogruppo"></div><span>👥 Altro Gruppo / Convalidato</span></div>
+                </div>
+                <div class="legend-divider"></div>
+                <div class="legend-group">
+                    <div class="legend-item"><span class="legend-dot dot-patologia"></span><span>Patologia Gen.</span></div>
+                    <div class="legend-item"><span class="legend-dot dot-neuro"></span><span>Neurolesioni</span></div>
+                    <div class="legend-item"><span class="legend-dot dot-locomotore"></span><span>App. Locomotore</span></div>
+                    <div class="legend-item"><span class="legend-dot dot-altro"></span><span>Altro</span></div>
                 </div>
             </div>
         </div>
 
-        <!-- Statistiche / Progressi (Comune) -->
+        <!-- Banner Focus Modulo -->
+        <div class="highlight-banner" id="highlightBanner">
+            <span id="highlightBannerText">🔍 Evidenziazione attiva per: ...</span>
+            <button class="btn-clear-highlight" onclick="disattivaEvidenziazione()">Mostra tutto</button>
+        </div>
+
+        <!-- Vista Calendario con ID Anchor -->
+        <div class="calendar-container vista-compatta" id="calendarContainer">
+            <div class="calendar" id="calendar"></div>
+        </div>
+
+        <!-- Statistiche / Progressi -->
         <div class="stats-container">
             <h3 class="stats-title">📊 Piano Frequenza Personalizzato</h3>
             <p style="font-size:12px; color:#64748b; margin-bottom:14px; text-align:center;">
-                💡 <em>Tieni premuto (long-press a schermo fermo) su un modulo o su una lezione per evidenziare le lezioni a calendario. Un tocco breve ovunque o ESC annulla.</em>
+                💡 <em>Tocca l'icona 👨‍🏫 / 👩‍🏫 per leggere e modificare le info sul docente (le modifiche sono condivise in tempo reale per tutti). Long-press sul modulo per evidenziare le lezioni a calendario.</em>
             </p>
             <div class="insegnamenti-container" id="insegnamentiContainer"></div>
         </div>
@@ -854,7 +880,7 @@
 
             <div class="form-group" id="groupModuloSelect">
                 <label for="editModulo">Corso / Modulo</label>
-                <select id="editModulo"></select>
+                <select id="editModulo" onchange="aggiornaIconaDocenteInModale()"></select>
             </div>
 
             <div class="form-group" id="groupTitoloLibero" style="display:none;">
@@ -862,7 +888,14 @@
                 <input type="text" id="editTitoloLibero" placeholder="Es. Tirocinio, Seminario...">
             </div>
 
-            <div class="form-group"><label for="editDocente">Docente</label><input type="text" id="editDocente" placeholder="Es. BOZZALI"></div>
+            <div class="form-group">
+                <label for="editDocente">Docente</label>
+                <div class="docente-input-row">
+                    <input type="text" id="editDocente" placeholder="Es. BOZZALI">
+                    <button type="button" class="btn-prof-icon" id="btnModalProfDetails" onclick="apriProfDaModaleLezione()" title="Vedi e modifica dettagli docente">👨‍🏫</button>
+                </div>
+            </div>
+
             <div class="form-group"><label for="editLuogo">Aula / Sede</label><input type="text" id="editLuogo" placeholder="Es. Aula Magna"></div>
             
             <div class="form-row">
@@ -886,6 +919,60 @@
         </div>
     </div>
 
+    <!-- Modale Scheda Dettagli Docente Condivisa (Editabile in tempo reale) -->
+    <div class="modal-overlay" id="profModal" onclick="gestisciClickOverlayProf(event)">
+        <div class="modal" id="profModalCard">
+            <div class="modal-header">
+                <div>
+                    <h3 style="margin-bottom:2px;">Scheda Docente</h3>
+                    <span class="prof-shared-badge">🌐 Modifiche condivise con tutti</span>
+                </div>
+                <button class="btn-close" onclick="chiudiModalProf()">&times;</button>
+            </div>
+
+            <div class="prof-card-container" id="profCardContainer">
+                <button type="button" class="prof-nav-btn prof-nav-prev" id="btnProfPrev" onclick="profPagePrev()">◀</button>
+                <button type="button" class="prof-nav-btn prof-nav-next" id="btnProfNext" onclick="profPageNext()">▶</button>
+
+                <div class="prof-header-box">
+                    <div class="prof-avatar" id="profAvatar" title="Icona Prof">👨‍🏫</div>
+                    <div class="prof-title-info">
+                        <div class="prof-modulo-title" id="profModuloTitle">MODULO</div>
+                        <input type="text" class="prof-name-input" id="profNameInput" placeholder="Nome Prof" onchange="aggiornaDatiProfCorrente('nome', this.value)">
+                        <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
+                            <span style="font-size:11px; color:#64748b; font-weight:600;">Genere:</span>
+                            <select class="prof-genere-select" id="profGenereSelect" onchange="aggiornaGenereProfCorrente(this.value)">
+                                <option value="M">Maschio (👨‍🏫)</option>
+                                <option value="F">Femmina (👩‍🏫)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="prof-detail-row">
+                    <div class="prof-detail-label">📋 Modalità d'Esame:</div>
+                    <input type="text" class="prof-edit-input" id="profEsameInput" placeholder="Descrivi l'esame..." onchange="aggiornaDatiProfCorrente('esame', this.value)">
+                </div>
+
+                <div class="prof-detail-row">
+                    <div class="prof-detail-label">📍 Presenze:</div>
+                    <input type="text" class="prof-edit-input" id="profPresenzeInput" placeholder="Descrivi come prende le presenze..." onchange="aggiornaDatiProfCorrente('presenze', this.value)">
+                </div>
+
+                <div class="prof-detail-row">
+                    <div class="prof-detail-label">📝 Note Aggiuntive:</div>
+                    <textarea class="prof-edit-textarea" id="profNotesInput" placeholder="Aggiungi eventuali note..." onchange="aggiornaDatiProfCorrente('note', this.value)"></textarea>
+                </div>
+
+                <div class="prof-page-indicator" id="profPageIndicator">1 di 1</div>
+            </div>
+
+            <div class="modal-footer" style="justify-content: flex-end;">
+                <button type="button" class="btn-cancel-modal" onclick="chiudiModalProf()">Chiudi</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modale Conflitti Smart Merge -->
     <div class="modal-overlay" id="conflictModal" onclick="gestisciClickOverlayConflitti(event)">
         <div class="modal" id="conflictModalCard">
@@ -897,9 +984,6 @@
                 Il nuovo orario ufficiale presenta modifiche che contrastano con alcune delle tue lezioni personalizzate:
             </p>
             <ul class="conflict-list" id="conflictList"></ul>
-            <p style="font-size:12px; color:#64748b;">
-                Scegliendo "Aggiorna comunque", le lezioni ufficiali verranno allineate al nuovo orario, mantenendo comunque le tue preferenze dove possibile.
-            </p>
             <div class="modal-footer">
                 <button type="button" class="btn btn-reset" onclick="chiudiModalConflitti()">Annulla</button>
                 <button type="button" class="btn" style="background:#b91c1c; color:white; font-weight:600;" onclick="applicaMergeConfermato()">Aggiorna comunque</button>
@@ -908,6 +992,47 @@
     </div>
 
     <script>
+        // Database Predefinito Informazioni Docenti (Sintassi verificata)
+        const defaultProfDatabase = {
+            'NEUROLOGIA II': [
+                { nome: 'Bozzali', genere: 'M', esame: '2 domande (scritte risposta aperta?)', presenze: 'Codice', note: 'Domande d’esame: 1 Semeiologia, 2 Patologia' }
+            ],
+            'NEUROCHIRURGIA': [
+                { nome: 'Cofano', genere: 'M', esame: 'A crocette, chi vuole 30 fa orale', presenze: 'No codice, no firma, no appello', note: '' }
+            ],
+            'FARMACOLOGIA': [
+                { nome: 'della Pepa', genere: 'M', esame: '60 v/f + 1 domanda ORALE', presenze: 'Foglio firme', note: 'Wall of text master' }
+            ],
+            'FISIOTERAPICHE 5': [
+                { nome: 'Moretto', genere: 'F', esame: 'Scritto, due domande risposta aperta', presenze: 'Codice + foglio firme per uscire anticipatamente', note: '' }
+            ],
+            'PATOLOGIA GENERALE LEZ': [
+                { nome: 'Testa', genere: 'M', esame: '16 domande v/f 30 minuti', presenze: 'Fa appello come a 12 anni + codice', note: 'Appunti e slide esaustivi. Legge le slide. Lezioni di 3 ore anziché 4' }
+            ],
+            'GASTROENTEROLOGIA': [
+                { nome: 'Ciancio', genere: 'M', esame: '30 v/f?', presenze: 'Codice', note: 'Evoluzione di quella di biochem. È una grande.' }
+            ],
+            'MALATTIE APPARATO LOCOMOTORE LEZ': [
+                { nome: 'Fusini', genere: 'M', esame: 'Non si sa ancora', presenze: 'No codice, no appello, no firma', note: 'Legge le slide' },
+                { nome: 'Ausidio', genere: 'M', esame: 'Non si sa ancora', presenze: 'No codice, no appello, no firma', note: 'Bomber' }
+            ],
+            'RIABILITATIVA IV': [
+                { nome: 'Tencone', genere: 'M', esame: 'Non si sa ancora', presenze: 'Foglio firme', note: '' }
+            ],
+            'OTORINOLARINGOIATRIA': [
+                { nome: 'Crosetti', genere: 'F', esame: 'Domande a risposta multipla', presenze: 'No codice, no firma, no appello', note: 'Prof diversa dall’anno scorso. Finisce mezz’ora prima, bomber.' }
+            ]
+        };
+
+        let profDatabase = JSON.parse(JSON.stringify(defaultProfDatabase));
+
+        try {
+            const localeProfs = localStorage.getItem('fisioterapia_prof_database_cache');
+            if (localeProfs) {
+                profDatabase = JSON.parse(localeProfs);
+            }
+        } catch(e) {}
+
         const corsiConfig = {
             'PATOLOGIA GENERALE': [
                 { label: 'PATOLOGIA GENERALE', valoreEsatto: 'PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ', searchKey: 'PATOLOGIA GENERALE LEZ' },
@@ -1216,7 +1341,7 @@
         const giornoOffset = { 'lunedì': 0, 'martedì': 1, 'mercoledì': 2, 'giovedì': 3, 'venerdì': 4 };
 
         function sanitizeUsername(name) {
-            return name.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+            return (name || '').trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
         }
 
         function updateHeaderDot(state, text) {
@@ -1237,7 +1362,6 @@
             }
         }
 
-        // Sincronizza i campi input tra desktop e mobile
         function syncInputsToUI() {
             document.querySelectorAll('.input-username').forEach(el => el.value = currentUser);
             document.querySelectorAll('.select-group').forEach(el => el.value = gruppoSelezionato);
@@ -1248,7 +1372,7 @@
 
         function calcolaIndiceSettimanaCorrente() {
             const adesso = new Date();
-            const giornoSettimana = adesso.getDay(); // 0 = dom, 1 = lun, ..., 6 = sab
+            const giornoSettimana = adesso.getDay();
 
             let targetDate = new Date(adesso);
             if (giornoSettimana === 0) {
@@ -1531,7 +1655,7 @@
             salvaSuCloudSilenzioso();
         }
 
-        // Focus Modulo & Long-Press Anti-Scroll
+        // Focus Modulo & Long-Press
         let pressTimer = null;
         let isLongPressTriggered = false;
         let pressOriginX = 0;
@@ -1749,6 +1873,26 @@
             }
         }
 
+        function getProfListSafe(searchKey) {
+            if (!profDatabase || !profDatabase[searchKey]) return [];
+            const data = profDatabase[searchKey];
+            return Array.isArray(data) ? data : Object.values(data);
+        }
+
+        function getProfIconForSearchKey(searchKey) {
+            const profs = getProfListSafe(searchKey);
+            if (!profs || profs.length === 0) return '👨‍🏫';
+            return profs[0].genere === 'F' ? '👩‍🏫' : '👨‍🏫';
+        }
+
+        function getProfNamesLowercaseForSearchKey(searchKey) {
+            const profs = getProfListSafe(searchKey);
+            if (!profs || profs.length === 0) return '';
+            const names = profs.map(p => (p.nome || '').trim().toLowerCase()).filter(Boolean);
+            if (names.length === 0) return '';
+            return `(${names.join(', ')})`;
+        }
+
         function renderInsegnamenti() {
             const container = document.getElementById('insegnamentiContainer');
             const insegnamenti = [
@@ -1787,6 +1931,8 @@
                     const isSelected = moduloInEvidenza === mod.searchKey;
                     const modColor = mod.percentuale >= 70 ? '#16a34a' : mod.percentuale >= 60 ? '#d97706' : '#dc2626';
                     const modColorClass = mod.percentuale >= 70 ? 'percent-ok' : mod.percentuale >= 60 ? 'percent-warn' : 'percent-bad';
+                    const iconaProf = getProfIconForSearchKey(mod.searchKey);
+                    const profNamesLower = getProfNamesLowercaseForSearchKey(mod.searchKey);
 
                     html += `<div class="modulo ${isSelected ? 'modulo-selected' : ''}" 
                                   onmousedown="startAntiScrollPress(event, '${mod.searchKey}', '${mod.label}')"
@@ -1799,7 +1945,11 @@
                                   onclick="handleModuloClick('${mod.searchKey}', '${mod.label}')">
                         <div class="modulo-header">
                             <div class="modulo-left">
-                                <span class="modulo-nome">${mod.label}</span>
+                                <button type="button" class="btn-prof-icon" onclick="apriProfDaChart(event, '${mod.searchKey}', '${mod.label}')" title="Dettagli e Modifica Prof">${iconaProf}</button>
+                                <div class="modulo-nome-box">
+                                    <span class="modulo-nome">${mod.label}</span>
+                                    ${profNamesLower ? `<span class="modulo-prof-name">${profNamesLower}</span>` : ''}
+                                </div>
                                 ${isConvalidato ? '<span class="badge-convalidato">🎓 Convalidato</span>' : ''}
                             </div>
                             <div class="modulo-stats">
@@ -1859,6 +2009,23 @@
                     selectModulo.value = valoreEsattoPredefinito;
                 }
             }
+            aggiornaIconaDocenteInModale();
+        }
+
+        function aggiornaIconaDocenteInModale() {
+            const insScelto = document.getElementById('editInsegnamento').value;
+            const btn = document.getElementById('btnModalProfDetails');
+            if (insScelto === 'ALTRO') {
+                btn.textContent = '👨‍🏫';
+                return;
+            }
+            const modVal = document.getElementById('editModulo').value;
+            const modRef = estraiModuloSearchKey(modVal);
+            if (modRef) {
+                btn.textContent = getProfIconForSearchKey(modRef.searchKey);
+            } else {
+                btn.textContent = '👨‍🏫';
+            }
         }
 
         function compilaCampiTitolo(titoloCompleto) {
@@ -1883,6 +2050,7 @@
                 onInsegnamentoChange();
                 document.getElementById('editTitoloLibero').value = titoloCompleto;
             }
+            aggiornaIconaDocenteInModale();
         }
 
         let tipoSelezionato = 'normale';
@@ -2030,7 +2198,9 @@
             if (confirm("ATTENZIONE: Il Reset Totale sovrascrive tutto il tuo calendario con l'orario iniziale. Vuoi procedere?")) {
                 settimane = JSON.parse(JSON.stringify(defaultSettimane));
                 moduliConvalidati = [];
-                try { localStorage.removeItem('convalidati_fisioterapia'); } catch(e) {}
+                try { 
+                    localStorage.removeItem('convalidati_fisioterapia');
+                } catch(e) {}
                 aggiornaInterfaccia();
                 salvaSuCloudSilenzioso();
             }
@@ -2057,7 +2227,178 @@
             aggiornaInterfaccia(dir); 
         }
 
-        // Smart merge
+        // ========================================================
+        // SCHEDA DOCENTE CONDIVISA (SINCRONIZZATA SU FIREBASE)
+        // ========================================================
+        let currentProfSearchKey = null;
+        let currentProfLabel = '';
+        let currentProfList = [];
+        let currentProfPageIndex = 0;
+
+        function initSharedProfSync() {
+            if (!db) return;
+            db.ref('professori_condivisi').on('value', snapshot => {
+                const data = snapshot.val();
+                if (data) {
+                    profDatabase = data;
+                } else {
+                    db.ref('professori_condivisi').set(defaultProfDatabase);
+                    profDatabase = JSON.parse(JSON.stringify(defaultProfDatabase));
+                }
+                try {
+                    localStorage.setItem('fisioterapia_prof_database_cache', JSON.stringify(profDatabase));
+                } catch(e) {}
+                renderInsegnamenti();
+                aggiornaIconaDocenteInModale();
+                if (document.getElementById('profModal').classList.contains('active')) {
+                    currentProfList = getProfListSafe(currentProfSearchKey);
+                    if (currentProfPageIndex >= currentProfList.length) currentProfPageIndex = 0;
+                    renderProfPage();
+                }
+            });
+        }
+
+        function apriProfModalPerModulo(searchKey, label) {
+            currentProfSearchKey = searchKey;
+            currentProfLabel = label;
+            currentProfList = getProfListSafe(searchKey);
+            currentProfPageIndex = 0;
+
+            if (currentProfList.length === 0) {
+                currentProfList = [{
+                    nome: '',
+                    genere: 'M',
+                    esame: '',
+                    presenze: '',
+                    note: ''
+                }];
+                profDatabase[searchKey] = currentProfList;
+            }
+            renderProfPage();
+            document.getElementById('profModal').classList.add('active');
+        }
+
+        function renderProfPage() {
+            const prof = currentProfList[currentProfPageIndex] || { nome: '', genere: 'M', esame: '', presenze: '', note: '' };
+            const icon = prof.genere === 'F' ? '👩‍🏫' : '👨‍🏫';
+
+            document.getElementById('profAvatar').textContent = icon;
+            document.getElementById('profModuloTitle').textContent = currentProfLabel || currentProfSearchKey;
+            document.getElementById('profNameInput').value = prof.nome || '';
+            document.getElementById('profGenereSelect').value = prof.genere || 'M';
+            document.getElementById('profEsameInput').value = prof.esame || '';
+            document.getElementById('profPresenzeInput').value = prof.presenze || '';
+            document.getElementById('profNotesInput').value = prof.note || '';
+
+            const total = currentProfList.length;
+            document.getElementById('btnProfPrev').disabled = (currentProfPageIndex === 0);
+            document.getElementById('btnProfNext').disabled = (currentProfPageIndex === total - 1);
+            
+            document.getElementById('btnProfPrev').style.display = total > 1 ? 'flex' : 'none';
+            document.getElementById('btnProfNext').style.display = total > 1 ? 'flex' : 'none';
+            document.getElementById('profPageIndicator').textContent = total > 1 ? `Prof ${currentProfPageIndex + 1} di ${total}` : '';
+        }
+
+        function aggiornaDatiProfCorrente(campo, valore) {
+            if (!currentProfSearchKey) return;
+            if (!profDatabase[currentProfSearchKey]) {
+                profDatabase[currentProfSearchKey] = [];
+            }
+            if (!profDatabase[currentProfSearchKey][currentProfPageIndex]) {
+                profDatabase[currentProfSearchKey][currentProfPageIndex] = { nome: '', genere: 'M', esame: '', presenze: '', note: '' };
+            }
+
+            profDatabase[currentProfSearchKey][currentProfPageIndex][campo] = valore.trim();
+            salvaProfDatabaseSuCloudCondiviso();
+        }
+
+        function aggiornaGenereProfCorrente(valoreGenere) {
+            if (!currentProfSearchKey) return;
+            aggiornaDatiProfCorrente('genere', valoreGenere);
+            document.getElementById('profAvatar').textContent = valoreGenere === 'F' ? '👩‍🏫' : '👨‍🏫';
+        }
+
+        function salvaProfDatabaseSuCloudCondiviso() {
+            try {
+                localStorage.setItem('fisioterapia_prof_database_cache', JSON.stringify(profDatabase));
+            } catch(e) {}
+            renderInsegnamenti();
+            aggiornaIconaDocenteInModale();
+
+            if (db) {
+                updateHeaderDot('syncing', 'Aggiornamento scheda docenti...');
+                db.ref('professori_condivisi').set(profDatabase).then(() => {
+                    updateHeaderDot('online', currentUser ? `Connesso come: ${currentUser}` : 'Online');
+                }).catch(err => {
+                    console.error("Errore salvataggio prof condivisi:", err);
+                    updateHeaderDot('offline', 'Errore salvataggio docenti');
+                });
+            }
+        }
+
+        function profPagePrev() {
+            if (currentProfPageIndex > 0) {
+                currentProfPageIndex--;
+                renderProfPage();
+            }
+        }
+
+        function profPageNext() {
+            if (currentProfPageIndex < currentProfList.length - 1) {
+                currentProfPageIndex++;
+                renderProfPage();
+            }
+        }
+
+        function chiudiModalProf() {
+            document.getElementById('profModal').classList.remove('active');
+        }
+
+        function gestisciClickOverlayProf(e) {
+            if (e.target === document.getElementById('profModal')) chiudiModalProf();
+        }
+
+        function apriProfDaChart(e, searchKey, label) {
+            if (e) e.stopPropagation();
+            apriProfModalPerModulo(searchKey, label);
+        }
+
+        function apriProfDaModaleLezione() {
+            const insScelto = document.getElementById('editInsegnamento').value;
+            if (insScelto === 'ALTRO') {
+                alert("Nessuna scheda professore disponibile per le attività non catalogate.");
+                return;
+            }
+            const modVal = document.getElementById('editModulo').value;
+            const modRef = estraiModuloSearchKey(modVal);
+            if (modRef) {
+                apriProfModalPerModulo(modRef.searchKey, modRef.label);
+            } else {
+                alert("Modulo non trovato.");
+            }
+        }
+
+        // Swipe su scheda prof
+        let profTouchStartX = 0;
+        let profTouchStartY = 0;
+        function initProfModalSwipe() {
+            const card = document.getElementById('profCardContainer');
+            card.addEventListener('touchstart', (e) => {
+                profTouchStartX = e.changedTouches[0].screenX;
+                profTouchStartY = e.changedTouches[0].screenY;
+            }, { passive: true });
+
+            card.addEventListener('touchend', (e) => {
+                const diffX = e.changedTouches[0].screenX - profTouchStartX;
+                const diffY = e.changedTouches[0].screenY - profTouchStartY;
+                if (Math.abs(diffX) > 35 && Math.abs(diffX) > Math.abs(diffY)) {
+                    if (diffX < 0) profPageNext();
+                    else profPagePrev();
+                }
+            }, { passive: true });
+        }
+
+        // SMART MERGE
         let mergedSettimanePending = null;
 
         function getChiaveSemantica(titolo) {
@@ -2183,10 +2524,14 @@
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const editModal = document.getElementById('editModal');
+                const profModal = document.getElementById('profModal');
                 const conflictModal = document.getElementById('conflictModal');
                 let modalClosed = false;
 
-                if (editModal && editModal.classList.contains('active')) {
+                if (profModal && profModal.classList.contains('active')) {
+                    chiudiModalProf();
+                    modalClosed = true;
+                } else if (editModal && editModal.classList.contains('active')) {
                     chiudiModale();
                     modalClosed = true;
                 }
@@ -2212,12 +2557,26 @@
             });
         }
 
+        // Autoscroll da Mobile sul Calendario
+        function checkMobileAutoScroll() {
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    const calElem = document.getElementById('calendarContainer');
+                    if (calElem) {
+                        calElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 150);
+            }
+        }
+
         // Inizializzazione
         function init() {
             popolaSelectSettimane();
             settimanaCorrente = calcolaIndiceSettimanaCorrente();
             syncInputsToUI();
             initSwipeGestures();
+            initProfModalSwipe();
+            initSharedProfSync();
 
             setInterval(() => {
                 renderCalendario();
@@ -2229,6 +2588,8 @@
                 updateHeaderDot('offline', 'Non connesso');
                 aggiornaInterfaccia();
             }
+
+            checkMobileAutoScroll();
         }
 
         window.addEventListener('DOMContentLoaded', init);
