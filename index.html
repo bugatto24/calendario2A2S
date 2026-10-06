@@ -734,14 +734,66 @@
             .legend-content { gap: 8px; font-size: 11px; justify-content: flex-start; }
             .legend-divider { display: none; }
 
-            .stats-container { padding: 14px; }
-            .insegnamento-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            /* --- INIZIO OTTIMIZZAZIONE GRAFICI/PROGRESSI SU MOBILE --- */
+            .stats-container { 
+                padding: 12px 10px; 
+            }
+            .insegnamento-header { 
+                flex-direction: column; 
+                align-items: flex-start; 
+                gap: 8px; 
+            }
+            .moduli-container { 
+                padding: 8px 10px; 
+            }
+            .modulo { 
+                padding: 8px 6px; 
+            }
+            .modulo-header { 
+                flex-direction: column; 
+                align-items: flex-start; 
+                gap: 6px; 
+            }
+            .modulo-left { 
+                width: 100%; 
+                display: flex; 
+                align-items: center; 
+                gap: 6px; 
+                flex-wrap: wrap; 
+            }
+            .modulo-nome { 
+                font-size: 0.8rem; 
+            }
+            .modulo-prof-name { 
+                font-size: 0.78rem; 
+            }
+            .modulo-stats { 
+                width: 100%; 
+                display: flex; 
+                align-items: center; 
+                justify-content: space-between; 
+                gap: 8px; 
+            }
+            .modulo-ore { 
+                font-size: 0.78rem; 
+                white-space: nowrap; 
+                margin-left: auto; /* Spinge ore e percentuale a destra */
+            }
+            .modulo-percent { 
+                font-size: 0.85rem; 
+                min-width: 36px; 
+                text-align: right; 
+                white-space: nowrap; 
+            }
+            /* --- FINE OTTIMIZZAZIONE GRAFICI/PROGRESSI SU MOBILE --- */
 
             .calendar-container.vista-compatta .calendar { 
                 min-width: 100% !important; 
                 width: 100% !important; 
                 grid-template-columns: 36px repeat(5, 1fr) !important; 
             }
+
+            
             .calendar-container.vista-compatta .time-column { width: 36px !important; }
             .calendar-container.vista-compatta .time-header { font-size: 9px; padding: 10px 2px; }
             .calendar-container.vista-compatta .time-slot { font-size: 9px; padding-right: 3px; justify-content: center; }
