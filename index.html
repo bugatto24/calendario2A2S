@@ -830,7 +830,7 @@
         </div>
 
         <!-- Vista Calendario con ID Anchor -->
-        <div class="calendar-container vista-compatta" id="calendarContainer">
+        <div class="calendar-container vista-compatta" id="calendario">
             <div class="calendar" id="calendar"></div>
         </div>
 
@@ -2559,15 +2559,24 @@
 
         // Autoscroll da Mobile sul Calendario
         function checkMobileAutoScroll() {
-            if (window.innerWidth <= 768) {
-                setTimeout(() => {
-                    const calElem = document.getElementById('calendarContainer');
-                    if (calElem) {
-                        calElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }, 150);
-            }
+    // Rileva se il dispositivo è mobile (schermo <= 768px o touch)
+    const isMobile = window.innerWidth <= 768 || ('ontouchstart' in window);
+
+    if (isMobile) {
+        // Applica l'hash nell'URL senza ricaricare la pagina
+        if (!window.location.hash) {
+            history.replaceState(null, null, '#calendario');
         }
+        
+        // Esegue l'inquadratura immediata sul calendario saltando header e barre superiori
+        requestAnimationFrame(() => {
+            const cal = document.getElementById('calendario');
+            if (cal) {
+                cal.scrollIntoView({ behavior: 'instant', block: 'start' });
+            }
+        });
+    }
+}
 
         // Inizializzazione
         function init() {
