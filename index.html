@@ -1560,9 +1560,11 @@
                 }
                 syncInputsToUI();
                 aggiornaInterfaccia();
+                checkMobileAutoScroll(); // Esegue lo scroll dopo che Firebase ha ridisegnato il calendario
             }).catch(err => {
                 console.error("Errore Firebase:", err);
                 updateHeaderDot('offline', 'Errore caricamento profilo');
+                checkMobileAutoScroll(); // Esegue lo scroll anche in caso di fallback offline
             });
         }
 
@@ -1641,6 +1643,7 @@
                 settimanaCorrente = targetIdx;
                 aggiornaInterfaccia(dir);
             }
+            checkMobileAutoScroll(); // Riposiziona la vista oraria sul momento odierno
         }
 
         function calcolaLayoutEventi(eventiGiorno) {
@@ -2673,17 +2676,31 @@
             });
         }
 
-        // Autoscroll preciso su Mobile all'inizio del calendario (linee rosse)
+        // Autoscroll preciso su Mobile: inquadra il calendario e la linea dell'ora attuale se presente
         function checkMobileAutoScroll() {
-    if (window.innerWidth <= 768) {
-        setTimeout(() => {
-            const calElem = document.getElementById('calendarContainer');
-            if (calElem) {
-                calElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (window.innerWidth <= 768) {
+                requestAnimationFrame(() => {
+                    setTimeout(() => {
+                        const calContainer = document.getElementById('calendarContainer');
+                        const redLine = document.querySelector('.current-time-line');
+
+                        if (calContainer) {
+                            if (redLine) {
+                                // Se la linea rossa di oggi è presente, calcola la posizione dell'orario
+                                const targetY = redLine.offsetTop - 100;
+                                window.scrollTo({
+                                    top: calContainer.offsetTop + Math.max(0, targetY),
+                                    behavior: 'smooth'
+                                });
+                            } else {
+                                // Altrimenti porta in cima al calendario
+                                calContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                        }
+                    }, 200);
+                });
             }
-        }, 300);
-    }
-}
+        }
 
         // Inizializzazione
         function init() {
