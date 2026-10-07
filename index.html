@@ -2677,26 +2677,19 @@
             });
         }
 
-        // Autoscroll preciso su Mobile: inquadra il calendario e la linea dell'ora attuale se presente
+        // Autoscroll preciso su Mobile: ancora saldamente la vista all'inizio della griglia settimanale
         function checkMobileAutoScroll() {
             if (window.innerWidth <= 768) {
                 requestAnimationFrame(() => {
                     setTimeout(() => {
                         const calContainer = document.getElementById('calendarContainer');
-                        const redLine = document.querySelector('.current-time-line');
-
                         if (calContainer) {
-                            if (redLine) {
-                                // Se la linea rossa di oggi è presente, calcola la posizione dell'orario
-                                const targetY = redLine.offsetTop - 100;
-                                window.scrollTo({
-                                    top: calContainer.offsetTop + Math.max(0, targetY),
-                                    behavior: 'smooth'
-                                });
-                            } else {
-                                // Altrimenti porta in cima al calendario
-                                calContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }
+                            // Calcola la posizione esatta della testata del calendario lasciando 8px di respiro
+                            const yCoord = calContainer.getBoundingClientRect().top + window.pageYOffset - 8;
+                            window.scrollTo({
+                                top: Math.max(0, yCoord),
+                                behavior: 'smooth'
+                            });
                         }
                     }, 200);
                 });
