@@ -1153,246 +1153,247 @@
         let eventoSelezionatoRef = null;
 
         const defaultSettimane = [
-            {
-                numero: 1, periodo: "1-2 ottobre 2026",
-                eventi: {
-                    giovedì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    venerdì: [
-                        { oraInizio: 8, oraFine: 10, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 10, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ]
-                }
-            },
-            {
-                numero: 2, periodo: "5-9 ottobre 2026",
-                eventi: {
-                    lunedì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
-                    ],
-                    martedì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
-                    ],
-                    mercoledì: [
-                        { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
-                    ],
-                    giovedì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 12.5, titolo: "ALTRO - Incontro Tirocinio", docente: "C. Sorba", luogo: "via Chiabrera", tipo: "obbligatorio" },
-                        { oraInizio: 14, oraFine: 16, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
-                    ],
-                    venerdì: [
-                        { oraInizio: 8, oraFine: 10, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 10, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
-                    ]
-                }
-            },
-            {
-                numero: 3, periodo: "12-16 ottobre 2026",
-                eventi: {
-                    lunedì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
-                    ],
-                    martedì: [
-                        { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula 2.7 Marenco", tipo: "normale" }
-                    ],
-                    mercoledì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
-                    ],
-                    giovedì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula 2.7 Marenco", tipo: "normale" }
-                    ],
-                    venerdì: [
-                        { oraInizio: 9, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
-                    ]
-                }
-            },
-            {
-                numero: 4, periodo: "19-23 ottobre 2026",
-                eventi: {
-                    lunedì: [
-                        { oraInizio: 8, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    martedì: [
-                        { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    mercoledì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    giovedì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    venerdì: [
-                        { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO (GRUPPI A/B)", luogo: "Aula 2 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO (GRUPPI C/D)", luogo: "Aula 2 CTO", tipo: "normale" }
-                    ]
-                }
-            },
-            {
-                numero: 5, periodo: "26-30 ottobre 2026",
-                eventi: {
-                    lunedì: [
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    martedì: [
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
-                    ],
-                    mercoledì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
-                    ],
-                    giovedì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" }
-                    ],
-                    venerdì: [
-                        { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO (GRUPPI A/B)", luogo: "Aula 1 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO (GRUPPI C/D)", luogo: "Aula 1 CTO", tipo: "normale" }
-                    ]
-                }
-            },
-            {
-                numero: 6, periodo: "2-6 novembre 2026",
-                eventi: {
-                    lunedì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    martedì: [
-                        { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    mercoledì: [
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    giovedì: [
-                        { oraInizio: 8, oraFine: 10, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 10, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 13, oraFine: 15, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 15, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    venerdì: [
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO B)", luogo: "Aula 1 CTO", tipo: "normale" },
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO A)", luogo: "Aula 1 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" }
-                    ]
-                }
-            },
-            {
-                numero: 7, periodo: "9-13 novembre 2026",
-                eventi: {
-                    lunedì: [
-                        { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 10.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    martedì: [
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    mercoledì: [
-                        { oraInizio: 8, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                        { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
-                    ],
-                    giovedì: [
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO A)", luogo: "Aula 1 CTO", tipo: "normale" },
-                        { oraInizio: 9, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    venerdì: [
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO C)", luogo: "Aula 1 CTO", tipo: "normale" },
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO D)", luogo: "Aula 2 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO D)", luogo: "Aula 1 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO C)", luogo: "Aula 2 CTO", tipo: "normale" }
-                    ]
-                }
-            },
-            {
-                numero: 8, periodo: "16-20 novembre 2026",
-                eventi: {
-                    lunedì: [
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 16, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    martedì: [
-                        { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                        { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    mercoledì: [
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPI C/D)", luogo: "Aula 1 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
-                    ],
-                    giovedì: [
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO B)", luogo: "Aula 1 CTO", tipo: "normale" },
-                        { oraInizio: 9, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO D)", luogo: "Aula 1 CTO", tipo: "normale" }
-                    ],
-                    venerdì: [
-                        { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO C)", luogo: "Aula 1 CTO", tipo: "normale" },
-                        { oraInizio: 9, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO D)", luogo: "Aula 2 CTO", tipo: "normale" },
-                        { oraInizio: 14, oraFine: 17, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO C)", luogo: "Aula 2 CTO", tipo: "normale" }
-                    ]
-                }
-            }
-        ];
+    {
+        numero: 1, periodo: "1-2 ottobre 2026",
+        eventi: {
+            giovedì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            venerdì: [
+                { oraInizio: 8, oraFine: 10, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 10, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ]
+        }
+    },
+    {
+        numero: 2, periodo: "5-9 ottobre 2026",
+        eventi: {
+            lunedì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            ],
+            martedì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            ],
+            mercoledì: [
+                { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            ],
+            giovedì: [
+                { oraInizio: 11, oraFine: 13, titolo: "ALTRO - Incontro Tirocinio", docente: "C. Sorba", luogo: "Aula 2.7 Marenco", tipo: "obbligatorio" },
+                { oraInizio: 14, oraFine: 16, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            ],
+            venerdì: [
+                { oraInizio: 10, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            ]
+        }
+    },
+    {
+        numero: 3, periodo: "12-16 ottobre 2026",
+        eventi: {
+            lunedì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            ],
+            martedì: [
+                { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            ],
+            mercoledì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            ],
+            giovedì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            ],
+            venerdì: [
+                { oraInizio: 9, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            ]
+        }
+    },
+    {
+        numero: 4, periodo: "19-23 ottobre 2026",
+        eventi: {
+            lunedì: [
+                { oraInizio: 8, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            martedì: [
+                { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "FERRERO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            mercoledì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            giovedì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            venerdì: [
+                { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO (GRUPPI A/B)", luogo: "Aula 2 CTO", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO (GRUPPI C/D)", luogo: "Aula 2 CTO", tipo: "normale" }
+            ]
+        }
+    },
+    {
+        numero: 5, periodo: "26-30 ottobre 2026",
+        eventi: {
+            lunedì: [
+                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            martedì: [
+                { oraInizio: 8.5, oraFine: 12.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
+            ],
+            mercoledì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
+            ],
+            giovedì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" }
+            ],
+            venerdì: [
+                { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO (GRUPPI A/B)", luogo: "Aula 1 CTO", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO (GRUPPI C/D)", luogo: "Aula 1 CTO", tipo: "normale" }
+            ]
+        }
+    },
+    {
+        numero: 6, periodo: "2-6 novembre 2026",
+        eventi: {
+            lunedì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            martedì: [
+                { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            mercoledì: [
+                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            giovedì: [
+                { oraInizio: 8, oraFine: 10, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 10, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 13, oraFine: 15, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 15, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            venerdì: [
+                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO B)", luogo: "Aula 1 CTO", tipo: "normale" },
+                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO A)", luogo: "Aula 1 CTO", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" }
+            ]
+        }
+    },
+    {
+        numero: 7, periodo: "9-13 novembre 2026",
+        eventi: {
+            lunedì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 10.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            martedì: [
+                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            mercoledì: [
+                { oraInizio: 8, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
+            ],
+            giovedì: [
+                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO A)", luogo: "Aula 1 CTO", tipo: "normale" },
+                { oraInizio: 9, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            venerdì: [
+                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO C)", luogo: "Aula 1 CTO", tipo: "normale" },
+                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO D)", luogo: "Aula 2 CTO", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO D)", luogo: "Aula 1 CTO", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO C)", luogo: "Aula 2 CTO", tipo: "normale" }
+            ]
+        }
+    },
+    {
+        numero: 8, periodo: "16-20 novembre 2026",
+        eventi: {
+            lunedì: [
+                { oraInizio: 8.5, oraFine: 12.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            martedì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" },
+                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
+                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            mercoledì: [
+                { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO C)", luogo: "Aula 2 CTO", tipo: "normale" },
+                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO D)", luogo: "Aula 2 CTO", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            ],
+            giovedì: [
+                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO B)", luogo: "Aula 1 CTO", tipo: "normale" },
+                { oraInizio: 9, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
+                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO D)", luogo: "Aula 1 CTO", tipo: "normale" }
+            ],
+            venerdì: [
+                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO C)", luogo: "Aula 1 CTO", tipo: "normale" },
+                { oraInizio: 9, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO D)", luogo: "Aula 2 CTO", tipo: "normale" },
+                { oraInizio: 14, oraFine: 17, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO C)", luogo: "Aula 2 CTO", tipo: "normale" }
+            ]
+        }
+    }
+];
 
         let settimane = JSON.parse(JSON.stringify(defaultSettimane));
         const giorni = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì'];
