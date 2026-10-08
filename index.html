@@ -2876,14 +2876,25 @@
                             classeStato = 'evento-convalidato';
                             emoji = '🎓';
                         } else if (!appartiene) {
-                            classeStato = 'evento-altrogruppo';
-                            emoji = '👥';
-                        } else {
-                            classeStato = evento.tipo === 'obbligatorio' ? 'evento-obbligatorio' : 
-                                          evento.tipo === 'saltata' ? 'evento-saltata' : 'evento-normale';
-                            emoji = evento.tipo === 'obbligatorio' ? '⚠️' : 
-                                    evento.tipo === 'saltata' ? '❌' : '✅';
-                        }
+    classeStato = 'evento-altrogruppo';
+    emoji = '👥';
+} else {
+    // Rileva se l'evento è diviso per gruppi
+    const testoGruppo = ((evento.docente || '') + ' ' + (evento.titolo || '')).toUpperCase();
+    const isPerGruppi = testoGruppo.includes('GRUPPO') || testoGruppo.includes('GRUPPI');
+
+    if (evento.tipo === 'saltata') {
+        classeStato = 'evento-saltata';
+        emoji = '❌';
+    } else if (evento.tipo === 'obbligatorio' || isPerGruppi) {
+        // Se è impostato obbligatorio OPPURE è una lezione a gruppi, usa lo stile giallo/avviso
+        classeStato = 'evento-obbligatorio';
+        emoji = evento.tipo === 'obbligatorio' ? '⚠️' : '👥';
+    } else {
+        classeStato = 'evento-normale';
+        emoji = '✅';
+    }
+}
 
                         const focusClass = inEvidenza ? 'evento-in-focus' : '';
                         const modRef = estraiModuloSearchKey(evento.titolo);
