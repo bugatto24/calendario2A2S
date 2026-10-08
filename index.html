@@ -861,8 +861,11 @@
             </div>
             <div class="action-buttons">
                 <button class="btn btn-sync-merge" onclick="avviaSmartMerge()">🔄 Sincronizza Orario</button>
+                <button class="btn" id="btnAdminBroadcastSync" style="display:none; background:#7e22ce; color:white; font-weight:600;" onclick="sincronizzaPerTuttiForzato()" title="Propaga istantaneamente le modifiche a tutti i profili utente">📢 Sincronizza per tutti</button>
+                <button class="btn" id="btnAdminUploadJSON" style="display:none; background:#0f766e; color:white; font-weight:600;" onclick="apriModalUploadJSON()" title="Carica un nuovo calendario JSON direttamente nel database">📥 Carica JSON</button>
                 <button class="btn btn-toggle-view" onclick="toggleVistaMobile()">📐 Espandi</button>
                 <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
+                <button class="btn" id="btnAdminCopyJSON" style="display:none; background:#475569; color:white;" onclick="copiaJSONPerHTML()" title="Copia l'orario attuale formattato per il codice HTML">📋 Copia JSON</button>
                 <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset Totale</button>
             </div>
         </div>
@@ -920,15 +923,21 @@
                 <button type="button" class="btn-status-quick" id="btnStatoSaltata" onclick="impostaStato('saltata')">❌ Salta</button>
             </div>
             
-            <div class="form-group">
-                <label for="editGiorno">Giorno</label>
-                <select id="editGiorno">
-                    <option value="lunedì">Lunedì</option>
-                    <option value="martedì">Martedì</option>
-                    <option value="mercoledì">Mercoledì</option>
-                    <option value="giovedì">Giovedì</option>
-                    <option value="venerdì">Venerdì</option>
-                </select>
+            <div class="form-row">
+                <div class="form-group" style="flex: 1.2;">
+                    <label for="editSettimana">Settimana</label>
+                    <select id="editSettimana"></select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label for="editGiorno">Giorno</label>
+                    <select id="editGiorno">
+                        <option value="lunedì">Lunedì</option>
+                        <option value="martedì">Martedì</option>
+                        <option value="mercoledì">Mercoledì</option>
+                        <option value="giovedì">Giovedì</option>
+                        <option value="venerdì">Venerdì</option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-group">
@@ -1041,6 +1050,33 @@
         </div>
     </div>
 
+
+<!-- Modale Caricamento JSON Orario (Admin) -->
+    <div class="modal-overlay" id="uploadJsonModal" onclick="if(event.target===this) chiudiModalUploadJSON()">
+        <div class="modal" style="max-width: 580px;">
+            <div class="modal-header">
+                <h3 style="color:#0f766e;">📥 Carica Nuovo Calendario JSON</h3>
+                <button class="btn-close" onclick="chiudiModalUploadJSON()">&times;</button>
+            </div>
+            <p style="font-size:12.5px; color:#475569; margin-bottom:12px;">
+                Carica o incolla il JSON contenente l'elenco delle settimane. Verrà salvato nell'orario ufficiale su Firebase. In seguito potrai usare <em>"📢 Sincronizza per tutti"</em> per propagarlo.
+            </p>
+            <div class="form-group">
+                <label for="jsonFileInput" style="font-weight:600; font-size:12px;">Carica da file .json:</label>
+                <input type="file" id="jsonFileInput" accept=".json,application/json" onchange="leggiFileJSON(event)" style="font-size:12px; padding:6px;">
+            </div>
+            <div class="form-group">
+                <label for="jsonTextarea" style="font-weight:600; font-size:12px;">Oppure incolla il testo JSON:</label>
+                <textarea id="jsonTextarea" placeholder='[ { "numero": 1, "periodo": "...", "eventi": { ... } } ]' style="min-height: 180px; font-family: monospace; font-size: 11px;"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel-modal" onclick="chiudiModalUploadJSON()">Annulla</button>
+                <button type="button" class="btn" style="background:#0f766e; color:white; font-weight:600;" onclick="salvaNuovoJSONSuDatabase()">💾 Salva nel Database</button>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Modale Conflitti Smart Merge -->
     <div class="modal-overlay" id="conflictModal" onclick="gestisciClickOverlayConflitti(event)">
         <div class="modal" id="conflictModalCard">
@@ -1147,6 +1183,12 @@
         let moduliConvalidati = [];
         let moduloInEvidenza = null;
 
+        // Lista degli utenti abilitati come admin
+        const adminUsers = ['admin', 'paolom'];
+        function isAdmin() {
+            return adminUsers.includes(currentUser);
+        }
+
         try {
             currentUser = localStorage.getItem('currentUser_fisioterapia') || '';
             gruppoSelezionato = localStorage.getItem('currentGroup_fisioterapia') || 'ALL';
@@ -1158,244 +1200,1134 @@
 
         const defaultSettimane = [
     {
-        numero: 1, periodo: "1-2 ottobre 2026",
-        eventi: {
-            giovedì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+        "eventi": {
+            "giovedì": [
+                {
+                    "docente": "C. DELLA PEPA",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - FARMACOLOGIA"
+                },
+                {
+                    "docente": "G. TESTA",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ"
+                },
+                {
+                    "docente": "M. BOZZALI",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA"
+                }
             ],
-            venerdì: [
-                { oraInizio: 8, oraFine: 10, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 10, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            "venerdì": [
+                {
+                    "docente": "F. COFANO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 10,
+                    "oraInizio": 8,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROCHIRURGIA"
+                },
+                {
+                    "docente": "A. CIANCIO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 13,
+                    "oraInizio": 10,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - GASTROENTEROLOGIA"
+                },
+                {
+                    "docente": "A. MASSE'",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ"
+                },
+                {
+                    "docente": "A. MORETTO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5"
+                }
             ]
-        }
+        },
+        "numero": 1,
+        "periodo": "1-2 ottobre 2026"
     },
     {
-        numero: 2, periodo: "5-9 ottobre 2026",
-        eventi: {
-            lunedì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+        "eventi": {
+            "giovedì": [
+                {
+                    "docente": "C. Sorba",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "obbligatorio",
+                    "titolo": "ALTRO - Incontro Tirocinio"
+                },
+                {
+                    "docente": "E. CROSETTI",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA"
+                },
+                {
+                    "docente": "A. MORETTO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5"
+                }
             ],
-            martedì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            "lunedì": [
+                {
+                    "docente": "C. DELLA PEPA",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - FARMACOLOGIA"
+                },
+                {
+                    "docente": "TENCONE",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV"
+                },
+                {
+                    "docente": "A. MASSE'",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ"
+                },
+                {
+                    "docente": "A. MORETTO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5"
+                }
             ],
-            mercoledì: [
-                { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            "martedì": [
+                {
+                    "docente": "M. BOZZALI",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA"
+                },
+                {
+                    "docente": "E. CROSETTI",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA"
+                },
+                {
+                    "docente": "F. COFANO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROCHIRURGIA"
+                },
+                {
+                    "docente": "A. MORETTO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5"
+                }
             ],
-            giovedì: [
-                { oraInizio: 11, oraFine: 13, titolo: "ALTRO - Incontro Tirocinio", docente: "C. Sorba", luogo: "Aula 2.7 Marenco", tipo: "obbligatorio" },
-                { oraInizio: 14, oraFine: 16, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            "mercoledì": [
+                {
+                    "docente": "A. IAGNOCCO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 11,
+                    "oraInizio": 8,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA"
+                },
+                {
+                    "docente": "F. MARIANO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - NEFROLOGIA"
+                },
+                {
+                    "docente": "G. MASSAZZA",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III"
+                },
+                {
+                    "docente": "S. SECCI",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                }
             ],
-            venerdì: [
-                { oraInizio: 10, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            "venerdì": [
+                {
+                    "docente": "A. CIANCIO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 13,
+                    "oraInizio": 10,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - GASTROENTEROLOGIA"
+                },
+                {
+                    "docente": "A. MASSE'",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ"
+                },
+                {
+                    "docente": "S. SECCI",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                }
             ]
-        }
+        },
+        "numero": 2,
+        "periodo": "5-9 ottobre 2026"
     },
     {
-        numero: 3, periodo: "12-16 ottobre 2026",
-        eventi: {
-            lunedì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+        "eventi": {
+            "giovedì": [
+                {
+                    "docente": "E. CROSETTI",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA"
+                },
+                {
+                    "docente": "F. MARIANO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - NEFROLOGIA"
+                },
+                {
+                    "docente": "G. TESTA",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ"
+                }
             ],
-            martedì: [
-                { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            "lunedì": [
+                {
+                    "docente": "A. CIANCIO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - GASTROENTEROLOGIA"
+                },
+                {
+                    "docente": "TENCONE",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV"
+                },
+                {
+                    "docente": "M. BOZZALI",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA"
+                },
+                {
+                    "docente": "S. SECCI",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                }
             ],
-            mercoledì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            "martedì": [
+                {
+                    "docente": "A. IAGNOCCO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 11,
+                    "oraInizio": 8,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA"
+                },
+                {
+                    "docente": "E. CROSETTI",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA"
+                },
+                {
+                    "docente": "F. COFANO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROCHIRURGIA"
+                },
+                {
+                    "docente": "",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                }
             ],
-            giovedì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            "mercoledì": [
+                {
+                    "docente": "F. MARIANO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - NEFROLOGIA"
+                },
+                {
+                    "docente": "M. BOZZALI",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA"
+                },
+                {
+                    "docente": "A. MASSE'",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ"
+                },
+                {
+                    "docente": "A. MORETTO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5"
+                }
             ],
-            venerdì: [
-                { oraInizio: 9, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO", luogo: "Aula 2.7 Marenco", tipo: "normale" }
+            "venerdì": [
+                {
+                    "docente": "CASTIGLIONE (GRUPPO A)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 11,
+                    "oraInizio": 9,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                },
+                {
+                    "docente": "CASTIGLIONE (GRUPPO B)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                },
+                {
+                    "docente": "L. PIANO",
+                    "luogo": "Aula 2.7 Marenco",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                }
             ]
-        }
+        },
+        "numero": 3,
+        "periodo": "12-16 ottobre 2026"
     },
     {
-        numero: 4, periodo: "19-23 ottobre 2026",
-        eventi: {
-            lunedì: [
-                { oraInizio: 8, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+        "eventi": {
+            "giovedì": [
+                {
+                    "docente": "A. MASSE'",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ"
+                },
+                {
+                    "docente": "A. CIANCIO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - GASTROENTEROLOGIA"
+                },
+                {
+                    "docente": "G. TESTA",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ"
+                }
             ],
-            martedì: [
-                { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "FERRERO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            "lunedì": [
+                {
+                    "docente": "",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 11,
+                    "oraInizio": 8,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                },
+                {
+                    "docente": "M. BOZZALI",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA"
+                },
+                {
+                    "docente": "M. BOZZALI",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA"
+                },
+                {
+                    "docente": "A. MORETTO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5"
+                }
             ],
-            mercoledì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            "martedì": [
+                {
+                    "docente": "A. IAGNOCCO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 11,
+                    "oraInizio": 8,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA"
+                },
+                {
+                    "docente": "E. CROSETTI",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA"
+                },
+                {
+                    "docente": "F. COFANO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROCHIRURGIA"
+                },
+                {
+                    "docente": "FERRERO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                }
             ],
-            giovedì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            "mercoledì": [
+                {
+                    "docente": "TENCONE",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV"
+                },
+                {
+                    "docente": "C. DELLA PEPA",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - FARMACOLOGIA"
+                },
+                {
+                    "docente": "S. SECCI",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                }
             ],
-            venerdì: [
-                { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO (GRUPPI A/B)", luogo: "Aula 2 CTO", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "L. PIANO (GRUPPI C/D)", luogo: "Aula 2 CTO", tipo: "normale" }
+            "venerdì": [
+                {
+                    "docente": "L. PIANO (GRUPPI A/B)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 13,
+                    "oraInizio": 9,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                },
+                {
+                    "docente": "L. PIANO (GRUPPI C/D)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                }
             ]
-        }
+        },
+        "numero": 4,
+        "periodo": "19-23 ottobre 2026"
     },
     {
-        numero: 5, periodo: "26-30 ottobre 2026",
-        eventi: {
-            lunedì: [
-                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "S. SECCI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+        "eventi": {
+            "giovedì": [
+                {
+                    "docente": "E. CROSETTI",
+                    "luogo": "Aula Magna Psi. M.Torre Molinette",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA"
+                },
+                {
+                    "docente": "A. CIANCIO",
+                    "luogo": "Aula Magna Psi. M.Torre Molinette",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - GASTROENTEROLOGIA"
+                },
+                {
+                    "docente": "A. MASSE'",
+                    "luogo": "Aula Magna Psi. M.Torre Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ"
+                },
+                {
+                    "docente": "TENCONE",
+                    "luogo": "Aula Magna Psi. M.Torre Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV"
+                }
             ],
-            martedì: [
-                { oraInizio: 8.5, oraFine: 12.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
+            "lunedì": [
+                {
+                    "docente": "M. TRUCCO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 12.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7"
+                },
+                {
+                    "docente": "A. MASSE'",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ"
+                },
+                {
+                    "docente": "S. SECCI",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                }
             ],
-            mercoledì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
+            "martedì": [
+                {
+                    "docente": "C. DELLA PEPA",
+                    "luogo": "Aula Magna Neurologia Molinette",
+                    "oraFine": 12.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - FARMACOLOGIA"
+                },
+                {
+                    "docente": "GALLISAI",
+                    "luogo": "Aula Magna Neurologia Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                },
+                {
+                    "docente": "RANIERI",
+                    "luogo": "Aula Magna Neurologia Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                }
             ],
-            giovedì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - OTORINOLARINGOIATRIA", docente: "E. CROSETTI", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - GASTROENTEROLOGIA", docente: "A. CIANCIO", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Psi. M.Torre Molinette", tipo: "normale" }
+            "mercoledì": [
+                {
+                    "docente": "TENCONE",
+                    "luogo": "Aula Magna Neurologia Molinette",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV"
+                },
+                {
+                    "docente": "F. MARIANO",
+                    "luogo": "Aula Magna Neurologia Molinette",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - NEFROLOGIA"
+                },
+                {
+                    "docente": "M. BOZZALI",
+                    "luogo": "Aula Magna Neurologia Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA"
+                }
             ],
-            venerdì: [
-                { oraInizio: 9, oraFine: 13, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO (GRUPPI A/B)", luogo: "Aula 1 CTO", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "M. TRUCCO (GRUPPI C/D)", luogo: "Aula 1 CTO", tipo: "normale" }
+            "venerdì": [
+                {
+                    "docente": "M. TRUCCO (GRUPPI A/B)",
+                    "luogo": "Aula 1 CTO",
+                    "oraFine": 13,
+                    "oraInizio": 9,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7"
+                },
+                {
+                    "docente": "M. TRUCCO (GRUPPI C/D)",
+                    "luogo": "Aula 1 CTO",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7"
+                }
             ]
-        }
+        },
+        "numero": 5,
+        "periodo": "26-30 ottobre 2026"
     },
     {
-        numero: 6, periodo: "2-6 novembre 2026",
-        eventi: {
-            lunedì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+        "eventi": {
+            "giovedì": [
+                {
+                    "docente": "M. BOZZALI",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 10,
+                    "oraInizio": 8,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA"
+                },
+                {
+                    "docente": "A. MASSE'",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 12,
+                    "oraInizio": 10,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ"
+                },
+                {
+                    "docente": "MORELLO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 15,
+                    "oraInizio": 13,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                },
+                {
+                    "docente": "VANZO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 15,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7"
+                }
             ],
-            martedì: [
-                { oraInizio: 8, oraFine: 11, titolo: "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA", docente: "A. IAGNOCCO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            "lunedì": [
+                {
+                    "docente": "TENCONE",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV"
+                },
+                {
+                    "docente": "F. MARIANO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - NEFROLOGIA"
+                },
+                {
+                    "docente": "A. MASSE'",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ"
+                },
+                {
+                    "docente": "A. MORETTO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5"
+                }
             ],
-            mercoledì: [
-                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            "martedì": [
+                {
+                    "docente": "A. IAGNOCCO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 11,
+                    "oraInizio": 8,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - REUMATOLOGIA"
+                },
+                {
+                    "docente": "G. MASSAZZA",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III"
+                },
+                {
+                    "docente": "F. COFANO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROCHIRURGIA"
+                },
+                {
+                    "docente": "A. MORETTO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5"
+                }
             ],
-            giovedì: [
-                { oraInizio: 8, oraFine: 10, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 10, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 13, oraFine: 15, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 15, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            "mercoledì": [
+                {
+                    "docente": "TENCONE",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 12.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV"
+                },
+                {
+                    "docente": "G. TESTA",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ"
+                }
             ],
-            venerdì: [
-                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO B)", luogo: "Aula 1 CTO", tipo: "normale" },
-                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO A)", luogo: "Aula 1 CTO", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" }
+            "venerdì": [
+                {
+                    "docente": "MORELLO (GRUPPO B)",
+                    "luogo": "Aula 1 CTO",
+                    "oraFine": 12.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                },
+                {
+                    "docente": "RANIERI (GRUPPO A)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 12.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                },
+                {
+                    "docente": "MORELLO (GRUPPO A)",
+                    "luogo": "Aula 1 CTO",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                },
+                {
+                    "docente": "RANIERI (GRUPPO B)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                }
             ]
-        }
+        },
+        "numero": 6,
+        "periodo": "2-6 novembre 2026"
     },
     {
-        numero: 7, periodo: "9-13 novembre 2026",
-        eventi: {
-            lunedì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 10.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV", docente: "TENCONE", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+        "eventi": {
+            "giovedì": [
+                {
+                    "docente": "GALLISAI (GRUPPO A)",
+                    "luogo": "Aula 1 CTO",
+                    "oraFine": 12.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                },
+                {
+                    "docente": "VANZO (GRUPPO B)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 12,
+                    "oraInizio": 9,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7"
+                },
+                {
+                    "docente": "A. MASSE'",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ"
+                },
+                {
+                    "docente": "C. DELLA PEPA",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - FARMACOLOGIA"
+                }
             ],
-            martedì: [
-                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - NEUROCHIRURGIA", docente: "F. COFANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            "lunedì": [
+                {
+                    "docente": "C. DELLA PEPA",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - FARMACOLOGIA"
+                },
+                {
+                    "docente": "TENCONE",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 12.5,
+                    "oraInizio": 10.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MEDICINA FISICA E RIABILITATIVA IV"
+                },
+                {
+                    "docente": "G. TESTA",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ"
+                }
             ],
-            mercoledì: [
-                { oraInizio: 8, oraFine: 11, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Neurologia Molinette", tipo: "normale" }
+            "martedì": [
+                {
+                    "docente": "A. MASSE'",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 12.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ"
+                },
+                {
+                    "docente": "F. COFANO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROCHIRURGIA"
+                },
+                {
+                    "docente": "A. MORETTO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5"
+                }
             ],
-            giovedì: [
-                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO A)", luogo: "Aula 1 CTO", tipo: "normale" },
-                { oraInizio: 9, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "MALATTIE APPARATO LOCOMOTORE - MALATTIE APPARATO LOCOMOTORE LEZ", docente: "A. MASSE'", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "PATOLOGIA GENERALE - FARMACOLOGIA", docente: "C. DELLA PEPA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            "mercoledì": [
+                {
+                    "docente": "",
+                    "luogo": "Aula Magna Neurologia Molinette",
+                    "oraFine": 11,
+                    "oraInizio": 8,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                },
+                {
+                    "docente": "M. BOZZALI",
+                    "luogo": "Aula Magna Neurologia Molinette",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA"
+                },
+                {
+                    "docente": "G. MASSAZZA",
+                    "luogo": "Aula Magna Neurologia Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III"
+                },
+                {
+                    "docente": "A. MORETTO",
+                    "luogo": "Aula Magna Neurologia Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5"
+                }
             ],
-            venerdì: [
-                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO C)", luogo: "Aula 1 CTO", tipo: "normale" },
-                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO D)", luogo: "Aula 2 CTO", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "MORELLO (GRUPPO D)", luogo: "Aula 1 CTO", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "RANIERI (GRUPPO C)", luogo: "Aula 2 CTO", tipo: "normale" }
+            "venerdì": [
+                {
+                    "docente": "MORELLO (GRUPPO C)",
+                    "luogo": "Aula 1 CTO",
+                    "oraFine": 12.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                },
+                {
+                    "docente": "RANIERI (GRUPPO D)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 12.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                },
+                {
+                    "docente": "MORELLO (GRUPPO D)",
+                    "luogo": "Aula 1 CTO",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                },
+                {
+                    "docente": "RANIERI (GRUPPO C)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                }
             ]
-        }
+        },
+        "numero": 7,
+        "periodo": "9-13 novembre 2026"
     },
     {
-        numero: 8, periodo: "16-20 novembre 2026",
-        eventi: {
-            lunedì: [
-                { oraInizio: 8.5, oraFine: 12.5, titolo: "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA", docente: "M. BOZZALI", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "PATOLOGIA GENERALE - NEFROLOGIA", docente: "F. MARIANO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+        "eventi": {
+            "giovedì": [
+                {
+                    "docente": "GALLISAI (GRUPPO B)",
+                    "luogo": "Aula 1 CTO",
+                    "oraFine": 12.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                },
+                {
+                    "docente": "VANZO (GRUPPO A)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 12,
+                    "oraInizio": 9,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7"
+                },
+                {
+                    "docente": "GALLISAI (GRUPPO D)",
+                    "luogo": "Aula 1 CTO",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                }
             ],
-            martedì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO B)", luogo: "Aula 2 CTO", tipo: "normale" },
-                { oraInizio: 14, oraFine: 16, titolo: "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III", docente: "G. MASSAZZA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" },
-                { oraInizio: 16, oraFine: 18, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5", docente: "A. MORETTO", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            "lunedì": [
+                {
+                    "docente": "M. BOZZALI",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 12.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - NEUROLOGIA II NEUROFISIOLOGIA"
+                },
+                {
+                    "docente": "F. MARIANO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - NEFROLOGIA"
+                },
+                {
+                    "docente": "A. MORETTO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5"
+                }
             ],
-            mercoledì: [
-                { oraInizio: 8.5, oraFine: 10.5, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO C)", luogo: "Aula 2 CTO", tipo: "normale" },
-                { oraInizio: 11, oraFine: 13, titolo: "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4", docente: "CASTIGLIONE (GRUPPO D)", luogo: "Aula 2 CTO", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ", docente: "G. TESTA", luogo: "Aula Magna Igiene Molinette", tipo: "normale" }
+            "martedì": [
+                {
+                    "docente": "CASTIGLIONE (GRUPPO A)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                },
+                {
+                    "docente": "CASTIGLIONE (GRUPPO B)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                },
+                {
+                    "docente": "G. MASSAZZA",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 16,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - MEDICINA FISICA E RIABILITATIVA III"
+                },
+                {
+                    "docente": "A. MORETTO",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 16,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 5"
+                }
             ],
-            giovedì: [
-                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO B)", luogo: "Aula 1 CTO", tipo: "normale" },
-                { oraInizio: 9, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO A)", luogo: "Aula 2 CTO", tipo: "normale" },
-                { oraInizio: 14, oraFine: 18, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO D)", luogo: "Aula 1 CTO", tipo: "normale" }
+            "mercoledì": [
+                {
+                    "docente": "CASTIGLIONE (GRUPPO C)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 10.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                },
+                {
+                    "docente": "CASTIGLIONE (GRUPPO D)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 13,
+                    "oraInizio": 11,
+                    "tipo": "normale",
+                    "titolo": "NEUROLESIONI - SCIENZE FISIOTERAPICHE 4"
+                },
+                {
+                    "docente": "G. TESTA",
+                    "luogo": "Aula Magna Igiene Molinette",
+                    "oraFine": 18,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "PATOLOGIA GENERALE - PATOLOGIA GENERALE LEZ"
+                }
             ],
-            venerdì: [
-                { oraInizio: 8.5, oraFine: 12.5, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6", docente: "GALLISAI (GRUPPO C)", luogo: "Aula 1 CTO", tipo: "normale" },
-                { oraInizio: 9, oraFine: 12, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO D)", luogo: "Aula 2 CTO", tipo: "normale" },
-                { oraInizio: 14, oraFine: 17, titolo: "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7", docente: "VANZO (GRUPPO C)", luogo: "Aula 2 CTO", tipo: "normale" }
+            "venerdì": [
+                {
+                    "docente": "GALLISAI (GRUPPO C)",
+                    "luogo": "Aula 1 CTO",
+                    "oraFine": 12.5,
+                    "oraInizio": 8.5,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 6"
+                },
+                {
+                    "docente": "VANZO (GRUPPO D)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 12,
+                    "oraInizio": 9,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7"
+                },
+                {
+                    "docente": "VANZO (GRUPPO C)",
+                    "luogo": "Aula 2 CTO",
+                    "oraFine": 17,
+                    "oraInizio": 14,
+                    "tipo": "normale",
+                    "titolo": "MALATTIE APPARATO LOCOMOTORE - SCIENZE FISIOTERAPICHE 7"
+                }
             ]
-        }
+        },
+        "numero": 8,
+        "periodo": "16-20 novembre 2026"
     }
 ];
 
@@ -1436,6 +2368,20 @@
             document.querySelectorAll('.week-selector-input').forEach(el => el.value = settimanaCorrente);
             document.querySelectorAll('.btn-prev-week').forEach(el => el.disabled = (settimanaCorrente === 0));
             document.querySelectorAll('.btn-next-week').forEach(el => el.disabled = (settimanaCorrente === settimane.length - 1));
+
+            // Mostra o nasconde i pulsanti riservati agli admin
+            const btnCopy = document.getElementById('btnAdminCopyJSON');
+            if (btnCopy) {
+                btnCopy.style.display = isAdmin() ? 'inline-flex' : 'none';
+            }
+            const btnBroadcast = document.getElementById('btnAdminBroadcastSync');
+            if (btnBroadcast) {
+                btnBroadcast.style.display = isAdmin() ? 'inline-flex' : 'none';
+            }
+            const btnUploadJSON = document.getElementById('btnAdminUploadJSON');
+            if (btnUploadJSON) {
+                btnUploadJSON.style.display = isAdmin() ? 'inline-flex' : 'none';
+            }
         }
 
         function calcolaIndiceSettimanaCorrente() {
@@ -2168,8 +3114,9 @@
             document.getElementById('modalTitle').textContent = "Nuova Lezione";
             document.getElementById('btnDeleteEvent').style.display = 'none';
             document.getElementById('btnDeleteEventGlobal').style.display = 'none';
-            document.getElementById('btnSaveGlobal').style.display = (currentUser === 'admin') ? 'inline-flex' : 'none';
+            document.getElementById('btnSaveGlobal').style.display = isAdmin() ? 'inline-flex' : 'none';
 
+            popolaSelectSettimaneModale(weekIdx);
             document.getElementById('editGiorno').value = giorno;
             document.getElementById('editInsegnamento').value = 'PATOLOGIA GENERALE';
             onInsegnamentoChange();
@@ -2181,6 +3128,19 @@
 
             impostaStato('normale');
             document.getElementById('editModal').classList.add('active');
+        }
+
+        function popolaSelectSettimaneModale(settimanaSelezionataIdx) {
+            const select = document.getElementById('editSettimana');
+            if (!select) return;
+            select.innerHTML = '';
+            settimane.forEach((s, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = `S${s.numero}, ${s.periodo}`;
+                select.appendChild(opt);
+            });
+            select.value = (settimanaSelezionataIdx !== undefined) ? settimanaSelezionataIdx : settimanaCorrente;
         }
 
         function apriModale(e, weekIdx, giorno, eventIdx) {
@@ -2201,9 +3161,10 @@
 
             document.getElementById('modalTitle').textContent = "Modifica Lezione";
             document.getElementById('btnDeleteEvent').style.display = 'block';
-            document.getElementById('btnDeleteEventGlobal').style.display = (currentUser === 'admin') ? 'inline-flex' : 'none';
-            document.getElementById('btnSaveGlobal').style.display = (currentUser === 'admin') ? 'inline-flex' : 'none';
+            document.getElementById('btnDeleteEventGlobal').style.display = isAdmin() ? 'inline-flex' : 'none';
+            document.getElementById('btnSaveGlobal').style.display = isAdmin() ? 'inline-flex' : 'none';
 
+            popolaSelectSettimaneModale(weekIdx);
             document.getElementById('editGiorno').value = giorno;
             compilaCampiTitolo(ev.titolo);
             document.getElementById('editDocente').value = ev.docente || '';
@@ -2235,7 +3196,9 @@
        
        function salvaModificheEvento(perTutti = false) {
             if (!eventoSelezionatoRef) return;
-            const { weekIdx, giorno: vecchioGiorno, eventIdx, isNew } = eventoSelezionatoRef;
+            const { weekIdx: vecchiaWeekIdx, giorno: vecchioGiorno, eventIdx, isNew } = eventoSelezionatoRef;
+            
+            const nuovaWeekIdx = parseInt(document.getElementById('editSettimana').value, 10);
             const nuovoGiorno = document.getElementById('editGiorno').value;
             const insScelto = document.getElementById('editInsegnamento').value;
             let titoloFinale = (insScelto === 'ALTRO') ? 
@@ -2262,26 +3225,39 @@
             };
 
             function applicaASettimane(targetSettimane) {
-                if (!targetSettimane[weekIdx].eventi) targetSettimane[weekIdx].eventi = {};
-                if (!targetSettimane[weekIdx].eventi[nuovoGiorno]) targetSettimane[weekIdx].eventi[nuovoGiorno] = [];
+                if (!targetSettimane[nuovaWeekIdx]) return;
+                if (!targetSettimane[nuovaWeekIdx].eventi) targetSettimane[nuovaWeekIdx].eventi = {};
+                if (!targetSettimane[nuovaWeekIdx].eventi[nuovoGiorno]) targetSettimane[nuovaWeekIdx].eventi[nuovoGiorno] = [];
 
                 if (isNew) {
-                    targetSettimane[weekIdx].eventi[nuovoGiorno].push(datiEvento);
+                    targetSettimane[nuovaWeekIdx].eventi[nuovoGiorno].push(datiEvento);
                 } else {
-                    if (vecchioGiorno === nuovoGiorno) {
-                        targetSettimane[weekIdx].eventi[vecchioGiorno][eventIdx] = datiEvento;
+                    const stessaSettimana = (vecchiaWeekIdx === nuovaWeekIdx);
+                    const stessoGiorno = (vecchioGiorno === nuovoGiorno);
+
+                    if (stessaSettimana && stessoGiorno) {
+                        targetSettimane[vecchiaWeekIdx].eventi[vecchioGiorno][eventIdx] = datiEvento;
                     } else {
-                        targetSettimane[weekIdx].eventi[vecchioGiorno].splice(eventIdx, 1);
-                        targetSettimane[weekIdx].eventi[nuovoGiorno].push(datiEvento);
+                        if (targetSettimane[vecchiaWeekIdx] && 
+                            targetSettimane[vecchiaWeekIdx].eventi && 
+                            targetSettimane[vecchiaWeekIdx].eventi[vecchioGiorno]) {
+                            targetSettimane[vecchiaWeekIdx].eventi[vecchioGiorno].splice(eventIdx, 1);
+                        }
+                        targetSettimane[nuovaWeekIdx].eventi[nuovoGiorno].push(datiEvento);
                     }
                 }
             }
 
-            // Applica al calendario corrente dell'admin
+            // 1. Applica al calendario corrente locale
             applicaASettimane(settimane);
 
+            // Se l'evento è stato spostato di settimana, aggiorna la vista
+            if (nuovaWeekIdx !== settimanaCorrente) {
+                settimanaCorrente = nuovaWeekIdx;
+            }
+
+            // 2. Se admin clicca "Per tutti", salva su Firebase nell'orario ufficiale
             if (perTutti && db) {
-                // Scarica l'orario base ufficiale da Firebase o usa defaultSettimane
                 db.ref('orario_ufficiale/settimane').once('value').then(snap => {
                     let baseSettimane = snap.val() || JSON.parse(JSON.stringify(defaultSettimane));
                     applicaASettimane(baseSettimane);
@@ -2298,6 +3274,7 @@
             aggiornaInterfaccia();
             salvaSuCloudSilenzioso();
         }
+        
 
         function eliminaEventoCorrente(perTutti = false) {
             if (!eventoSelezionatoRef || eventoSelezionatoRef.isNew) return;
@@ -2305,13 +3282,21 @@
             if (!confirm(mex)) return;
 
             const { weekIdx, giorno, eventIdx } = eventoSelezionatoRef;
+            const targetEv = settimane[weekIdx].eventi[giorno][eventIdx];
+            
+            // Rimuove dal profilo locale
             settimane[weekIdx].eventi[giorno].splice(eventIdx, 1);
 
             if (perTutti && db) {
                 db.ref('orario_ufficiale/settimane').once('value').then(snap => {
                     let baseSettimane = snap.val() || JSON.parse(JSON.stringify(defaultSettimane));
                     if (baseSettimane[weekIdx] && baseSettimane[weekIdx].eventi && baseSettimane[weekIdx].eventi[giorno]) {
-                        baseSettimane[weekIdx].eventi[giorno].splice(eventIdx, 1);
+                        // Trova e rimuove l'evento corrispondente per parametri (non per indice)
+                        baseSettimane[weekIdx].eventi[giorno] = baseSettimane[weekIdx].eventi[giorno].filter(e => {
+                            const stessoTitolo = e.titolo === targetEv.titolo;
+                            const stessaOra = Math.abs(e.oraInizio - targetEv.oraInizio) < 0.05 && Math.abs(e.oraFine - targetEv.oraFine) < 0.05;
+                            return !(stessoTitolo && stessaOra);
+                        });
                         return db.ref('orario_ufficiale/settimane').set(baseSettimane);
                     }
                 }).then(() => {
@@ -2609,9 +3594,22 @@
                         }
                     });
 
+                    // Manteniamo solo gli eventi custom personali che NON appartenevano a un corso ufficiale
+                    // e solo se non sono lezioni che facevano parte dell'orario base (evita che le lezioni cancellate rispuntino)
                     eventiUtente.forEach(evU => {
-                        const isCustom = evU.titolo && (evU.titolo.startsWith('ALTRO') || !Object.keys(corsiConfig).some(k => evU.titolo.includes(k)));
-                        if (isCustom) {
+                        const appartieneACorsi = Object.keys(corsiConfig).some(k => (evU.titolo || '').includes(k));
+                        
+                        // È un vero evento custom solo se l'utente ha inserito qualcosa di manuale (es. tirocinio/impegno personale non ufficiale)
+                        const isCustom = !appartieneACorsi;
+                        
+                        // Se l'evento era presente nell'orario di default originale ma non c'è più nel nuovo orario master,
+                        // significa che è stato eliminato ufficialmente: NON va ripescato!
+                        const eraInDefault = defaultSettimane[wNumero - 1] && 
+                                             defaultSettimane[wNumero - 1].eventi && 
+                                             defaultSettimane[wNumero - 1].eventi[giorno] && 
+                                             defaultSettimane[wNumero - 1].eventi[giorno].some(d => d.titolo === evU.titolo && Math.abs(d.oraInizio - evU.oraInizio) < 0.1);
+
+                        if (isCustom && !eraInDefault) {
                             const sovrapposto = eventiNuovi.find(n => n.oraInizio < evU.oraFine && n.oraFine > evU.oraInizio);
                             if (sovrapposto && evU.titolo !== sovrapposto.titolo) {
                                 conflitti.push(`W${wNumero} (${giorno}): L'evento "${evU.titolo}" (${formattaOra(evU.oraInizio)}-${formattaOra(evU.oraFine)}) si sovrappone alla lezione ufficiale "${sovrapposto.titolo}".`);
@@ -2653,6 +3651,101 @@
             }
         }
 
+        // Esegue il merge tra l'orario master e il calendario specifico di un utente
+        function eseguiMergeSuDati(utenteSettimane, masterSettimane) {
+            const nuoveSettimane = JSON.parse(JSON.stringify(masterSettimane));
+            nuoveSettimane.forEach((nuovaW) => {
+                const wNumero = nuovaW.numero;
+                const utenteW = utenteSettimane.find(s => s && s.numero === wNumero);
+                if (!utenteW || !utenteW.eventi) return;
+
+                giorni.forEach(giorno => {
+                    const eventiUtente = utenteW.eventi[giorno] || [];
+                    const eventiNuovi = nuovaW.eventi[giorno] || [];
+
+                    // Mantiene lo stato (seguita/saltata/obbligatoria) impostato dall'utente
+                    eventiNuovi.forEach(evNuovo => {
+                        const matchUtente = eventiUtente.find(u => sonoStessaLezioneUfficiale(u, evNuovo));
+                        if (matchUtente) {
+                            evNuovo.tipo = matchUtente.tipo;
+                        }
+                    });
+
+                    // Preserva gli impegni personali custom non ufficiali
+                    eventiUtente.forEach(evU => {
+                        const appartieneACorsi = Object.keys(corsiConfig).some(k => (evU.titolo || '').includes(k));
+                        const isCustom = !appartieneACorsi;
+                        const eraInDefault = defaultSettimane[wNumero - 1] && 
+                                             defaultSettimane[wNumero - 1].eventi && 
+                                             defaultSettimane[wNumero - 1].eventi[giorno] && 
+                                             defaultSettimane[wNumero - 1].eventi[giorno].some(d => d.titolo === evU.titolo && Math.abs(d.oraInizio - evU.oraInizio) < 0.1);
+
+                        if (isCustom && !eraInDefault) {
+                            if (!eventiNuovi.some(n => n.titolo === evU.titolo && Math.abs(n.oraInizio - evU.oraInizio) < 0.1)) {
+                                eventiNuovi.push(evU);
+                            }
+                        }
+                    });
+                });
+            });
+            return nuoveSettimane;
+        }
+
+        // Funzione azionata dal pulsante admin
+        function sincronizzaPerTuttiForzato() {
+            if (!isAdmin() || !db) return;
+            if (!confirm("⚠️ Vuoi sincronizzare e aggiornare l'orario ufficiale su TUTTI i profili utente nel database?")) return;
+
+            updateHeaderDot('syncing', 'Propagazione modifiche a tutti...');
+
+            db.ref('orario_ufficiale/settimane').once('value').then(snapMaster => {
+                const master = snapMaster.val() || defaultSettimane;
+
+                return db.ref('utenti').once('value').then(snapUtenti => {
+                    const utenti = snapUtenti.val() || {};
+                    const updates = {};
+
+                    // Aggiorna ogni singolo profilo utente
+                    Object.keys(utenti).forEach(uName => {
+                        const uData = utenti[uName];
+                        if (uData && uData.settimane) {
+                            const uSett = Array.isArray(uData.settimane) ? uData.settimane : Object.values(uData.settimane);
+                            const merged = eseguiMergeSuDati(uSett, master);
+                            updates[`utenti/${uName}/settimane`] = merged;
+                            updates[`utenti/${uName}/lastUpdate`] = new Date().toISOString();
+                        }
+                    });
+
+                    // Notifica in tempo reale per tutti i client connessi
+                    updates['orario_ufficiale/lastBroadcastSync'] = Date.now();
+
+                    return db.ref().update(updates);
+                });
+            }).then(() => {
+                updateHeaderDot('online', `Connesso come: ${currentUser}`);
+                alert("🚀 SUCCESSO! Tutti i calendari di tutti gli utenti sono stati sincronizzati e aggiornati.");
+            }).catch(err => {
+                console.error("Errore sincronizzazione massiva:", err);
+                updateHeaderDot('offline', 'Errore durante la propagazione');
+                alert("❌ Errore durante l'aggiornamento massivo.");
+            });
+        }
+
+        function initBroadcastListener() {
+            if (!db) return;
+            let initialLoad = true;
+            db.ref('orario_ufficiale/lastBroadcastSync').on('value', snapshot => {
+                if (initialLoad) {
+                    initialLoad = false;
+                    return;
+                }
+                // Quando l'admin lancia la sincronizzazione, ricarica automaticamente i dati locali
+                if (currentUser) {
+                    caricaOCreaProfilo();
+                }
+            });
+        }
+
         function applicaMergeConfermato() {
             if (!mergedSettimanePending) return;
             settimane = mergedSettimanePending;
@@ -2669,6 +3762,95 @@
         function gestisciClickOverlayConflitti(e) {
             if (e.target === document.getElementById('conflictModal')) chiudiModalConflitti();
         }
+
+
+        function apriModalUploadJSON() {
+            if (!isAdmin()) return;
+            document.getElementById('jsonTextarea').value = '';
+            document.getElementById('jsonFileInput').value = '';
+            document.getElementById('uploadJsonModal').classList.add('active');
+        }
+
+        function chiudiModalUploadJSON() {
+            document.getElementById('uploadJsonModal').classList.remove('active');
+        }
+
+        function leggiFileJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                document.getElementById('jsonTextarea').value = evt.target.result;
+            };
+            reader.readAsText(file);
+        }
+
+        function salvaNuovoJSONSuDatabase() {
+            if (!isAdmin()) return;
+            const rawText = document.getElementById('jsonTextarea').value.trim();
+            if (!rawText) {
+                alert("Inserisci o carica un JSON valido.");
+                return;
+            }
+
+            let parsed;
+            try {
+                // Rimuove eventuale 'const defaultSettimane =' o ';' iniziale/finale se copiato da sorgente JS
+                let cleanText = rawText;
+                if (cleanText.includes('=')) {
+                    cleanText = cleanText.substring(cleanText.indexOf('=') + 1).trim();
+                }
+                if (cleanText.endsWith(';')) {
+                    cleanText = cleanText.slice(0, -1).trim();
+                }
+                parsed = JSON.parse(cleanText);
+            } catch(err) {
+                alert("❌ Errore di sintassi JSON:\n" + err.message);
+                return;
+            }
+
+            // Normalizza array se racchiuso in un oggetto o proprietà
+            const datiSettimane = Array.isArray(parsed) ? parsed : (parsed.settimane || Object.values(parsed));
+
+            if (!Array.isArray(datiSettimane) || datiSettimane.length === 0 || !datiSettimane[0].eventi) {
+                alert("❌ Formato non valido: il JSON deve contenere un array di settimane con campo 'eventi' e 'numero'.");
+                return;
+            }
+
+            if (!confirm(`Trovate ${datiSettimane.length} settimane. Vuoi salvarle nell'orario ufficiale su Firebase?`)) {
+                return;
+            }
+
+            updateHeaderDot('syncing', 'Salvataggio nuovo orario su database...');
+
+            if (db) {
+                db.ref('orario_ufficiale/settimane').set(datiSettimane).then(() => {
+                    // Aggiorna anche il calendario locale dell'admin
+                    settimane = datiSettimane;
+                    popolaSelectSettimane();
+                    settimanaCorrente = Math.min(settimanaCorrente, settimane.length - 1);
+                    aggiornaInterfaccia();
+                    salvaSuCloudSilenzioso();
+
+                    chiudiModalUploadJSON();
+                    updateHeaderDot('online', `Connesso come: ${currentUser}`);
+                    alert("✅ Nuovo orario salvato con successo nel database!\n\nPer trasmetterlo a tutti gli altri profili, usa il pulsante '📢 Sincronizza per tutti'.");
+                }).catch(err => {
+                    console.error("Errore salvataggio Firebase:", err);
+                    updateHeaderDot('offline', 'Errore salvataggio JSON');
+                    alert("❌ Errore durante il salvataggio su Firebase: " + err.message);
+                });
+            } else {
+                // Fallback solo locale se non c'è DB
+                settimane = datiSettimane;
+                popolaSelectSettimane();
+                settimanaCorrente = Math.min(settimanaCorrente, settimane.length - 1);
+                aggiornaInterfaccia();
+                chiudiModalUploadJSON();
+                alert("⚠️ Database non connesso: orario caricato solo localmente nella sessione.");
+            }
+        }
+
 
         function exportICS() {
             let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Fisioterapia UniTO//IT\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nX-WR-CALNAME:Fisioterapia 2026-2027\r\nX-WR-TIMEZONE:Europe/Rome\r\n';
@@ -2703,14 +3885,55 @@
             link.click();
         }
 
+        function copiaJSONPerHTML() {
+            if (!isAdmin()) return;
+
+            const eseguiCopia = (datiSettimane) => {
+                // Formatta il codice JavaScript identico a quello del file sorgente
+                const codiceGenerato = "const defaultSettimane = " + JSON.stringify(datiSettimane, null, 4) + ";";
+
+                navigator.clipboard.writeText(codiceGenerato).then(() => {
+                    alert(
+                        "📋 COPIATO NEGLI APPUNTI!\n\n" +
+                        "1. Apri il file HTML nell'editor.\n" +
+                        "2. Cerca 'const defaultSettimane = ...'\n" +
+                        "3. Incolla (Ctrl+V / Cmd+V) per allineare il sorgente alle modifiche del database prima di farne di nuove."
+                    );
+                }).catch(err => {
+                    console.error("Errore clipboard:", err);
+                    // Fallback se il browser blocca l'accesso automatico agli appunti
+                    prompt("Copia manualmente il testo sottostante:", codiceGenerato);
+                });
+            };
+
+            // Se siamo online, recupera la versione più aggiornata direttamente da Firebase
+            if (db) {
+                updateHeaderDot('syncing', 'Recupero orario dal database...');
+                db.ref('orario_ufficiale/settimane').once('value').then(snap => {
+                    updateHeaderDot('online', `Connesso come: ${currentUser}`);
+                    const cloudData = snap.val();
+                    eseguiCopia(cloudData || settimane);
+                }).catch(() => {
+                    eseguiCopia(settimane);
+                });
+            } else {
+                eseguiCopia(settimane);
+            }
+        }
+
         // Tasto ESC da tastiera
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const editModal = document.getElementById('editModal');
                 const profModal = document.getElementById('profModal');
                 const conflictModal = document.getElementById('conflictModal');
+                const uploadJsonModal = document.getElementById('uploadJsonModal');
                 let modalClosed = false;
 
+                if (uploadJsonModal && uploadJsonModal.classList.contains('active')) {
+                    chiudiModalUploadJSON();
+                    modalClosed = true;
+                }
                 if (profModal && profModal.classList.contains('active')) {
                     chiudiModalProf();
                     modalClosed = true;
@@ -2767,6 +3990,7 @@
             initSwipeGestures();
             initProfModalSwipe();
             initSharedProfSync();
+            initBroadcastListener();
 
             setInterval(() => {
                 renderCalendario();
@@ -2783,6 +4007,11 @@
         }
 
         window.addEventListener('DOMContentLoaded', init);
+
+
+
+
     </script>
+
 </body>
 </html>
