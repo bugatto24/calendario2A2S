@@ -1238,7 +1238,11 @@
             currentUser = localStorage.getItem('currentUser_fisioterapia') || '';
             gruppoSelezionato = localStorage.getItem('currentGroup_fisioterapia') || 'ALL';
             moduliConvalidati = JSON.parse(localStorage.getItem('convalidati_fisioterapia') || '[]');
-            ratingDocenti = JSON.parse(localStorage.getItem('fisioterapia_rating_docenti_' + currentUser) || '{}');
+            if (currentUser) {
+                ratingDocenti = JSON.parse(localStorage.getItem('fisioterapia_rating_docenti_' + currentUser) || '{}');
+            } else {
+                ratingDocenti = {};
+            }
         } catch(e) {}
 
         let settimanaCorrente = 0;
@@ -2519,9 +2523,11 @@
                 const cachedSettimane = localStorage.getItem('fisioterapia_settimane_cache_' + currentUser);
                 if (cachedSettimane) {
                     settimane = JSON.parse(cachedSettimane);
-                    popolaSelectSettimane();
-                    aggiornaInterfaccia();
                 }
+                const cachedRatings = localStorage.getItem('fisioterapia_rating_docenti_' + currentUser);
+                ratingDocenti = cachedRatings ? JSON.parse(cachedRatings) : {};
+                popolaSelectSettimane();
+                aggiornaInterfaccia();
             } catch(e) {}
 
             syncInputsToUI();
@@ -2546,12 +2552,12 @@
                             moduliConvalidati = Array.isArray(data.convalidati) ? data.convalidati : [];
                             try { localStorage.setItem('convalidati_fisioterapia', JSON.stringify(moduliConvalidati)); } catch(e) {}
                         }
-                        if (data.ratingDocenti) {
-                            ratingDocenti = data.ratingDocenti;
-                            try { localStorage.setItem('fisioterapia_rating_docenti_' + currentUser, JSON.stringify(ratingDocenti)); } catch(e) {}
-                        }
+                        // Carica solo i rating di questo utente (se assenti, svuota per non ereditare quelli del profilo precedente)
+                        ratingDocenti = (data.ratingDocenti && typeof data.ratingDocenti === 'object') ? data.ratingDocenti : {};
+                        try { localStorage.setItem('fisioterapia_rating_docenti_' + currentUser, JSON.stringify(ratingDocenti)); } catch(e) {}
                     } else {
                         settimane = Array.isArray(data) ? data : Object.values(data);
+                        ratingDocenti = {};
                     }
                     try {
                         localStorage.setItem('fisioterapia_settimane_cache_' + currentUser, JSON.stringify(settimane));
@@ -2559,17 +2565,14 @@
                     updateHeaderDot('online', `Connesso come: ${currentUser}`);
                 } else {
                     settimane = JSON.parse(JSON.stringify(defaultSettimane));
+                    ratingDocenti = {};
                     salvaSuCloudSilenzioso();
                     updateHeaderDot('online', `Nuovo profilo creato: ${currentUser}`);
                 }
                 syncInputsToUI();
                 aggiornaInterfaccia();
                 checkMobileAutoScroll(); // Esegue lo scroll dopo che Firebase ha ridisegnato il calendario
-            }).catch(err => {
-                console.error("Errore Firebase:", err);
-                updateHeaderDot('offline', 'Errore caricamento profilo');
-                checkMobileAutoScroll(); // Esegue lo scroll anche in caso di fallback offline
-            });
+            })
         }
 
        function salvaSuCloudSilenzioso() {
@@ -3568,7 +3571,12 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
         }
 
         function votaProfPersonale(valore) {
+            if (!currentUser) {
+                alert("⚠️ Inserisci prima il tuo Nome Utente in alto e clicca su 'Carica' per salvare la tua valutazione personale!");
+                return;
+            }
             if (!currentProfSearchKey) return;
+
             // Se si riclicca lo stesso, viene deselezionato (toggle)
             if (ratingDocenti[currentProfSearchKey] === valore) {
                 delete ratingDocenti[currentProfSearchKey];
@@ -3576,9 +3584,14 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                 ratingDocenti[currentProfSearchKey] = valore;
             }
 
+            // Salva subito nella cache specifica di questo utente
+            try {
+                localStorage.setItem('fisioterapia_rating_docenti_' + currentUser, JSON.stringify(ratingDocenti));
+            } catch(e) {}
+
             renderProfPage();
             renderCalendario();
-            salvaSuCloudSilenzioso(); // Salva nel profilo utente (NON nei prof condivisi)
+            salvaSuCloudSilenzioso(); // Scrive ESCLUSIVAMENTE nel percorso Firebase 'utenti/' + currentUser
         }
 
         function toggleModificaProf() {
