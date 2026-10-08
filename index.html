@@ -973,10 +973,14 @@
             </div>
             
             <div class="modal-footer">
-                <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente()">🗑 Elimina</button>
+                <div style="display:flex; gap:6px;">
+                    <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente(false)">🗑 Elimina</button>
+                    <button type="button" class="btn-delete" id="btnDeleteEventGlobal" style="display:none; background:#7f1d1d; color:white;" onclick="eliminaEventoCorrente(true)">🗑 Per tutti</button>
+                </div>
                 <div class="modal-footer-right">
                     <button type="button" class="btn-cancel-modal" onclick="chiudiModale()">Annulla</button>
-                    <button type="button" class="btn-save-modal" onclick="salvaModificheEvento()">Conferma</button>
+                    <button type="button" class="btn-save-modal" onclick="salvaModificheEvento(false)">Conferma</button>
+                    <button type="button" class="btn-save-modal" id="btnSaveGlobal" style="display:none; background:#0284c7;" onclick="salvaModificheEvento(true)">🌐 Per tutti</button>
                 </div>
             </div>
         </div>
@@ -2163,6 +2167,8 @@
 
             document.getElementById('modalTitle').textContent = "Nuova Lezione";
             document.getElementById('btnDeleteEvent').style.display = 'none';
+            document.getElementById('btnDeleteEventGlobal').style.display = 'none';
+            document.getElementById('btnSaveGlobal').style.display = (currentUser === 'admin') ? 'inline-flex' : 'none';
 
             document.getElementById('editGiorno').value = giorno;
             document.getElementById('editInsegnamento').value = 'PATOLOGIA GENERALE';
@@ -2195,6 +2201,8 @@
 
             document.getElementById('modalTitle').textContent = "Modifica Lezione";
             document.getElementById('btnDeleteEvent').style.display = 'block';
+            document.getElementById('btnDeleteEventGlobal').style.display = (currentUser === 'admin') ? 'inline-flex' : 'none';
+            document.getElementById('btnSaveGlobal').style.display = (currentUser === 'admin') ? 'inline-flex' : 'none';
 
             document.getElementById('editGiorno').value = giorno;
             compilaCampiTitolo(ev.titolo);
@@ -2224,7 +2232,8 @@
             });
         }
 
-        function salvaModificheEvento() {
+       
+       function salvaModificheEvento(perTutti = false) {
             if (!eventoSelezionatoRef) return;
             const { weekIdx, giorno: vecchioGiorno, eventIdx, isNew } = eventoSelezionatoRef;
             const nuovoGiorno = document.getElementById('editGiorno').value;
@@ -2252,18 +2261,37 @@
                 tipo: tipoSelezionato
             };
 
-            if (!settimane[weekIdx].eventi) settimane[weekIdx].eventi = {};
-            if (!settimane[weekIdx].eventi[nuovoGiorno]) settimane[weekIdx].eventi[nuovoGiorno] = [];
+            function applicaASettimane(targetSettimane) {
+                if (!targetSettimane[weekIdx].eventi) targetSettimane[weekIdx].eventi = {};
+                if (!targetSettimane[weekIdx].eventi[nuovoGiorno]) targetSettimane[weekIdx].eventi[nuovoGiorno] = [];
 
-            if (isNew) {
-                settimane[weekIdx].eventi[nuovoGiorno].push(datiEvento);
-            } else {
-                if (vecchioGiorno === nuovoGiorno) {
-                    settimane[weekIdx].eventi[vecchioGiorno][eventIdx] = datiEvento;
+                if (isNew) {
+                    targetSettimane[weekIdx].eventi[nuovoGiorno].push(datiEvento);
                 } else {
-                    settimane[weekIdx].eventi[vecchioGiorno].splice(eventIdx, 1);
-                    settimane[weekIdx].eventi[nuovoGiorno].push(datiEvento);
+                    if (vecchioGiorno === nuovoGiorno) {
+                        targetSettimane[weekIdx].eventi[vecchioGiorno][eventIdx] = datiEvento;
+                    } else {
+                        targetSettimane[weekIdx].eventi[vecchioGiorno].splice(eventIdx, 1);
+                        targetSettimane[weekIdx].eventi[nuovoGiorno].push(datiEvento);
+                    }
                 }
+            }
+
+            // Applica al calendario corrente dell'admin
+            applicaASettimane(settimane);
+
+            if (perTutti && db) {
+                // Scarica l'orario base ufficiale da Firebase o usa defaultSettimane
+                db.ref('orario_ufficiale/settimane').once('value').then(snap => {
+                    let baseSettimane = snap.val() || JSON.parse(JSON.stringify(defaultSettimane));
+                    applicaASettimane(baseSettimane);
+                    return db.ref('orario_ufficiale/settimane').set(baseSettimane);
+                }).then(() => {
+                    alert("✅ Modifica pubblicata nell'orario ufficiale per tutti!");
+                }).catch(err => {
+                    console.error("Errore salvataggio orario_ufficiale:", err);
+                    alert("❌ Errore durante il salvataggio per tutti.");
+                });
             }
 
             chiudiModale();
@@ -2271,15 +2299,35 @@
             salvaSuCloudSilenzioso();
         }
 
-        function eliminaEventoCorrente() {
+        function eliminaEventoCorrente(perTutti = false) {
             if (!eventoSelezionatoRef || eventoSelezionatoRef.isNew) return;
-            if (!confirm("Vuoi eliminare questa lezione?")) return;
+            const mex = perTutti ? "Vuoi eliminare questa lezione dall'orario ufficiale PER TUTTI GLI UTENTI?" : "Vuoi eliminare questa lezione dal tuo calendario?";
+            if (!confirm(mex)) return;
+
             const { weekIdx, giorno, eventIdx } = eventoSelezionatoRef;
             settimane[weekIdx].eventi[giorno].splice(eventIdx, 1);
+
+            if (perTutti && db) {
+                db.ref('orario_ufficiale/settimane').once('value').then(snap => {
+                    let baseSettimane = snap.val() || JSON.parse(JSON.stringify(defaultSettimane));
+                    if (baseSettimane[weekIdx] && baseSettimane[weekIdx].eventi && baseSettimane[weekIdx].eventi[giorno]) {
+                        baseSettimane[weekIdx].eventi[giorno].splice(eventIdx, 1);
+                        return db.ref('orario_ufficiale/settimane').set(baseSettimane);
+                    }
+                }).then(() => {
+                    alert("🗑 Lezione rimossa dall'orario ufficiale per tutti!");
+                }).catch(err => {
+                    console.error("Errore eliminazione per tutti:", err);
+                    alert("❌ Errore durante l'eliminazione per tutti.");
+                });
+            }
+
             chiudiModale();
             aggiornaInterfaccia();
             salvaSuCloudSilenzioso();
         }
+
+
 
         function ripristinaDati() {
             if (confirm("ATTENZIONE: Il Reset Totale sovrascrive tutto il tuo calendario con l'orario iniziale. Vuoi procedere?")) {
@@ -2539,8 +2587,11 @@
         }
 
         function avviaSmartMerge() {
-            const conflitti = [];
-            const nuoveSettimane = JSON.parse(JSON.stringify(defaultSettimane));
+            updateHeaderDot('syncing', 'Controllo orario ufficiale...');
+            
+            const procediConMerge = (orarioMaster) => {
+                const conflitti = [];
+                const nuoveSettimane = JSON.parse(JSON.stringify(orarioMaster));
 
             nuoveSettimane.forEach((nuovaW) => {
                 const wNumero = nuovaW.numero;
@@ -2576,17 +2627,29 @@
             mergedSettimanePending = nuoveSettimane;
 
             if (conflitti.length > 0) {
-                const listElem = document.getElementById('conflictList');
-                listElem.innerHTML = '';
-                conflitti.forEach(c => {
-                    const li = document.createElement('li');
-                    li.textContent = c;
-                    listElem.appendChild(li);
+                    const listElem = document.getElementById('conflictList');
+                    listElem.innerHTML = '';
+                    conflitti.forEach(c => {
+                        const li = document.createElement('li');
+                        li.textContent = c;
+                        listElem.appendChild(li);
+                    });
+                    document.getElementById('conflictModal').classList.add('active');
+                } else {
+                    applicaMergeConfermato();
+                    alert("✅ Calendario sincronizzato con l'orario ufficiale!");
+                }
+            };
+
+            if (db) {
+                db.ref('orario_ufficiale/settimane').once('value').then(snap => {
+                    const cloudMaster = snap.val();
+                    procediConMerge(cloudMaster || defaultSettimane);
+                }).catch(() => {
+                    procediConMerge(defaultSettimane);
                 });
-                document.getElementById('conflictModal').classList.add('active');
             } else {
-                applicaMergeConfermato();
-                alert("✅ Calendario sincronizzato con l'orario ufficiale!");
+                procediConMerge(defaultSettimane);
             }
         }
 
