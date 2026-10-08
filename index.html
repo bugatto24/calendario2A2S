@@ -383,6 +383,7 @@
         .evento-normale { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
         .evento-obbligatorio { background: #fffbeb; color: #92400e; border-color: #fde68a; }
         .evento-saltata { background: #f8fafc; color: #64748b; opacity: 0.65; text-decoration: line-through; border-color: #e2e8f0; }
+        .evento-badge { background: #d1fae5; color: #047857; border-color: #6ee7b7; font-weight: 500; }
 
         .bordo-patologia { border-left-color: #a855f7 !important; }
         .bordo-neuro { border-left-color: #0284c7 !important; }
@@ -519,8 +520,9 @@
         .modal-header h3 { font-size: 1.15rem; color: #0f172a; font-weight: 700; }
         .btn-close { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #94a3b8; }
         
-        .quick-status-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
-        .btn-status-quick { padding: 9px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid transparent; background: #f8fafc; font-family: inherit; }
+        .quick-status-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 16px; }
+.btn-status-badge { min-width: 42px; font-size: 15px; padding: 6px 10px; }
+.btn-status-quick.active-badge { border-color: #059669; background: #d1fae5; color: #047857; }.btn-status-quick { padding: 9px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid transparent; background: #f8fafc; font-family: inherit; }
         .btn-status-quick.active-normale { border-color: #10b981; background: #ecfdf5; color: #065f46; }
         .btn-status-quick.active-obbligatorio { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
         .btn-status-quick.active-saltata { border-color: #94a3b8; background: #f1f5f9; color: #475569; }
@@ -911,10 +913,11 @@
                 <button class="btn-close" onclick="chiudiModale()">&times;</button>
             </div>
             <div class="quick-status-buttons">
-                <button type="button" class="btn-status-quick" id="btnStatoNormale" onclick="impostaStato('normale')">✅ Segui</button>
-                <button type="button" class="btn-status-quick" id="btnStatoObbligatorio" onclick="impostaStato('obbligatorio')">⚠️ Obbligatoria</button>
-                <button type="button" class="btn-status-quick" id="btnStatoSaltata" onclick="impostaStato('saltata')">❌ Salta</button>
-            </div>
+    <button type="button" class="btn-status-quick" id="btnStatoNormale" onclick="impostaStato('normale')">✅ Segui</button>
+    <button type="button" class="btn-status-quick" id="btnStatoObbligatorio" onclick="impostaStato('obbligatorio')">⚠️ Obbligatoria</button>
+    <button type="button" class="btn-status-quick" id="btnStatoSaltata" onclick="impostaStato('saltata')">❌ Salta</button>
+    <button type="button" class="btn-status-quick btn-status-badge" id="btnStatoBadge" onclick="impostaStato('badge')" title="Speciale / Importante">🎖️</button>
+</div>
             
             <div class="form-row">
                 <div class="form-group" style="flex: 1.2;">
@@ -2574,7 +2577,7 @@
                         if (e.titolo && e.titolo.includes(searchTerm) && appartieneAlGruppo(e, gruppoSelezionato)) {
                             const d = e.oraFine - e.oraInizio;
                             totale += d;
-                            if (e.tipo === 'normale' || e.tipo === 'obbligatorio') seguite += d;
+                            if (e.tipo === 'normale' || e.tipo === 'obbligatorio' || e.tipo === 'badge') seguite += d;
                         }
                     });
                 });
@@ -2856,19 +2859,22 @@
                         if (convalidato) {
                             classeStato = 'evento-convalidato';
                             emoji = '🎓';
+
                         } else if (!appartiene) {
     classeStato = 'evento-altrogruppo';
     emoji = '👥';
 } else {
-    // Rileva se l'evento è diviso per gruppi
+    // Rileva se è per gruppi
     const testoGruppo = ((evento.docente || '') + ' ' + (evento.titolo || '')).toUpperCase();
     const isPerGruppi = testoGruppo.includes('GRUPPO') || testoGruppo.includes('GRUPPI');
 
     if (evento.tipo === 'saltata') {
         classeStato = 'evento-saltata';
         emoji = '❌';
+    } else if (evento.tipo === 'badge') {
+        classeStato = 'evento-badge';
+        emoji = '🎖️';
     } else if (evento.tipo === 'obbligatorio' || isPerGruppi) {
-        // Se è impostato obbligatorio OPPURE è una lezione a gruppi, usa lo stile giallo/avviso
         classeStato = 'evento-obbligatorio';
         emoji = evento.tipo === 'obbligatorio' ? '⚠️' : '👥';
     } else {
@@ -3211,12 +3217,14 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
         }
 
         function impostaStato(tipo) {
-            tipoSelezionato = tipo;
-            ['Normale', 'Obbligatorio', 'Saltata'].forEach(t => {
-                const b = document.getElementById(`btnStato${t}`);
-                b.className = 'btn-status-quick' + (tipo === t.toLowerCase() ? ` active-${tipo}` : '');
-            });
-        }
+    tipoSelezionato = tipo;
+    ['Normale', 'Obbligatorio', 'Saltata', 'Badge'].forEach(t => {
+        const b = document.getElementById(`btnStato${t}`);
+        if (!b) return;
+        const extraClass = (t === 'Badge') ? ' btn-status-badge' : '';
+        b.className = 'btn-status-quick' + extraClass + (tipo === t.toLowerCase() ? ` active-${tipo}` : '');
+    });
+}
 
        
        function salvaModificheEvento(perTutti = false) {
@@ -3894,7 +3902,9 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                         const dtE = new Date(dEv); dtE.setHours(hF, mF, 0);
                         const fmt = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
 
-                        let prefisso = ev.tipo === 'saltata' ? '❌ [SALTATA] ' : ev.tipo === 'obbligatorio' ? '⚠️ [OBBLIGATORIO] ' : '✅ ';
+                        let prefisso = ev.tipo === 'saltata' ? '❌ [SALTATA] ' : 
+               ev.tipo === 'obbligatorio' ? '⚠️ [OBBLIGATORIO] ' : 
+               ev.tipo === 'badge' ? '🎖️ [IMPORTANTE] ' : '✅ ';
                         ics += `BEGIN:VEVENT\r\nUID:${s.numero}-${g}-${ev.oraInizio}@fisioterapia\r\nDTSTART:${fmt(dtS)}\r\nDTEND:${fmt(dtE)}\r\nSUMMARY:${prefisso}${ev.titolo}\r\n`;
                         if (ev.docente) ics += `DESCRIPTION:Docente: ${ev.docente}\r\n`;
                         if (ev.luogo) ics += `LOCATION:${ev.luogo}\r\n`;
