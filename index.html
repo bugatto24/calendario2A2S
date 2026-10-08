@@ -4017,9 +4017,9 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                         const dtE = new Date(dEv); dtE.setHours(hF, mF, 0);
                         const fmt = d => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
 
-                        let prefisso = ev.tipo === 'saltata' ? '❌ [SALTATA] ' : 
-               ev.tipo === 'obbligatorio' ? '⚠️ [OBBLIGATORIO] ' : 
-               ev.tipo === 'badge' ? '🎖️ [IMPORTANTE] ' : '✅ ';
+                       let prefisso = ev.tipo === 'saltata' ? '❌ ' : 
+               ev.tipo === 'obbligatorio' ? '⚠️ ' : 
+               ev.tipo === 'badge' ? '🎖️ ' : '✅ ';
                         ics += `BEGIN:VEVENT\r\nUID:${s.numero}-${g}-${ev.oraInizio}@fisioterapia\r\nDTSTART:${fmt(dtS)}\r\nDTEND:${fmt(dtE)}\r\nSUMMARY:${prefisso}${ev.titolo}\r\n`;
                         if (ev.docente) ics += `DESCRIPTION:Docente: ${ev.docente}\r\n`;
                         if (ev.luogo) ics += `LOCATION:${ev.luogo}\r\n`;
