@@ -2479,6 +2479,17 @@
             }
             currentUser = sanitized;
             try { localStorage.setItem('currentUser_fisioterapia', currentUser); } catch(e) {}
+
+            // 1. CARICAMENTO ISTANTANEO DA CACHE (0 ms)
+            try {
+                const cachedSettimane = localStorage.getItem('fisioterapia_settimane_cache_' + currentUser);
+                if (cachedSettimane) {
+                    settimane = JSON.parse(cachedSettimane);
+                    popolaSelectSettimane();
+                    aggiornaInterfaccia();
+                }
+            } catch(e) {}
+
             syncInputsToUI();
 
             updateHeaderDot('syncing', 'Connessione al profilo...');
@@ -2487,6 +2498,7 @@
                 return;
             }
 
+            // 2. SINCRONIZZAZIONE SILENZIOSA IN BACKGROUND CON FIREBASE
             db.ref('utenti/' + currentUser).once('value').then(snapshot => {
                 const data = snapshot.val();
                 if (data) {
@@ -2503,6 +2515,9 @@
                     } else {
                         settimane = Array.isArray(data) ? data : Object.values(data);
                     }
+                    try {
+                        localStorage.setItem('fisioterapia_settimane_cache_' + currentUser, JSON.stringify(settimane));
+                    } catch(e) {}
                     updateHeaderDot('online', `Connesso come: ${currentUser}`);
                 } else {
                     settimane = JSON.parse(JSON.stringify(defaultSettimane));
@@ -2519,8 +2534,15 @@
             });
         }
 
-        function salvaSuCloudSilenzioso() {
-            if (!currentUser || !db) return;
+       function salvaSuCloudSilenzioso() {
+            if (!currentUser) return;
+            
+            // Salvataggio istantaneo in cache locale per azzerare i tempi d'attesa al riavvio
+            try {
+                localStorage.setItem('fisioterapia_settimane_cache_' + currentUser, JSON.stringify(settimane));
+            } catch(e) {}
+
+            if (!db) return;
             updateHeaderDot('syncing', 'Salvataggio in corso...');
 
             const payload = {
@@ -3984,9 +4006,23 @@
 
         // Inizializzazione
         function init() {
+            // Recupera la cache locale immediatamente prima di qualsiasi chiamata di rete
+            if (currentUser) {
+                try {
+                    const cached = localStorage.getItem('fisioterapia_settimane_cache_' + currentUser);
+                    if (cached) {
+                        settimane = JSON.parse(cached);
+                    }
+                } catch(e) {}
+            }
+
             popolaSelectSettimane();
             settimanaCorrente = calcolaIndiceSettimanaCorrente();
+            
+            // Rendering immediato: la pagina è subito pronta all'uso
+            aggiornaInterfaccia();
             syncInputsToUI();
+
             initSwipeGestures();
             initProfModalSwipe();
             initSharedProfSync();
@@ -4000,7 +4036,6 @@
                 caricaOCreaProfilo();
             } else {
                 updateHeaderDot('offline', 'Non connesso');
-                aggiornaInterfaccia();
             }
 
             checkMobileAutoScroll();
