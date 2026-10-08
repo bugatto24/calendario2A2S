@@ -378,6 +378,10 @@
             white-space: nowrap; 
             overflow: hidden; 
             text-overflow: ellipsis; 
+            display: block;
+        }
+        .evento-docente-mobile {
+            display: none; /* Nascosto su desktop */
         }
 
         .evento-normale { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
@@ -843,7 +847,21 @@
             .calendar-container.vista-compatta .evento { padding: 3px 2px; border-left-width: 3px !important; border-radius: 4px; }
             .calendar-container.vista-compatta .evento-title { font-size: 9.5px; line-height: 1.15; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
             .calendar-container.vista-compatta .evento-time { font-size: 8.5px; margin-top: 1px; }
-            .calendar-container.vista-compatta .evento-docente { display: none; }
+            /* Su mobile nasconde la riga estesa (Docente • Aula) e mostra solo il cognome pulito */
+            .calendar-container.vista-compatta .evento-docente { 
+                display: none !important; 
+            }
+            .calendar-container.vista-compatta .evento-docente-mobile { 
+                display: block; 
+                font-size: 8.5px;
+                font-weight: 500;
+                line-height: 1.15;
+                margin-top: 1px;
+                white-space: nowrap; 
+                overflow: hidden; 
+                text-overflow: ellipsis; 
+                opacity: 0.85;
+            }
 
           
         }
@@ -1295,7 +1313,7 @@
                     "titolo": "PATOLOGIA GENERALE - GASTROENTEROLOGIA"
                 },
                 {
-                    "docente": "A. MASSE'",
+                    "docente": "A. MASSÈ",
                     "luogo": "Aula Magna Igiene Molinette",
                     "oraFine": 16,
                     "oraInizio": 14,
@@ -2975,9 +2993,28 @@
                                       onclick="apriModale(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
                         html += `<div class="evento-title">${emoji} ${evento.titolo}</div>`;
                         html += `<div class="evento-time">${formattaOra(evento.oraInizio)} - ${formattaOra(evento.oraFine)}</div>`;
+                        
+                        // 1. Riga desktop: docente completo + luogo (es. "M. BOZZALI • Aula 2.7 Marenco")
                         if (evento.docente || evento.luogo) {
-                            html += `<div class="evento-docente">${[evento.docente, evento.luogo].filter(Boolean).join(' • ')}</div>`;
+                            let docDesktop = (evento.docente || '').replace(/MASSE'/gi, 'MASSÈ');
+                            let infoDesktop = [docDesktop, evento.luogo].filter(Boolean).join(' • ');
+                            html += `<div class="evento-docente">${infoDesktop}</div>`;
                         }
+
+                        // 2. Riga mobile: solo cognome con iniziale maiuscola sotto l'orario
+                        if (evento.docente) {
+                            let soloCognome = evento.docente
+                                .replace(/^(PROF\.|PROF\b|DOTT\.|DOTT\b|[A-Z]\.\s*)/gi, '')
+                                .split('(')[0]
+                                .trim();
+                            if (soloCognome) {
+                                soloCognome = soloCognome.replace(/MASSE'/gi, 'Massè')
+                                    .toLowerCase()
+                                    .replace(/(?:^|\s|-)\S/g, char => char.toUpperCase());
+                                html += `<div class="evento-docente-mobile">${soloCognome}</div>`;
+                            }
+                        }
+
                         html += badgeRatingHtml;
                         html += `</div>`;
                     });
