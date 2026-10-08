@@ -100,8 +100,7 @@
         .btn-user:hover { background: #6b21a8; }
         .btn-today { background: #f8fafc; color: #1e293b; border: 1.5px solid #cbd5e1; font-weight: 600; }
         .btn-today:hover { background: #e2e8f0; border-color: #94a3b8; }
-        .btn-toggle-view { background: #e0e7ff; color: #4338ca; font-weight: 600; border: 1px solid #c7d2fe; }
-        .btn-toggle-view:hover { background: #c7d2fe; }
+       
         .btn-sync-merge { background: #0284c7; color: white; font-weight: 600; }
         .btn-sync-merge:hover { background: #0369a1; }
         .btn-export { background: #10b981; color: white; }
@@ -222,7 +221,6 @@
             scroll-margin-top: 0px;
         }
         .calendar-container.vista-compatta { touch-action: pan-y; }
-        .calendar-container.vista-espansa { touch-action: auto !important; overflow-x: scroll !important; }
 
         .calendar { 
             display: grid; 
@@ -804,11 +802,7 @@
             .calendar-container.vista-compatta .evento-time { font-size: 8.5px; margin-top: 1px; }
             .calendar-container.vista-compatta .evento-docente { display: none; }
 
-            .calendar-container.vista-espansa .calendar { 
-                min-width: 900px !important; 
-                width: 900px !important; 
-                grid-template-columns: 55px repeat(5, minmax(165px, 1fr)) !important; 
-            }
+          
         }
     </style>
 </head>
@@ -863,7 +857,6 @@
                 <button class="btn btn-sync-merge" onclick="avviaSmartMerge()">🔄 Sincronizza Orario</button>
                 <button class="btn" id="btnAdminBroadcastSync" style="display:none; background:#7e22ce; color:white; font-weight:600;" onclick="sincronizzaPerTuttiForzato()" title="Propaga istantaneamente le modifiche a tutti i profili utente">📢 Sincronizza per tutti</button>
                 <button class="btn" id="btnAdminUploadJSON" style="display:none; background:#0f766e; color:white; font-weight:600;" onclick="apriModalUploadJSON()" title="Carica un nuovo calendario JSON direttamente nel database">📥 Carica JSON</button>
-                <button class="btn btn-toggle-view" onclick="toggleVistaMobile()">📐 Espandi</button>
                 <button class="btn btn-export" onclick="exportICS()">🗓 ICS</button>
                 <button class="btn" id="btnAdminCopyJSON" style="display:none; background:#475569; color:white;" onclick="copiaJSONPerHTML()" title="Copia l'orario attuale formattato per il codice HTML">📋 Copia JSON</button>
                 <button class="btn btn-reset" onclick="ripristinaDati()">↺ Reset Totale</button>
@@ -2411,19 +2404,7 @@
             return settimane.length - 1;
         }
 
-        function toggleVistaMobile() {
-            const container = document.getElementById('calendarContainer');
-            const btns = document.querySelectorAll('.btn-toggle-view');
-            if (container.classList.contains('vista-compatta')) {
-                container.classList.remove('vista-compatta');
-                container.classList.add('vista-espansa');
-                btns.forEach(b => b.textContent = '📐 Compatta');
-            } else {
-                container.classList.remove('vista-espansa');
-                container.classList.add('vista-compatta');
-                btns.forEach(b => b.textContent = '📐 Espandi');
-            }
-        }
+
 
         let touchStartX = 0;
         let touchStartY = 0;
@@ -3145,9 +3126,13 @@
             eventoSelezionatoRef = { weekIdx, giorno, eventIdx: -1, isNew: true };
 
             document.getElementById('modalTitle').textContent = "Nuova Lezione";
-            document.getElementById('btnDeleteEvent').style.display = 'none';
-            document.getElementById('btnDeleteEventGlobal').style.display = 'none';
-            document.getElementById('btnSaveGlobal').style.display = isAdmin() ? 'inline-flex' : 'none';
+// Se admin, nasconde i tasti personali e mostra solo quello globale
+const admin = isAdmin();
+document.getElementById('btnDeleteEvent').style.display = 'none';
+document.getElementById('btnDeleteEventGlobal').style.display = 'none';
+document.querySelector('.btn-save-modal:not(#btnSaveGlobal)').style.display = admin ? 'none' : 'inline-flex';
+document.getElementById('btnSaveGlobal').style.display = admin ? 'inline-flex' : 'none';
+document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti";
 
             popolaSelectSettimaneModale(weekIdx);
             document.getElementById('editGiorno').value = giorno;
@@ -3193,9 +3178,16 @@
             const ev = settimane[weekIdx].eventi[giorno][eventIdx];
 
             document.getElementById('modalTitle').textContent = "Modifica Lezione";
-            document.getElementById('btnDeleteEvent').style.display = 'block';
-            document.getElementById('btnDeleteEventGlobal').style.display = isAdmin() ? 'inline-flex' : 'none';
-            document.getElementById('btnSaveGlobal').style.display = isAdmin() ? 'inline-flex' : 'none';
+const admin = isAdmin();
+// Tasti eliminazione
+document.getElementById('btnDeleteEvent').style.display = admin ? 'none' : 'inline-flex';
+document.getElementById('btnDeleteEventGlobal').style.display = admin ? 'inline-flex' : 'none';
+document.getElementById('btnDeleteEventGlobal').textContent = "🗑 Elimina per tutti";
+
+// Tasti salvataggio
+document.querySelector('.btn-save-modal:not(#btnSaveGlobal)').style.display = admin ? 'none' : 'inline-flex';
+document.getElementById('btnSaveGlobal').style.display = admin ? 'inline-flex' : 'none';
+document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti";
 
             popolaSelectSettimaneModale(weekIdx);
             document.getElementById('editGiorno').value = giorno;
