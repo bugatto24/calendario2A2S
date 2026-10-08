@@ -465,10 +465,10 @@
             align-items: center;
             justify-content: center;
             background: #f1f5f9;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            padding: 2px 6px;
-            font-size: 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 20px; /* Più grande */
             cursor: pointer;
             transition: all 0.15s;
             line-height: 1;
@@ -478,6 +478,47 @@
             background: #f5f3ff;
             border-color: #a855f7;
             transform: scale(1.08);
+        }
+
+        /* Bottoni gradimento prof nella modale */
+        .prof-rating-box {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-rating-prof {
+            background: #ffffff;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 16px;
+            padding: 3px 6px;
+            cursor: pointer;
+            line-height: 1;
+            transition: all 0.15s;
+        }
+        .btn-rating-prof:hover {
+            background: #f3e8ff;
+            border-color: #c084fc;
+        }
+        .btn-rating-prof.active-rating {
+            background: #ede9fe;
+            border-color: #7e22ce;
+            box-shadow: 0 0 0 2px rgba(126, 34, 206, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Valutazione docente in basso a destra nel riquadro evento */
+        .evento-footer-rating {
+            position: absolute;
+            bottom: 3px;
+            right: 5px;
+            font-size: 11px;
+            line-height: 1;
+            opacity: 0.85;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 2px;
         }
 
         .docente-input-row {
@@ -1010,7 +1051,14 @@
                     <div class="prof-avatar" id="profAvatar" title="Icona Prof">👨‍🏫</div>
                     <div class="prof-title-info">
                         <div class="prof-modulo-title" id="profModuloTitle">MODULO</div>
-                        <input type="text" class="prof-name-input" id="profNameInput" placeholder="Nome Prof" disabled onchange="aggiornaDatiProfCorrente('nome', this.value)">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <input type="text" class="prof-name-input" id="profNameInput" placeholder="Nome Prof" disabled onchange="aggiornaDatiProfCorrente('nome', this.value)">
+                            <div class="prof-rating-box">
+                                <button type="button" class="btn-rating-prof" id="btnRateDown" onclick="votaProfPersonale('down')" title="Non mi piace">👎🏻</button>
+                                <button type="button" class="btn-rating-prof" id="btnRateNeutral" onclick="votaProfPersonale('neutral')" title="Così così">✋🏻</button>
+                                <button type="button" class="btn-rating-prof" id="btnRateUp" onclick="votaProfPersonale('up')" title="Mi piace">👍🏻</button>
+                            </div>
+                        </div>
                         <div id="profGenereWrapper" style="display:none; align-items:center; gap:6px; margin-top:4px;">
                             <span style="font-size:11px; color:#64748b; font-weight:600;">Genere:</span>
                             <select class="prof-genere-select" id="profGenereSelect" onchange="aggiornaGenereProfCorrente(this.value)">
@@ -1178,6 +1226,7 @@
         let gruppoSelezionato = 'ALL';
         let moduliConvalidati = [];
         let moduloInEvidenza = null;
+        let ratingDocenti = {}; // Valutazioni personali dell'utente: { searchKey: 'up' | 'neutral' | 'down' }
 
         // Lista degli utenti abilitati come admin
         const adminUsers = ['admin', 'paolom'];
@@ -1189,6 +1238,7 @@
             currentUser = localStorage.getItem('currentUser_fisioterapia') || '';
             gruppoSelezionato = localStorage.getItem('currentGroup_fisioterapia') || 'ALL';
             moduliConvalidati = JSON.parse(localStorage.getItem('convalidati_fisioterapia') || '[]');
+            ratingDocenti = JSON.parse(localStorage.getItem('fisioterapia_rating_docenti_' + currentUser) || '{}');
         } catch(e) {}
 
         let settimanaCorrente = 0;
@@ -2496,6 +2546,10 @@
                             moduliConvalidati = Array.isArray(data.convalidati) ? data.convalidati : [];
                             try { localStorage.setItem('convalidati_fisioterapia', JSON.stringify(moduliConvalidati)); } catch(e) {}
                         }
+                        if (data.ratingDocenti) {
+                            ratingDocenti = data.ratingDocenti;
+                            try { localStorage.setItem('fisioterapia_rating_docenti_' + currentUser, JSON.stringify(ratingDocenti)); } catch(e) {}
+                        }
                     } else {
                         settimane = Array.isArray(data) ? data : Object.values(data);
                     }
@@ -2529,10 +2583,15 @@
             if (!db) return;
             updateHeaderDot('syncing', 'Salvataggio in corso...');
 
+            try {
+                localStorage.setItem('fisioterapia_rating_docenti_' + currentUser, JSON.stringify(ratingDocenti));
+            } catch(e) {}
+
             const payload = {
                 settimane: settimane,
                 gruppo: gruppoSelezionato,
                 convalidati: moduliConvalidati,
+                ratingDocenti: ratingDocenti,
                 lastUpdate: new Date().toISOString()
             };
 
@@ -2887,6 +2946,20 @@
                         const modRef = estraiModuloSearchKey(evento.titolo);
                         const pressParams = modRef ? `'${modRef.searchKey}', '${modRef.label}'` : `null, null`;
 
+                        // Calcolo icona valutazione docente per l'angolo in basso a destra
+                        let badgeRatingHtml = '';
+                        if (modRef) {
+                            const userRating = ratingDocenti[modRef.searchKey];
+                            if (!userRating) {
+                                // Nessuna scelta: solo sagoma generica
+                                badgeRatingHtml = `<span class="evento-footer-rating" title="Nessuna valutazione prof">👤</span>`;
+                            } else {
+                                const profIcon = getProfIconForSearchKey(modRef.searchKey);
+                                const ratingEmoji = userRating === 'up' ? '👍🏻' : userRating === 'down' ? '👎🏻' : '✋🏻';
+                                badgeRatingHtml = `<span class="evento-footer-rating" title="Valutazione prof: ${ratingEmoji}">${profIcon}${ratingEmoji}</span>`;
+                            }
+                        }
+
                         html += `<div class="evento ${classeStato} ${classeBordo} ${focusClass}" 
                                       style="top: ${top}px; height: ${height}px; width: ${widthCalc}; left: ${leftCalc};" 
                                       onmousedown="if(${modRef !== null}) startAntiScrollPress(event, ${pressParams})"
@@ -2902,6 +2975,7 @@
                         if (evento.docente || evento.luogo) {
                             html += `<div class="evento-docente">${[evento.docente, evento.luogo].filter(Boolean).join(' • ')}</div>`;
                         }
+                        html += badgeRatingHtml;
                         html += `</div>`;
                     });
                     html += '</div></div>';
@@ -3462,11 +3536,25 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
             // Il genere compare solo se in modalità modifica
             genereWrap.style.display = isProfEditingMode ? 'flex' : 'none';
 
+            // Aggiorna lo stato visivo dei pulsanti di voto (👎🏻 ✋🏻 👍🏻)
+            const currentRating = currentProfSearchKey ? (ratingDocenti[currentProfSearchKey] || null) : null;
+            ['down', 'neutral', 'up'].forEach(type => {
+                const btnId = type === 'down' ? 'btnRateDown' : type === 'neutral' ? 'btnRateNeutral' : 'btnRateUp';
+                const btnElem = document.getElementById(btnId);
+                if (btnElem) {
+                    if (currentRating === type) {
+                        btnElem.classList.add('active-rating');
+                    } else {
+                        btnElem.classList.remove('active-rating');
+                    }
+                }
+            });
+
             if (isProfEditingMode) {
                 btnEdit.textContent = '💾 Fatto';
                 btnEdit.style.background = '#10b981';
             } else {
-                btnEdit.textContent = '✏️️ Modifica';
+                btnEdit.textContent = '✏ Modifica';
                 btnEdit.style.background = '#7e22ce';
             }
 
@@ -3477,6 +3565,20 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
             document.getElementById('btnProfPrev').style.display = total > 1 ? 'flex' : 'none';
             document.getElementById('btnProfNext').style.display = total > 1 ? 'flex' : 'none';
             document.getElementById('profPageIndicator').textContent = total > 1 ? `Prof ${currentProfPageIndex + 1} di ${total}` : '';
+        }
+
+        function votaProfPersonale(valore) {
+            if (!currentProfSearchKey) return;
+            // Se si riclicca lo stesso, viene deselezionato (toggle)
+            if (ratingDocenti[currentProfSearchKey] === valore) {
+                delete ratingDocenti[currentProfSearchKey];
+            } else {
+                ratingDocenti[currentProfSearchKey] = valore;
+            }
+
+            renderProfPage();
+            renderCalendario();
+            salvaSuCloudSilenzioso(); // Salva nel profilo utente (NON nei prof condivisi)
         }
 
         function toggleModificaProf() {
