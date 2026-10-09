@@ -565,9 +565,18 @@
         .modal-header h3 { font-size: 1.15rem; color: #0f172a; font-weight: 700; }
         .btn-close { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #94a3b8; }
         
-        .quick-status-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 16px; }
-.btn-status-badge { min-width: 42px; font-size: 15px; padding: 6px 10px; }
-.btn-status-quick.active-badge { border-color: #059669; background: #d1fae5; color: #047857; }.btn-status-quick { padding: 9px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid transparent; background: #f8fafc; font-family: inherit; }
+       .quick-status-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 16px; }
+        .btn-status-quick { padding: 9px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 2px solid transparent; background: #f8fafc; font-family: inherit; }
+        .btn-status-badge { 
+            min-width: 42px; 
+            font-size: 22px !important; 
+            line-height: 1; 
+            padding: 4px 8px !important; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .btn-status-quick.active-badge { border-color: #059669; background: #d1fae5; color: #047857; }
         .btn-status-quick.active-normale { border-color: #10b981; background: #ecfdf5; color: #065f46; }
         .btn-status-quick.active-obbligatorio { border-color: #f59e0b; background: #fffbeb; color: #92400e; }
         .btn-status-quick.active-saltata { border-color: #94a3b8; background: #f1f5f9; color: #475569; }
