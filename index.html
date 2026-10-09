@@ -3298,13 +3298,18 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                 return;
             }
 
+            const ev = settimane[weekIdx].eventi[giorno][eventIdx];
+
             if (moduloInEvidenza) {
-                disattivaEvidenziazione();
-                return;
+                const appartieneAlModulo = (ev.titolo || '').toUpperCase().includes(moduloInEvidenza);
+                if (!appartieneAlModulo) {
+                    disattivaEvidenziazione();
+                    return;
+                }
+                // Se appartiene al modulo in evidenza, prosegue regolarmente aprendo la finestra di modifica
             }
 
             eventoSelezionatoRef = { weekIdx, giorno, eventIdx, isNew: false };
-            const ev = settimane[weekIdx].eventi[giorno][eventIdx];
 
             document.getElementById('modalTitle').textContent = "Modifica Lezione";
 const admin = isAdmin();
@@ -4180,7 +4185,7 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
 
         // Inizializzazione
         function init() {
-            // Recupera la cache locale immediatamente prima di qualsiasi chiamata di rete
+            // Recupera la cache locale immediatamente prima di qualsiasiTile di rete
             if (currentUser) {
                 try {
                     const cached = localStorage.getItem('fisioterapia_settimane_cache_' + currentUser);
@@ -4201,6 +4206,17 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
             initProfModalSwipe();
             initSharedProfSync();
             initBroadcastListener();
+
+            // Deseleziona se si fa single press/click in un punto qualsiasi fuori da eventi o moduli
+            document.addEventListener('click', (e) => {
+                if (!moduloInEvidenza) return;
+                // Ignora se si clicca su modali aperte, sul banner o se il long press è appena terminato
+                if (e.target.closest('.modal') || e.target.closest('.highlight-banner') || isLongPressTriggered) return;
+                // Se non si è cliccato su una card lezione o su un elemento del modulo
+                if (!e.target.closest('.evento') && !e.target.closest('.modulo')) {
+                    disattivaEvidenziazione();
+                }
+            });
 
             setInterval(() => {
                 renderCalendario();
