@@ -1047,8 +1047,8 @@
             
             <div class="modal-footer">
                 <div style="display:flex; gap:6px;">
-                    <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente(false)">🗑 Elimina</button>
-                    <button type="button" class="btn-delete" id="btnDeleteEventGlobal" style="display:none; background:#7f1d1d; color:white;" onclick="eliminaEventoCorrente(true)">🗑 Per tutti</button>
+                    <button type="button" class="btn-delete" id="btnDeleteEvent" onclick="eliminaEventoCorrente(false)">🗑 Elimina evento</button>
+                    <button type="button" class="btn-delete" id="btnDeleteEventGlobal" style="display:none; background:#7f1d1d; color:white;" onclick="eliminaEventoCorrente(true)">🗑 Elimina evento per tutti</button>
                 </div>
                 <div class="modal-footer-right">
                     <button type="button" class="btn-cancel-modal" onclick="chiudiModale()">Annulla</button>
@@ -1116,8 +1116,8 @@
 
             <div class="modal-footer" style="justify-content: space-between; align-items: center; gap: 8px;">
                 <div style="display: flex; gap: 6px;">
-                    <button type="button" class="btn" id="btnAddProfDocente" style="display:none; background:#0284c7; color:white; font-weight:600;" onclick="aggiungiDocenteAModulo()">➕ Aggiungi Docente</button>
-                    <button type="button" class="btn-delete" id="btnDeleteProfDocente" style="display:none; padding: 7px 12px; font-size: 12px;" onclick="eliminaDocenteDaModulo()">🗑 Elimina</button>
+                    <button type="button" class="btn" id="btnAddProfDocente" style="background:#0284c7; color:white; font-weight:600;" onclick="aggiungiDocenteAModulo()">➕ Aggiungi Docente</button>
+                    <button type="button" class="btn-delete" id="btnDeleteProfDocente" style="display:none; padding: 7px 12px; font-size: 12px;" onclick="eliminaDocenteDaModulo()">🗑 Elimina docente</button>
                 </div>
                 <div style="display: flex; gap: 8px;">
                     <button type="button" class="btn" id="btnToggleEditProf" style="background:#7e22ce; color:white; font-weight:600;" onclick="toggleModificaProf()">✏️ Modifica</button>
@@ -3317,12 +3317,12 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
 
             eventoSelezionatoRef = { weekIdx, giorno, eventIdx, isNew: false };
 
-            document.getElementById('modalTitle').textContent = "Modifica Lezione";
+          document.getElementById('modalTitle').textContent = "Modifica Lezione";
 const admin = isAdmin();
 // Tasti eliminazione
 document.getElementById('btnDeleteEvent').style.display = admin ? 'none' : 'inline-flex';
 document.getElementById('btnDeleteEventGlobal').style.display = admin ? 'inline-flex' : 'none';
-document.getElementById('btnDeleteEventGlobal').textContent = "🗑 Elimina per tutti";
+document.getElementById('btnDeleteEventGlobal').textContent = "🗑 Elimina evento per tutti";
 
 // Tasti salvataggio
 document.querySelector('.btn-save-modal:not(#btnSaveGlobal)').style.display = admin ? 'none' : 'inline-flex';
@@ -3618,13 +3618,19 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                 btnEdit.style.background = '#7e22ce';
             }
 
-            const total = currentProfList.length;
+          const total = currentProfList.length;
 
-            // Mostra i tasti di aggiunta/eliminazione solo se siamo in modalità modifica
+            // Il pulsante "Aggiungi Docente" è visibile SOLO nella schermata iniziale (nascosto in modifica)
             const btnAdd = document.getElementById('btnAddProfDocente');
+            if (btnAdd) {
+                btnAdd.style.display = !isProfEditingMode ? 'inline-flex' : 'none';
+            }
+
+            // Il tasto "Elimina" compare solo in modalità modifica se ci sono 2 o più docenti
             const btnDel = document.getElementById('btnDeleteProfDocente');
-            if (btnAdd) btnAdd.style.display = isProfEditingMode ? 'inline-flex' : 'none';
-            if (btnDel) btnDel.style.display = (isProfEditingMode && total > 1) ? 'inline-flex' : 'none';
+            if (btnDel) {
+                btnDel.style.display = (isProfEditingMode && total > 1) ? 'inline-flex' : 'none';
+            }
 
             document.getElementById('btnProfPrev').disabled = (currentProfPageIndex === 0);
             document.getElementById('btnProfNext').disabled = (currentProfPageIndex === total - 1);
@@ -3698,11 +3704,21 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
 
             profDatabase[currentProfSearchKey].push(nuovoDocente);
             currentProfList = profDatabase[currentProfSearchKey];
-            // Si posiziona automaticamente sulla nuova scheda appena creata
+            
+            // Si posiziona sulla nuova scheda appena creata
             currentProfPageIndex = currentProfList.length - 1;
+            
+            // Attiva automaticamente la modalità modifica per compilare subito i campi
+            isProfEditingMode = true;
             
             salvaProfDatabaseSuCloudCondiviso();
             renderProfPage();
+
+            // Mette subito il focus sul campo del nome
+            setTimeout(() => {
+                const nameInput = document.getElementById('profNameInput');
+                if (nameInput) nameInput.focus();
+            }, 50);
         }
 
         function eliminaDocenteDaModulo() {
