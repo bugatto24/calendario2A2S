@@ -1173,38 +1173,10 @@
     </div>
 
     <script>
-        const defaultProfDatabase = {
-            'NEUROLOGIA II': [
-                { nome: 'Bozzali', genere: 'M', esame: '2 domande (scritte risposta aperta?)', presenze: 'Codice', note: 'Domande d’esame: 1 Semeiologia, 2 Patologia' }
-            ],
-            'NEUROCHIRURGIA': [
-                { nome: 'Cofano', genere: 'M', esame: 'A crocette, chi vuole 30 fa orale', presenze: 'No codice, no firma, no appello', note: '' }
-            ],
-            'FARMACOLOGIA': [
-                { nome: 'della Pepa', genere: 'M', esame: '60 v/f + 1 domanda ORALE', presenze: 'Foglio firme', note: 'Wall of text master' }
-            ],
-            'FISIOTERAPICHE 5': [
-                { nome: 'Moretto', genere: 'F', esame: 'Scritto, due domande risposta aperta', presenze: 'Codice + foglio firme per uscire anticipatamente', note: '' }
-            ],
-            'PATOLOGIA GENERALE LEZ': [
-                { nome: 'Testa', genere: 'M', esame: '16 domande v/f 30 minuti', presenze: 'Fa appello come a 12 anni + codice', note: 'Appunti e slide esaustivi. Legge le slide. Lezioni di 3 ore anziché 4' }
-            ],
-            'GASTROENTEROLOGIA': [
-                { nome: 'Ciancio', genere: 'M', esame: '30 v/f?', presenze: 'Codice', note: 'Evoluzione di quella di biochem. È una grande.' }
-            ],
-            'MALATTIE APPARATO LOCOMOTORE LEZ': [
-                { nome: 'Fusini', genere: 'M', esame: 'Non si sa ancora', presenze: 'No codice, no appello, no firma', note: 'Legge le slide' },
-                { nome: 'Ausidio', genere: 'M', esame: 'Non si sa ancora', presenze: 'No codice, no appello, no firma', note: 'Bomber' }
-            ],
-            'RIABILITATIVA IV': [
-                { nome: 'Tencone', genere: 'M', esame: 'Non si sa ancora', presenze: 'Foglio firme', note: '' }
-            ],
-            'OTORINOLARINGOIATRIA': [
-                { nome: 'Crosetti', genere: 'F', esame: 'Domande a risposta multipla', presenze: 'No codice, no firma, no appello', note: 'Prof diversa dall’anno scorso. Finisce mezz’ora prima, bomber.' }
-            ]
-        };
+        // Database docenti di default (vuoto: i dati vengono letti e sincronizzati esclusivamente da Firebase)
+        const defaultProfDatabase = {};
 
-        let profDatabase = JSON.parse(JSON.stringify(defaultProfDatabase));
+        let profDatabase = {};
 
         try {
             const localeProfs = localStorage.getItem('fisioterapia_prof_database_cache');
@@ -3522,6 +3494,8 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
         let currentProfList = [];
         let currentProfPageIndex = 0;
         let isProfEditingMode = false;
+        let isCreatingNewProf = false;
+        let profDraftData = null;
 
         function initSharedProfSync() {
             if (!db) return;
@@ -3546,12 +3520,14 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
             });
         }
 
-        function apriProfModalPerModulo(searchKey, label) {
+       function apriProfModalPerModulo(searchKey, label) {
             currentProfSearchKey = searchKey;
             currentProfLabel = label;
             currentProfList = getProfListSafe(searchKey);
             currentProfPageIndex = 0;
             isProfEditingMode = false;
+            isCreatingNewProf = false;
+            profDraftData = null;
 
             if (currentProfList.length === 0) {
                 currentProfList = [{
@@ -3568,7 +3544,8 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
         }
 
         function renderProfPage() {
-            const prof = currentProfList[currentProfPageIndex] || { nome: '', genere: 'M', esame: '', presenze: '', note: '' };
+            // Se stiamo creando un nuovo docente, mostriamo la bozza, altrimenti il docente esistente
+            const prof = isCreatingNewProf ? profDraftData : (currentProfList[currentProfPageIndex] || { nome: '', genere: 'M', esame: '', presenze: '', note: '' });
             const icon = prof.genere === 'F' ? '👩‍🏫' : '👨‍🏫';
 
             document.getElementById('profAvatar').textContent = icon;
@@ -3602,7 +3579,7 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                 const btnId = type === 'down' ? 'btnRateDown' : type === 'neutral' ? 'btnRateNeutral' : 'btnRateUp';
                 const btnElem = document.getElementById(btnId);
                 if (btnElem) {
-                    if (currentRating === type) {
+                    if (currentRating === type && !isCreatingNewProf) {
                         btnElem.classList.add('active-rating');
                     } else {
                         btnElem.classList.remove('active-rating');
@@ -3610,7 +3587,7 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                 }
             });
 
-           if (isProfEditingMode) {
+            if (isProfEditingMode) {
                 btnEdit.textContent = '💾 Fatto';
                 btnEdit.style.background = '#10b981';
             } else {
@@ -3618,7 +3595,7 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                 btnEdit.style.background = '#7e22ce';
             }
 
-          const total = currentProfList.length;
+            const total = currentProfList.length;
 
             // Il pulsante "Aggiungi Docente" è visibile SOLO nella schermata iniziale (nascosto in modifica)
             const btnAdd = document.getElementById('btnAddProfDocente');
@@ -3626,18 +3603,24 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                 btnAdd.style.display = !isProfEditingMode ? 'inline-flex' : 'none';
             }
 
-            // Il tasto "Elimina" compare solo in modalità modifica se ci sono 2 o più docenti
+            // Il tasto "Elimina" compare solo in modalità modifica se NON stiamo creando una bozza e ci sono 2 o più docenti
             const btnDel = document.getElementById('btnDeleteProfDocente');
             if (btnDel) {
-                btnDel.style.display = (isProfEditingMode && total > 1) ? 'inline-flex' : 'none';
+                btnDel.style.display = (isProfEditingMode && !isCreatingNewProf && total > 1) ? 'inline-flex' : 'none';
             }
 
-            document.getElementById('btnProfPrev').disabled = (currentProfPageIndex === 0);
-            document.getElementById('btnProfNext').disabled = (currentProfPageIndex === total - 1);
-            
-            document.getElementById('btnProfPrev').style.display = total > 1 ? 'flex' : 'none';
-            document.getElementById('btnProfNext').style.display = total > 1 ? 'flex' : 'none';
-            document.getElementById('profPageIndicator').textContent = total > 1 ? `Prof ${currentProfPageIndex + 1} di ${total}` : '';
+            // Frecce e indicatore pagina: disabilitate/nascoste se stiamo inserendo una nuova bozza
+            if (isCreatingNewProf) {
+                document.getElementById('btnProfPrev').style.display = 'none';
+                document.getElementById('btnProfNext').style.display = 'none';
+                document.getElementById('profPageIndicator').textContent = 'Nuovo Docente (in compilazione)';
+            } else {
+                document.getElementById('btnProfPrev').disabled = (currentProfPageIndex === 0);
+                document.getElementById('btnProfNext').disabled = (currentProfPageIndex === total - 1);
+                document.getElementById('btnProfPrev').style.display = total > 1 ? 'flex' : 'none';
+                document.getElementById('btnProfNext').style.display = total > 1 ? 'flex' : 'none';
+                document.getElementById('profPageIndicator').textContent = total > 1 ? `Prof ${currentProfPageIndex + 1} di ${total}` : '';
+            }
         }
 
         function votaProfPersonale(valore) {
@@ -3664,13 +3647,52 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
             salvaSuCloudSilenzioso(); // Scrive ESCLUSIVAMENTE nel percorso Firebase 'utenti/' + currentUser
         }
 
-        function toggleModificaProf() {
-            isProfEditingMode = !isProfEditingMode;
+      function toggleModificaProf() {
+            if (isProfEditingMode) {
+                // L'utente ha cliccato su "💾 Fatto"
+                if (isCreatingNewProf && profDraftData) {
+                    // Controlla se è stato inserito almeno un campo
+                    const hasData = (profDraftData.nome || '').trim() || 
+                                    (profDraftData.esame || '').trim() || 
+                                    (profDraftData.presenze || '').trim() || 
+                                    (profDraftData.note || '').trim();
+
+                    if (!hasData) {
+                        alert("⚠️ Inserisci almeno il nome del docente prima di salvare.");
+                        return;
+                    }
+
+                    if (!profDatabase[currentProfSearchKey]) {
+                        profDatabase[currentProfSearchKey] = [];
+                    }
+
+                    // Aggiunge effettivamente il nuovo docente al database solo ora
+                    profDatabase[currentProfSearchKey].push(profDraftData);
+                    currentProfList = profDatabase[currentProfSearchKey];
+                    currentProfPageIndex = currentProfList.length - 1;
+
+                    isCreatingNewProf = false;
+                    profDraftData = null;
+                    salvaProfDatabaseSuCloudCondiviso();
+                }
+                isProfEditingMode = false;
+            } else {
+                // Entra in modalità modifica
+                isProfEditingMode = true;
+            }
             renderProfPage();
         }
 
         function aggiornaDatiProfCorrente(campo, valore) {
             if (!currentProfSearchKey) return;
+
+            // Se stiamo creando un nuovo docente, aggiorniamo solo la bozza temporanea (non il DB!)
+            if (isCreatingNewProf && profDraftData) {
+                profDraftData[campo] = valore.trim();
+                return;
+            }
+
+            // Altrimenti aggiorniamo il docente esistente e salviamo
             if (!profDatabase[currentProfSearchKey]) {
                 profDatabase[currentProfSearchKey] = [];
             }
@@ -3690,11 +3712,10 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
 
         function aggiungiDocenteAModulo() {
             if (!currentProfSearchKey) return;
-            if (!profDatabase[currentProfSearchKey]) {
-                profDatabase[currentProfSearchKey] = [];
-            }
 
-            const nuovoDocente = {
+            // Inizializza la bozza temporanea SENZA toccare il database o Firebase
+            isCreatingNewProf = true;
+            profDraftData = {
                 nome: '',
                 genere: 'M',
                 esame: '',
@@ -3702,16 +3723,7 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                 note: ''
             };
 
-            profDatabase[currentProfSearchKey].push(nuovoDocente);
-            currentProfList = profDatabase[currentProfSearchKey];
-            
-            // Si posiziona sulla nuova scheda appena creata
-            currentProfPageIndex = currentProfList.length - 1;
-            
-            // Attiva automaticamente la modalità modifica per compilare subito i campi
             isProfEditingMode = true;
-            
-            salvaProfDatabaseSuCloudCondiviso();
             renderProfPage();
 
             // Mette subito il focus sul campo del nome
@@ -3719,6 +3731,14 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                 const nameInput = document.getElementById('profNameInput');
                 if (nameInput) nameInput.focus();
             }, 50);
+        }
+
+        function chiudiModalProf() {
+            // Se l'utente chiude mentre stava creando un nuovo docente, la bozza viene annullata e non salvata!
+            isCreatingNewProf = false;
+            profDraftData = null;
+            isProfEditingMode = false;
+            document.getElementById('profModal').classList.remove('active');
         }
 
         function eliminaDocenteDaModulo() {
@@ -3771,10 +3791,7 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
             }
         }
 
-        function chiudiModalProf() {
-            isProfEditingMode = false;
-            document.getElementById('profModal').classList.remove('active');
-        }
+        
 
         function gestisciClickOverlayProf(e) {
             if (e.target === document.getElementById('profModal')) chiudiModalProf();
