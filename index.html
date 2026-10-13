@@ -1114,9 +1114,15 @@
                 <div class="prof-page-indicator" id="profPageIndicator">1 di 1</div>
             </div>
 
-            <div class="modal-footer" style="justify-content: flex-end; gap: 8px;">
-                <button type="button" class="btn" id="btnToggleEditProf" style="background:#7e22ce; color:white; font-weight:600;" onclick="toggleModificaProf()">✏️ Modifica</button>
-                <button type="button" class="btn-cancel-modal" onclick="chiudiModalProf()">Chiudi</button>
+            <div class="modal-footer" style="justify-content: space-between; align-items: center; gap: 8px;">
+                <div style="display: flex; gap: 6px;">
+                    <button type="button" class="btn" id="btnAddProfDocente" style="display:none; background:#0284c7; color:white; font-weight:600;" onclick="aggiungiDocenteAModulo()">➕ Aggiungi Docente</button>
+                    <button type="button" class="btn-delete" id="btnDeleteProfDocente" style="display:none; padding: 7px 12px; font-size: 12px;" onclick="eliminaDocenteDaModulo()">🗑 Elimina</button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn" id="btnToggleEditProf" style="background:#7e22ce; color:white; font-weight:600;" onclick="toggleModificaProf()">✏️ Modifica</button>
+                    <button type="button" class="btn-cancel-modal" onclick="chiudiModalProf()">Chiudi</button>
+                </div>
             </div>
         </div>
     </div>
@@ -3604,7 +3610,7 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                 }
             });
 
-            if (isProfEditingMode) {
+           if (isProfEditingMode) {
                 btnEdit.textContent = '💾 Fatto';
                 btnEdit.style.background = '#10b981';
             } else {
@@ -3613,6 +3619,13 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
             }
 
             const total = currentProfList.length;
+
+            // Mostra i tasti di aggiunta/eliminazione solo se siamo in modalità modifica
+            const btnAdd = document.getElementById('btnAddProfDocente');
+            const btnDel = document.getElementById('btnDeleteProfDocente');
+            if (btnAdd) btnAdd.style.display = isProfEditingMode ? 'inline-flex' : 'none';
+            if (btnDel) btnDel.style.display = (isProfEditingMode && total > 1) ? 'inline-flex' : 'none';
+
             document.getElementById('btnProfPrev').disabled = (currentProfPageIndex === 0);
             document.getElementById('btnProfNext').disabled = (currentProfPageIndex === total - 1);
             
@@ -3667,6 +3680,47 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
             if (!currentProfSearchKey) return;
             aggiornaDatiProfCorrente('genere', valoreGenere);
             document.getElementById('profAvatar').textContent = valoreGenere === 'F' ? '👩‍🏫' : '👨‍🏫';
+        }
+
+        function aggiungiDocenteAModulo() {
+            if (!currentProfSearchKey) return;
+            if (!profDatabase[currentProfSearchKey]) {
+                profDatabase[currentProfSearchKey] = [];
+            }
+
+            const nuovoDocente = {
+                nome: '',
+                genere: 'M',
+                esame: '',
+                presenze: '',
+                note: ''
+            };
+
+            profDatabase[currentProfSearchKey].push(nuovoDocente);
+            currentProfList = profDatabase[currentProfSearchKey];
+            // Si posiziona automaticamente sulla nuova scheda appena creata
+            currentProfPageIndex = currentProfList.length - 1;
+            
+            salvaProfDatabaseSuCloudCondiviso();
+            renderProfPage();
+        }
+
+        function eliminaDocenteDaModulo() {
+            if (!currentProfSearchKey || !profDatabase[currentProfSearchKey]) return;
+            if (profDatabase[currentProfSearchKey].length <= 1) {
+                alert("Non puoi eliminare l'unico docente presente.");
+                return;
+            }
+            if (!confirm("Sei sicuro di voler eliminare la scheda di questo docente?")) return;
+
+            profDatabase[currentProfSearchKey].splice(currentProfPageIndex, 1);
+            currentProfList = profDatabase[currentProfSearchKey];
+            if (currentProfPageIndex >= currentProfList.length) {
+                currentProfPageIndex = currentProfList.length - 1;
+            }
+
+            salvaProfDatabaseSuCloudCondiviso();
+            renderProfPage();
         }
 
         function salvaProfDatabaseSuCloudCondiviso() {
