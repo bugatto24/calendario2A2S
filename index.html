@@ -905,7 +905,21 @@
                 opacity: 0.85;
             }
 
-          
+            .modal {
+                padding: 16px;
+                max-width: 100%;
+                width: 100%;
+                margin: 0 4px;
+            }
+            .form-row {
+                gap: 8px;
+            }
+            input[type="time"] {
+                font-size: 15px;
+                padding: 8px 6px;
+                width: 100%;
+                min-width: 0;
+            }
         }
     </style>
 </head>
@@ -1076,14 +1090,14 @@
 
             <div class="form-group" id="groupLuogo"><label for="editLuogo">Aula / Sede</label><input type="text" id="editLuogo" placeholder="Es. Aula Magna"></div>
             
-            <div class="form-row">
+           <div class="form-row">
                 <div class="form-group" style="flex:1">
                     <label for="editOraInizio">Ora Inizio</label>
-                    <select id="editOraInizio"></select>
+                    <input type="time" id="editOraInizio" step="900" onclick="if(this.showPicker) this.showPicker()">
                 </div>
                 <div class="form-group" style="flex:1">
                     <label for="editOraFine">Ora Fine</label>
-                    <select id="editOraFine"></select>
+                    <input type="time" id="editOraFine" step="900" onclick="if(this.showPicker) this.showPicker()">
                 </div>
             </div>
 
@@ -3337,7 +3351,6 @@ document.getElementById('btnSaveGlobal').style.display = admin ? 'inline-flex' :
 document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti";
 
             popolaSelectSettimaneModale(weekIdx);
-            popolaSelectOrari(formattaOra(oraInizio), formattaOra(oraFine));
             document.getElementById('editGiorno').value = giorno;
             document.getElementById('editInsegnamento').value = 'PATOLOGIA GENERALE';
             document.getElementById('editRicorrenza').value = 'nessuna';
@@ -3346,6 +3359,8 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
             document.getElementById('editTitoloLibero').value = '';
             document.getElementById('editDocente').value = '';
             document.getElementById('editLuogo').value = '';
+            document.getElementById('editOraInizio').value = formattaOra(oraInizio);
+            document.getElementById('editOraFine').value = formattaOra(oraFine);
 
             impostaStato('normale');
             document.getElementById('editModal').classList.add('active');
@@ -3398,13 +3413,14 @@ document.getElementById('btnSaveGlobal').style.display = admin ? 'inline-flex' :
 document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti";
 
             popolaSelectSettimaneModale(weekIdx);
-            popolaSelectOrari(formattaOra(ev.oraInizio), formattaOra(ev.oraFine));
             document.getElementById('editGiorno').value = giorno;
             document.getElementById('editRicorrenza').value = ev.ricorrenza || 'nessuna';
             document.getElementById('groupRicorrenza').style.display = 'block';
             compilaCampiTitolo(ev.titolo, ev);
             document.getElementById('editDocente').value = ev.docente || '';
             document.getElementById('editLuogo').value = ev.luogo || '';
+            document.getElementById('editOraInizio').value = formattaOra(ev.oraInizio);
+            document.getElementById('editOraFine').value = formattaOra(ev.oraFine);
 
             if (ev.categoria === 'PERSONALE' || (ev.titolo || '').startsWith('PERSONALE - ')) {
                 impostaStato(ev.tipo || 'nessuno');
