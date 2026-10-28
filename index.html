@@ -588,6 +588,39 @@
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #7e22ce; outline: none; }
         .form-row { display: flex; gap: 10px; }
 
+        /* Rimozione icona digitazione manuale orario nativo per evitare overflow su mobile */
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            display: none;
+            -webkit-appearance: none;
+        }
+        input[type="time"] {
+            min-width: 0;
+            width: 100%;
+        }
+
+        /* Selettore colore per eventi personali */
+        .color-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .color-picker-row input[type="color"] {
+            -webkit-appearance: none;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            width: 44px;
+            height: 38px;
+            padding: 2px;
+            cursor: pointer;
+            background: #ffffff;
+        }
+        .color-picker-row input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .color-picker-row input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 6px;
+        }
         .modal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #f1f5f9; }
         .modal-footer-right { display: flex; align-items: center; gap: 8px; }
         .btn-delete { background: #fee2e2; color: #dc2626; border: none; padding: 9px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; }
@@ -1011,7 +1044,16 @@
                     <option value="NEUROLESIONI">NEUROLESIONI</option>
                     <option value="MALATTIE APPARATO LOCOMOTORE">MALATTIE APPARATO LOCOMOTORE</option>
                     <option value="ALTRO">ALTRO / NON CATALOGATO (Nessun conteggio)</option>
+                    <option value="PERSONALE">PERSONALE (Colore personalizzato)</option>
                 </select>
+            </div>
+
+            <div class="form-group" id="groupColorePersonale" style="display:none;">
+                <label for="editColoreEvento">Colore Evento Personale</label>
+                <div class="color-picker-row">
+                    <input type="color" id="editColoreEvento" value="#6366f1">
+                    <span style="font-size: 12px; color: #64748b; font-weight: 500;">Scegli il colore per il calendario</span>
+                </div>
             </div>
 
             <div class="form-group" id="groupModuloSelect">
@@ -1024,7 +1066,7 @@
                 <input type="text" id="editTitoloLibero" placeholder="Es. Tirocinio, Seminario...">
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="groupDocente">
                 <label for="editDocente">Docente</label>
                 <div class="docente-input-row">
                     <input type="text" id="editDocente" placeholder="Es. BOZZALI">
@@ -1032,7 +1074,7 @@
                 </div>
             </div>
 
-            <div class="form-group"><label for="editLuogo">Aula / Sede</label><input type="text" id="editLuogo" placeholder="Es. Aula Magna"></div>
+            <div class="form-group" id="groupLuogo"><label for="editLuogo">Aula / Sede</label><input type="text" id="editLuogo" placeholder="Es. Aula Magna"></div>
             
             <div class="form-row">
                 <div class="form-group" style="flex:1">
@@ -2923,32 +2965,42 @@
                         let classeBordo = getClasseInsegnamento(evento.titolo);
                         let emoji = '';
 
-                        if (convalidato) {
+                        const isPersonale = evento.categoria === 'PERSONALE' || (evento.titolo || '').startsWith('PERSONALE - ');
+                        let stilePersonalizzato = '';
+
+                        if (isPersonale) {
+                            classeStato = '';
+                            classeBordo = '';
+                            emoji = ''; // Nessun emoji per gli eventi personali
+                            const hex = evento.colore || '#6366f1';
+                            stilePersonalizzato = `background-color: ${hex}18; border-color: ${hex}66; border-left-color: ${hex} !important; color: #0f172a;`;
+                        } else if (convalidato) {
                             classeStato = 'evento-convalidato';
                             emoji = '🎓';
-
                         } else if (!appartiene) {
-    classeStato = 'evento-altrogruppo';
-    emoji = '👥';
-} else {
-    // Rileva se è per gruppi
-    const testoGruppo = ((evento.docente || '') + ' ' + (evento.titolo || '')).toUpperCase();
-    const isPerGruppi = testoGruppo.includes('GRUPPO') || testoGruppo.includes('GRUPPI');
+                            classeStato = 'evento-altrogruppo';
+                            emoji = '👥';
+                        } else {
+                            const testoGruppo = ((evento.docente || '') + ' ' + (evento.titolo || '')).toUpperCase();
+                            const isPerGruppi = testoGruppo.includes('GRUPPO') || testoGruppo.includes('GRUPPI');
 
-    if (evento.tipo === 'saltata') {
-        classeStato = 'evento-saltata';
-        emoji = '❌';
-    } else if (evento.tipo === 'badge') {
-        classeStato = 'evento-badge';
-        emoji = '🎖️';
-    } else if (evento.tipo === 'obbligatorio' || isPerGruppi) {
-        classeStato = 'evento-obbligatorio';
-        emoji = evento.tipo === 'obbligatorio' ? '⚠️' : '👥';
-    } else {
-        classeStato = 'evento-normale';
-        emoji = '✅';
-    }
-}
+                            if (evento.tipo === 'saltata') {
+                                classeStato = 'evento-saltata';
+                                emoji = '❌';
+                            } else if (evento.tipo === 'badge') {
+                                classeStato = 'evento-badge';
+                                emoji = '🎖️';
+                            } else if (evento.tipo === 'obbligatorio' || isPerGruppi) {
+                                classeStato = 'evento-obbligatorio';
+                                emoji = evento.tipo === 'obbligatorio' ? '⚠️' : '👥';
+                            } else if (evento.tipo === 'nessuno') {
+                                classeStato = 'evento-normale';
+                                emoji = '';
+                            } else {
+                                classeStato = 'evento-normale';
+                                emoji = '✅';
+                            }
+                        }
 
                         const focusClass = inEvidenza ? 'evento-in-focus' : '';
                         const modRef = estraiModuloSearchKey(evento.titolo);
@@ -2969,7 +3021,7 @@
                         }
 
                         html += `<div class="evento ${classeStato} ${classeBordo} ${focusClass}" 
-                                      style="top: ${top}px; height: ${height}px; width: ${widthCalc}; left: ${leftCalc};" 
+                                      style="top: ${top}px; height: ${height}px; width: ${widthCalc}; left: ${leftCalc}; ${stilePersonalizzato}"
                                       onmousedown="if(${modRef !== null}) startAntiScrollPress(event, ${pressParams})"
                                       onmousemove="checkAntiScrollMove(event)"
                                       onmouseup="cancelAntiScrollPress()"
@@ -3145,14 +3197,33 @@
             const insScelto = document.getElementById('editInsegnamento').value;
             const groupModulo = document.getElementById('groupModuloSelect');
             const groupLibero = document.getElementById('groupTitoloLibero');
+            const groupDocente = document.getElementById('groupDocente');
+            const groupColore = document.getElementById('groupColorePersonale');
             const selectModulo = document.getElementById('editModulo');
+            const quickButtons = document.querySelector('.quick-status-buttons');
 
-            if (insScelto === 'ALTRO') {
+            if (insScelto === 'PERSONALE') {
                 groupModulo.style.display = 'none';
+                groupDocente.style.display = 'none';
                 groupLibero.style.display = 'block';
+                groupColore.style.display = 'block';
+                if (quickButtons) quickButtons.style.opacity = '0.5';
+                document.getElementById('editDocente').value = '';
+                impostaStato('nessuno');
+            } else if (insScelto === 'ALTRO') {
+                groupModulo.style.display = 'none';
+                groupDocente.style.display = 'block';
+                groupLibero.style.display = 'block';
+                groupColore.style.display = 'none';
+                if (quickButtons) quickButtons.style.opacity = '1';
+                if (tipoSelezionato === 'nessuno') impostaStato('normale');
             } else {
                 groupModulo.style.display = 'block';
+                groupDocente.style.display = 'block';
                 groupLibero.style.display = 'none';
+                groupColore.style.display = 'none';
+                if (quickButtons) quickButtons.style.opacity = '1';
+                if (tipoSelezionato === 'nessuno') impostaStato('normale');
                 selectModulo.innerHTML = '';
 
                 const listaModuli = corsiConfig[insScelto] || [];
@@ -3173,7 +3244,7 @@
         function aggiornaIconaDocenteInModale() {
             const insScelto = document.getElementById('editInsegnamento').value;
             const btn = document.getElementById('btnModalProfDetails');
-            if (insScelto === 'ALTRO') {
+            if (insScelto === 'ALTRO' || insScelto === 'PERSONALE') {
                 btn.textContent = '👨‍🏫';
                 return;
             }
@@ -3186,7 +3257,17 @@
             }
         }
 
-        function compilaCampiTitolo(titoloCompleto) {
+        function compilaCampiTitolo(titoloCompleto, ev = null) {
+            if ((ev && ev.categoria === 'PERSONALE') || (titoloCompleto || '').startsWith('PERSONALE - ')) {
+                document.getElementById('editInsegnamento').value = 'PERSONALE';
+                onInsegnamentoChange();
+                const nomePulito = titoloCompleto.replace(/^PERSONALE\s*-\s*/i, '');
+                document.getElementById('editTitoloLibero').value = nomePulito;
+                document.getElementById('editColoreEvento').value = (ev && ev.colore) ? ev.colore : '#6366f1';
+                aggiornaIconaDocenteInModale();
+                return;
+            }
+
             let trovato = false;
             for (const [insNome, moduli] of Object.entries(corsiConfig)) {
                 if (titoloCompleto.includes(insNome)) {
@@ -3303,13 +3384,17 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
 
             popolaSelectSettimaneModale(weekIdx);
             document.getElementById('editGiorno').value = giorno;
-            compilaCampiTitolo(ev.titolo);
+            compilaCampiTitolo(ev.titolo, ev);
             document.getElementById('editDocente').value = ev.docente || '';
             document.getElementById('editLuogo').value = ev.luogo || '';
             document.getElementById('editOraInizio').value = formattaOra(ev.oraInizio);
             document.getElementById('editOraFine').value = formattaOra(ev.oraFine);
 
-            impostaStato(ev.tipo || 'normale');
+            if (ev.categoria === 'PERSONALE' || (ev.titolo || '').startsWith('PERSONALE - ')) {
+                impostaStato(ev.tipo || 'nessuno');
+            } else {
+                impostaStato(ev.tipo || 'normale');
+            }
             document.getElementById('editModal').classList.add('active');
         }
 
@@ -3323,16 +3408,28 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
         }
 
         function impostaStato(tipo) {
-    tipoSelezionato = tipo;
-    ['Normale', 'Obbligatorio', 'Saltata', 'Badge'].forEach(t => {
-        const b = document.getElementById(`btnStato${t}`);
-        if (!b) return;
-        const extraClass = (t === 'Badge') ? ' btn-status-badge' : '';
-        b.className = 'btn-status-quick' + extraClass + (tipo === t.toLowerCase() ? ` active-${tipo}` : '');
-    });
-}
+            const insScelto = document.getElementById('editInsegnamento') ? document.getElementById('editInsegnamento').value : '';
+            
+            // Per gli eventi NON personali, non è consentito deselezionare le emoji
+            if (insScelto !== 'PERSONALE' && tipo === 'nessuno') {
+                tipo = 'normale';
+            }
 
-       
+            // Se è personale e si clicca lo stato già attivo, si deseleziona
+            if (insScelto === 'PERSONALE' && tipoSelezionato === tipo) {
+                tipoSelezionato = 'nessuno';
+            } else {
+                tipoSelezionato = tipo;
+            }
+
+            ['Normale', 'Obbligatorio', 'Saltata', 'Badge'].forEach(t => {
+                const b = document.getElementById(`btnStato${t}`);
+                if (!b) return;
+                const extraClass = (t === 'Badge') ? ' btn-status-badge' : '';
+                b.className = 'btn-status-quick' + extraClass + (tipoSelezionato === t.toLowerCase() ? ` active-${tipoSelezionato}` : '');
+            });
+        }
+
        function salvaModificheEvento(perTutti = false) {
             if (!eventoSelezionatoRef) return;
             const { weekIdx: vecchiaWeekIdx, giorno: vecchioGiorno, eventIdx, isNew } = eventoSelezionatoRef;
@@ -3340,11 +3437,24 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
             const nuovaWeekIdx = parseInt(document.getElementById('editSettimana').value, 10);
             const nuovoGiorno = document.getElementById('editGiorno').value;
             const insScelto = document.getElementById('editInsegnamento').value;
-            let titoloFinale = (insScelto === 'ALTRO') ? 
-                (document.getElementById('editTitoloLibero').value.trim() || 'Attività Extra') : 
-                document.getElementById('editModulo').value;
 
-            const docente = document.getElementById('editDocente').value.trim();
+            let titoloFinale = '';
+            let docente = '';
+            let colore = null;
+            let categoria = insScelto;
+
+            if (insScelto === 'PERSONALE') {
+                titoloFinale = 'PERSONALE - ' + (document.getElementById('editTitoloLibero').value.trim() || 'Impegno Personale');
+                docente = ''; // No docente
+                colore = document.getElementById('editColoreEvento').value || '#6366f1';
+            } else if (insScelto === 'ALTRO') {
+                titoloFinale = document.getElementById('editTitoloLibero').value.trim() || 'Attività Extra';
+                docente = document.getElementById('editDocente').value.trim();
+            } else {
+                titoloFinale = document.getElementById('editModulo').value;
+                docente = document.getElementById('editDocente').value.trim();
+            }
+
             const luogo = document.getElementById('editLuogo').value.trim();
             const oraInizio = timeStringToDecimal(document.getElementById('editOraInizio').value);
             const oraFine = timeStringToDecimal(document.getElementById('editOraFine').value);
@@ -3360,7 +3470,9 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                 luogo,
                 oraInizio,
                 oraFine,
-                tipo: tipoSelezionato
+                tipo: tipoSelezionato,
+                categoria,
+                ...(colore ? { colore } : {})
             };
 
             function applicaASettimane(targetSettimane) {
