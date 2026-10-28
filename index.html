@@ -588,14 +588,14 @@
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #7e22ce; outline: none; }
         .form-row { display: flex; gap: 10px; }
 
-        /* Rimozione icona digitazione manuale orario nativo per evitare overflow su mobile */
-        input[type="time"]::-webkit-calendar-picker-indicator {
-            display: none;
-            -webkit-appearance: none;
-        }
+        /* Ottimizzazione contenitore orario per garantire visibilità su mobile */
         input[type="time"] {
             min-width: 0;
             width: 100%;
+            font-size: 14px;
+            padding: 8px 10px;
+            background: #ffffff;
+            cursor: pointer;
         }
 
         /* Selettore colore per eventi personali */
@@ -905,18 +905,23 @@
                 opacity: 0.85;
             }
 
+            .modal-overlay {
+                padding: 8px;
+            }
             .modal {
-                padding: 16px;
+                padding: 16px 14px;
                 max-width: 100%;
                 width: 100%;
-                margin: 0 4px;
+                max-height: 92vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             }
             .form-row {
                 gap: 8px;
             }
             input[type="time"] {
-                font-size: 15px;
-                padding: 8px 6px;
+                font-size: 14px;
+                padding: 8px 8px;
                 width: 100%;
                 min-width: 0;
             }
