@@ -1079,12 +1079,21 @@
             <div class="form-row">
                 <div class="form-group" style="flex:1">
                     <label for="editOraInizio">Ora Inizio</label>
-                    <input type="time" id="editOraInizio">
+                    <select id="editOraInizio"></select>
                 </div>
                 <div class="form-group" style="flex:1">
                     <label for="editOraFine">Ora Fine</label>
-                    <input type="time" id="editOraFine">
+                    <select id="editOraFine"></select>
                 </div>
+            </div>
+
+            <div class="form-group" id="groupRicorrenza">
+                <label for="editRicorrenza">Ricorrenza</label>
+                <select id="editRicorrenza">
+                    <option value="nessuna">Nessuna (solo questa settimana)</option>
+                    <option value="settimanale">Ogni settimana</option>
+                    <option value="mensile">Ogni mese (ogni 4 settimane)</option>
+                </select>
             </div>
             
             <div class="modal-footer">
@@ -3020,6 +3029,11 @@
                             }
                         }
 
+                        let titoloVisualizzato = evento.titolo || '';
+                        if (isPersonale) {
+                            titoloVisualizzato = titoloVisualizzato.replace(/^PERSONALE\s*-\s*/i, '');
+                        }
+
                         html += `<div class="evento ${classeStato} ${classeBordo} ${focusClass}" 
                                       style="top: ${top}px; height: ${height}px; width: ${widthCalc}; left: ${leftCalc}; ${stilePersonalizzato}"
                                       onmousedown="if(${modRef !== null}) startAntiScrollPress(event, ${pressParams})"
@@ -3030,7 +3044,7 @@
                                       ontouchmove="checkAntiScrollMove(event)"
                                       ontouchend="cancelAntiScrollPress()"
                                       onclick="apriModale(event, ${settimanaCorrente}, '${giorno}', ${eventIdx})">`;
-                        html += `<div class="evento-title">${emoji} ${evento.titolo}</div>`;
+                        html += `<div class="evento-title">${emoji ? emoji + ' ' : ''}${titoloVisualizzato}</div>`;
                         html += `<div class="evento-time">${formattaOra(evento.oraInizio)} - ${formattaOra(evento.oraFine)}</div>`;
                         
                         // 1. Riga desktop: docente completo + luogo (es. "M. BOZZALI • Aula 2.7 Marenco")
@@ -3323,14 +3337,15 @@ document.getElementById('btnSaveGlobal').style.display = admin ? 'inline-flex' :
 document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti";
 
             popolaSelectSettimaneModale(weekIdx);
+            popolaSelectOrari(formattaOra(oraInizio), formattaOra(oraFine));
             document.getElementById('editGiorno').value = giorno;
             document.getElementById('editInsegnamento').value = 'PATOLOGIA GENERALE';
+            document.getElementById('editRicorrenza').value = 'nessuna';
+            document.getElementById('groupRicorrenza').style.display = 'block';
             onInsegnamentoChange();
             document.getElementById('editTitoloLibero').value = '';
             document.getElementById('editDocente').value = '';
             document.getElementById('editLuogo').value = '';
-            document.getElementById('editOraInizio').value = formattaOra(oraInizio);
-            document.getElementById('editOraFine').value = formattaOra(oraFine);
 
             impostaStato('normale');
             document.getElementById('editModal').classList.add('active');
@@ -3383,12 +3398,13 @@ document.getElementById('btnSaveGlobal').style.display = admin ? 'inline-flex' :
 document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti";
 
             popolaSelectSettimaneModale(weekIdx);
+            popolaSelectOrari(formattaOra(ev.oraInizio), formattaOra(ev.oraFine));
             document.getElementById('editGiorno').value = giorno;
+            document.getElementById('editRicorrenza').value = ev.ricorrenza || 'nessuna';
+            document.getElementById('groupRicorrenza').style.display = 'block';
             compilaCampiTitolo(ev.titolo, ev);
             document.getElementById('editDocente').value = ev.docente || '';
             document.getElementById('editLuogo').value = ev.luogo || '';
-            document.getElementById('editOraInizio').value = formattaOra(ev.oraInizio);
-            document.getElementById('editOraFine').value = formattaOra(ev.oraFine);
 
             if (ev.categoria === 'PERSONALE' || (ev.titolo || '').startsWith('PERSONALE - ')) {
                 impostaStato(ev.tipo || 'nessuno');
@@ -3430,13 +3446,32 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
             });
         }
 
-       function salvaModificheEvento(perTutti = false) {
+       function popolaSelectOrari(valInizio, valFine) {
+            const selInizio = document.getElementById('editOraInizio');
+            const selFine = document.getElementById('editOraFine');
+            if (!selInizio || !selFine) return;
+
+            selInizio.innerHTML = '';
+            selFine.innerHTML = '';
+
+            for (let ora = 8; ora <= 20; ora += 0.5) {
+                const f = formattaOra(ora);
+                selInizio.appendChild(new Option(f, f));
+                selFine.appendChild(new Option(f, f));
+            }
+
+            if (valInizio) selInizio.value = valInizio;
+            if (valFine) selFine.value = valFine;
+        }
+
+        function salvaModificheEvento(perTutti = false) {
             if (!eventoSelezionatoRef) return;
             const { weekIdx: vecchiaWeekIdx, giorno: vecchioGiorno, eventIdx, isNew } = eventoSelezionatoRef;
             
             const nuovaWeekIdx = parseInt(document.getElementById('editSettimana').value, 10);
             const nuovoGiorno = document.getElementById('editGiorno').value;
             const insScelto = document.getElementById('editInsegnamento').value;
+            const ricorrenza = document.getElementById('editRicorrenza').value;
 
             let titoloFinale = '';
             let docente = '';
@@ -3445,7 +3480,7 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
 
             if (insScelto === 'PERSONALE') {
                 titoloFinale = 'PERSONALE - ' + (document.getElementById('editTitoloLibero').value.trim() || 'Impegno Personale');
-                docente = ''; // No docente
+                docente = '';
                 colore = document.getElementById('editColoreEvento').value || '#6366f1';
             } else if (insScelto === 'ALTRO') {
                 titoloFinale = document.getElementById('editTitoloLibero').value.trim() || 'Attività Extra';
@@ -3472,37 +3507,39 @@ document.getElementById('btnSaveGlobal').textContent = "🌐 Conferma per tutti"
                 oraFine,
                 tipo: tipoSelezionato,
                 categoria,
+                ricorrenza,
                 ...(colore ? { colore } : {})
             };
 
             function applicaASettimane(targetSettimane) {
-                if (!targetSettimane[nuovaWeekIdx]) return;
-                if (!targetSettimane[nuovaWeekIdx].eventi) targetSettimane[nuovaWeekIdx].eventi = {};
-                if (!targetSettimane[nuovaWeekIdx].eventi[nuovoGiorno]) targetSettimane[nuovaWeekIdx].eventi[nuovoGiorno] = [];
+                // Rimuove la versione precedente se modificato e non nuovo
+                if (!isNew && targetSettimane[vecchiaWeekIdx]?.eventi?.[vecchioGiorno]) {
+                    targetSettimane[vecchiaWeekIdx].eventi[vecchioGiorno].splice(eventIdx, 1);
+                }
 
-                if (isNew) {
-                    targetSettimane[nuovaWeekIdx].eventi[nuovoGiorno].push(datiEvento);
+                // Determina le settimane di destinazione in base alla ricorrenza
+                const step = ricorrenza === 'settimanale' ? 1 : (ricorrenza === 'mensile' ? 4 : 0);
+                const settimaneTarget = [];
+
+                if (step === 0) {
+                    settimaneTarget.push(nuovaWeekIdx);
                 } else {
-                    const stessaSettimana = (vecchiaWeekIdx === nuovaWeekIdx);
-                    const stessoGiorno = (vecchioGiorno === nuovoGiorno);
-
-                    if (stessaSettimana && stessoGiorno) {
-                        targetSettimane[vecchiaWeekIdx].eventi[vecchioGiorno][eventIdx] = datiEvento;
-                    } else {
-                        if (targetSettimane[vecchiaWeekIdx] && 
-                            targetSettimane[vecchiaWeekIdx].eventi && 
-                            targetSettimane[vecchiaWeekIdx].eventi[vecchioGiorno]) {
-                            targetSettimane[vecchiaWeekIdx].eventi[vecchioGiorno].splice(eventIdx, 1);
-                        }
-                        targetSettimane[nuovaWeekIdx].eventi[nuovoGiorno].push(datiEvento);
+                    for (let w = nuovaWeekIdx; w < targetSettimane.length; w += step) {
+                        settimaneTarget.push(w);
                     }
                 }
+
+                settimaneTarget.forEach(w => {
+                    if (!targetSettimane[w]) return;
+                    if (!targetSettimane[w].eventi) targetSettimane[w].eventi = {};
+                    if (!targetSettimane[w].eventi[nuovoGiorno]) targetSettimane[w].eventi[nuovoGiorno] = [];
+                    targetSettimane[w].eventi[nuovoGiorno].push({ ...datiEvento });
+                });
             }
 
             // 1. Applica al calendario corrente locale
             applicaASettimane(settimane);
 
-            // Se l'evento è stato spostato di settimana, aggiorna la vista
             if (nuovaWeekIdx !== settimanaCorrente) {
                 settimanaCorrente = nuovaWeekIdx;
             }
