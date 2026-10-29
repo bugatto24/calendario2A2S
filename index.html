@@ -183,7 +183,7 @@
             font-weight: 600;
         }
 
-        /* Legenda */
+       /* Legenda */
         .legend-bar {
             background: #f8fafc;
             padding: 10px 20px;
@@ -199,6 +199,31 @@
             font-weight: 500;
         }
         .legend-group { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .legend-filter-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            user-select: none;
+            background: #ffffff;
+            padding: 2px 7px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.15s ease-in-out;
+        }
+        .legend-filter-label:hover {
+            border-color: #7e22ce;
+            color: #7e22ce;
+        }
+        .legend-filter-label input[type="checkbox"] {
+            cursor: pointer;
+            accent-color: #7e22ce;
+            width: 13px;
+            height: 13px;
+        }
         .legend-divider { width: 1px; height: 16px; background: #cbd5e1; }
         .legend-item { display: flex; align-items: center; gap: 6px; }
         .legend-box { width: 14px; height: 14px; border-radius: 4px; }
@@ -989,6 +1014,17 @@
         <div class="legend-bar">
             <div class="legend-content">
                 <div class="legend-group">
+                    <label class="legend-filter-label" title="Nasconde le lezioni didattiche e visualizza solo i tuoi impegni personali">
+                        <input type="checkbox" id="chkSoloPersonali" onchange="toggleFiltroEventi('personali')">
+                        <span>Solo personali</span>
+                    </label>
+                    <label class="legend-filter-label" title="Nasconde gli eventi personali e visualizza solo le lezioni didattiche">
+                        <input type="checkbox" id="chkSoloDidattici" onchange="toggleFiltroEventi('didattici')">
+                        <span>Solo didattici</span>
+                    </label>
+                </div>
+                <div class="legend-divider"></div>
+                <div class="legend-group">
                     <div class="legend-item"><div class="legend-box legend-verde"></div><span>✅ Segui</span></div>
                     <div class="legend-item"><div class="legend-box legend-giallo"></div><span>⚠️ Obbligatoria</span></div>
                     <div class="legend-item"><div class="legend-box legend-grigio"></div><span>❌ Salta</span></div>
@@ -1302,6 +1338,28 @@
         let moduliConvalidati = [];
         let moduloInEvidenza = null;
         let ratingDocenti = {}; // Valutazioni personali dell'utente: { searchKey: 'up' | 'neutral' | 'down' }
+        let filtroEventiVisibili = 'tutti'; // 'tutti' | 'personali' | 'didattici'
+
+        function toggleFiltroEventi(tipo) {
+            const chkPers = document.getElementById('chkSoloPersonali');
+            const chkDidat = document.getElementById('chkSoloDidattici');
+            if (tipo === 'personali') {
+                if (chkPers && chkPers.checked) {
+                    filtroEventiVisibili = 'personali';
+                    if (chkDidat) chkDidat.checked = false;
+                } else {
+                    filtroEventiVisibili = 'tutti';
+                }
+            } else if (tipo === 'didattici') {
+                if (chkDidat && chkDidat.checked) {
+                    filtroEventiVisibili = 'didattici';
+                    if (chkPers) chkPers.checked = false;
+                } else {
+                    filtroEventiVisibili = 'tutti';
+                }
+            }
+            renderCalendario();
+        }
 
         // Lista degli utenti abilitati come admin
         const adminUsers = ['admin', 'paolom'];
@@ -2974,7 +3032,13 @@
                         html += `<div class="current-time-line" style="top: ${lineTop}px;" title="Ora attuale"></div>`;
                     }
 
-                    const eventiGiorno = (settimana.eventi && settimana.eventi[giorno]) ? settimana.eventi[giorno] : [];
+                    const eventiGiornoGrezzi = (settimana.eventi && settimana.eventi[giorno]) ? settimana.eventi[giorno] : [];
+                    const eventiGiorno = eventiGiornoGrezzi.filter(ev => {
+                        const isPers = ev.categoria === 'PERSONALE' || (ev.titolo || '').startsWith('PERSONALE - ');
+                        if (filtroEventiVisibili === 'personali') return isPers;
+                        if (filtroEventiVisibili === 'didattici') return !isPers;
+                        return true;
+                    });
                     const eventiLayout = calcolaLayoutEventi(eventiGiorno);
 
                     eventiLayout.forEach(({ evento, eventIdx, colIndex, totalCols }) => {
