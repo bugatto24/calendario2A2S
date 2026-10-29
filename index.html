@@ -2801,9 +2801,13 @@
         function calcolaLayoutEventi(eventiGiorno) {
             if (!eventiGiorno || eventiGiorno.length === 0) return [];
 
-            const items = eventiGiorno.map((ev, originalIndex) => ({
-                ev, originalIndex, start: ev.oraInizio, end: ev.oraFine
-            }));
+            const items = eventiGiorno.map((item, idx) => {
+                const ev = item.evento || item;
+                const originalIndex = item.originalIndex !== undefined ? item.originalIndex : idx;
+                return {
+                    ev, originalIndex, start: ev.oraInizio, end: ev.oraFine
+                };
+            });
 
             items.sort((a, b) => (a.start - b.start) || ((b.end - b.start) - (a.end - a.start)));
 
@@ -3033,12 +3037,14 @@
                     }
 
                     const eventiGiornoGrezzi = (settimana.eventi && settimana.eventi[giorno]) ? settimana.eventi[giorno] : [];
-                    const eventiGiorno = eventiGiornoGrezzi.filter(ev => {
-                        const isPers = ev.categoria === 'PERSONALE' || (ev.titolo || '').startsWith('PERSONALE - ');
-                        if (filtroEventiVisibili === 'personali') return isPers;
-                        if (filtroEventiVisibili === 'didattici') return !isPers;
-                        return true;
-                    });
+                    const eventiGiorno = eventiGiornoGrezzi
+                        .map((ev, idx) => ({ evento: ev, originalIndex: idx }))
+                        .filter(({ evento: ev }) => {
+                            const isPers = ev.categoria === 'PERSONALE' || (ev.titolo || '').startsWith('PERSONALE - ');
+                            if (filtroEventiVisibili === 'personali') return isPers;
+                            if (filtroEventiVisibili === 'didattici') return !isPers;
+                            return true;
+                        });
                     const eventiLayout = calcolaLayoutEventi(eventiGiorno);
 
                     eventiLayout.forEach(({ evento, eventIdx, colIndex, totalCols }) => {
