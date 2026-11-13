@@ -488,6 +488,57 @@
         .convalida-label input { cursor: pointer; }
         .badge-convalidato { font-size: 10px; background: #e9d5ff; color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
 
+        
+        /* RIEPILOGO SIMBOLI IN FONDO */
+        .riepilogo-simboli-details {
+            margin-top: 36px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .riepilogo-simboli-summary {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+            cursor: pointer;
+            user-select: none;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .riepilogo-simboli-summary::-webkit-details-marker { display: none; }
+        .riepilogo-simboli-summary::after {
+            content: '▶';
+            font-size: 13px;
+            color: #94a3b8;
+            transition: transform 0.2s;
+        }
+        .riepilogo-simboli-details[open] .riepilogo-simboli-summary::after {
+            transform: rotate(90deg);
+            color: #7e22ce;
+        }
+        .riepilogo-simboli-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .riepilogo-simbolo-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            min-width: 140px;
+        }
+
+
         /* BOTTONE DOCENTE */
         .btn-prof-icon {
             display: inline-flex;
@@ -1058,6 +1109,12 @@
                 💡 <em>Tocca l'icona 👨‍🏫 / 👩‍🏫 per leggere e modificare le info sul docente (le modifiche sono condivise in tempo reale per tutti). Long-press sul modulo per evidenziare le lezioni a calendario.</em>
             </p>
             <div class="insegnamenti-container" id="insegnamentiContainer"></div>
+
+            <!-- Menu a tendina riepilogo simboli (chiuso di default) -->
+            <details class="riepilogo-simboli-details" id="riepilogoSimboliDetails">
+                <summary class="riepilogo-simboli-summary">📋 Riepilogo</summary>
+                <div class="riepilogo-simboli-grid" id="riepilogoSimboliContent"></div>
+            </details>
         </div>
     </div>
 
@@ -3290,9 +3347,60 @@
             }
         }
 
+        function renderRiepilogoSimboli() {
+            const container = document.getElementById('riepilogoSimboliContent');
+            if (!container) return;
+
+            const stats = {
+                segui: { icon: '✅', lezioni: 0, ore: 0 },
+                salta: { icon: '❌', lezioni: 0, ore: 0 },
+                badge: { icon: '🎖️', lezioni: 0, ore: 0 },
+                gruppi: { icon: '👥', lezioni: 0, ore: 0 }
+            };
+
+            settimane.forEach(s => {
+                if (!s || !s.eventi) return;
+                giorni.forEach(g => {
+                    const eventi = s.eventi[g] || [];
+                    eventi.forEach(ev => {
+                        const isPersonale = ev.categoria === 'PERSONALE' || (ev.titolo || '').startsWith('PERSONALE - ');
+                        if (isPersonale) return;
+                        if (isEventoConvalidato(ev.titolo)) return;
+                        if (!appartieneAlGruppo(ev, gruppoSelezionato)) return;
+
+                        const durata = Math.max(0, (ev.oraFine || 0) - (ev.oraInizio || 0));
+                        const testoGruppo = ((ev.docente || '') + ' ' + (ev.titolo || '')).toUpperCase();
+                        const isGruppo = testoGruppo.includes('GRUPPO') || testoGruppo.includes('GRUPPI');
+
+                        if (ev.tipo === 'saltata') {
+                            stats.salta.lezioni++;
+                            stats.salta.ore += durata;
+                        } else if (ev.tipo === 'badge') {
+                            stats.badge.lezioni++;
+                            stats.badge.ore += durata;
+                        } else if (isGruppo) {
+                            stats.gruppi.lezioni++;
+                            stats.gruppi.ore += durata;
+                        } else if (ev.tipo === 'normale' || !ev.tipo) {
+                            stats.segui.lezioni++;
+                            stats.segui.ore += durata;
+                        }
+                    });
+                });
+            });
+
+            const formatOre = (val) => Number.isInteger(val) ? val : val.toFixed(1).replace(/\.0$/, '');
+
+            container.innerHTML = ['segui', 'salta', 'badge', 'gruppi'].map(key => {
+                const item = stats[key];
+                return `<div class="riepilogo-simbolo-item">${item.icon} <span>${item.lezioni} (${formatOre(item.ore)}h)</span></div>`;
+            }).join('');
+        }
+
         function aggiornaInterfaccia(animationDirection = null) {
             renderCalendario(animationDirection);
             renderInsegnamenti();
+            renderRiepilogoSimboli();
             syncInputsToUI();
         }
 
